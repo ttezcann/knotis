@@ -16,6 +16,10 @@ SCRIPTS_DIR = SITE_ROOT / "scripts"
 
 
 class PreviewRenderTests(unittest.TestCase):
+    def setUp(self) -> None:
+        if not (SCRIPTS_DIR / "preview_render.py").is_file():
+            self.skipTest("site preview helper is unavailable in the standalone package")
+
     def _run_preview_helper(self, helper: str) -> subprocess.CompletedProcess[str]:
         env = os.environ.copy()
         root_path = str(SITE_ROOT)

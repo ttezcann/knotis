@@ -5812,6 +5812,8 @@ enabled = true
 
     def test_scripts_build_site_resolves_generated_zensical_config(self) -> None:
         repo_root = Path(__file__).resolve().parents[2]
+        if not (repo_root / "scripts" / "build_site.py").is_file():
+            self.skipTest("legacy site scripts are unavailable in the standalone package")
         script = """
 from pathlib import Path
 import sys

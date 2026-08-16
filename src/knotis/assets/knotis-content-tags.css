@@ -1,0 +1,97 @@
+:root,
+[data-md-color-scheme="default"] {
+  --content-tag-1: #b45309;
+  --content-tag-2: #067647;
+  --content-tag-3: #175cd3;
+  --content-tag-4: #7a5af8;
+  --content-tag-5: #d4448b;
+  --knotis-content-tag-text: var(--content-tag-3);
+  --knotis-content-tag-background: color-mix(in srgb, var(--knotis-content-tag-text) 18%, transparent);
+  --knotis-content-tag-hover-background: color-mix(in srgb, var(--knotis-content-tag-text) 28%, transparent);
+  --knotis-content-tag-mark-text: var(--content-tag-3);
+  --knotis-content-tag-mark-background: color-mix(in srgb, var(--knotis-content-tag-mark-text) 28%, transparent);
+}
+
+[data-md-color-scheme="slate"] {
+  --content-tag-1: #ffbf7d;
+  --content-tag-2: #79d7a7;
+  --content-tag-3: #86bbff;
+  --content-tag-4: #b4a7ff;
+  --content-tag-5: #ff8ec0;
+  --knotis-content-tag-text: var(--content-tag-3);
+  --knotis-content-tag-background: color-mix(in srgb, var(--knotis-content-tag-text) 18%, transparent);
+  --knotis-content-tag-hover-background: color-mix(in srgb, var(--knotis-content-tag-text) 28%, transparent);
+  --knotis-content-tag-mark-text: var(--content-tag-3);
+  --knotis-content-tag-mark-background: color-mix(in srgb, var(--knotis-content-tag-mark-text) 28%, transparent);
+}
+
+.content-tag {
+  color: var(--knotis-content-tag-text, #b54708);
+  background-color: var(--knotis-content-tag-background, color-mix(in srgb, var(--knotis-content-tag-text, #b54708) 18%, transparent));
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0 3px;
+  font-weight: 650;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.content-tag:hover,
+.content-tag:focus-visible {
+  background-color: var(--knotis-content-tag-hover-background, color-mix(in srgb, var(--knotis-content-tag-text, #b54708) 28%, transparent));
+  text-decoration: underline;
+}
+
+.content-tag--inline {
+  color: var(--knotis-content-tag-text, #b54708);
+}
+
+.content-tag-mark {
+  background: var(--knotis-content-tag-mark-background, color-mix(in srgb, var(--knotis-content-tag-mark-text, #93370d) 28%, transparent));
+  color: var(--knotis-content-tag-mark-text, #93370d);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.wikilink-nav-tags__heading {
+  cursor: default;
+}
+
+.wikilink-nav-tags {
+  padding: 0 0 0.45rem;
+}
+
+.wikilink-nav-tags__wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0 0.6rem 0.05rem;
+  margin-top: -0.05rem;
+}
+
+.wikilink-nav-tags__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.35rem;
+  border: 0;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.wikilink-content-tags-page {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.wikilink-content-tags-page__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.55rem;
+  border: 0;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}

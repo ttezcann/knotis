@@ -1,0 +1,44 @@
+:root,
+[data-md-color-scheme="default"] {
+  --knotis-block-highlight-background: color-mix(in srgb, var(--content-tag-3, #175cd3) 42%, transparent);
+  --knotis-block-highlight-mid-background: color-mix(in srgb, var(--content-tag-3, #175cd3) 26%, transparent);
+  --knotis-block-highlight-outline: var(--content-tag-3, #175cd3);
+  --knotis-hyperlink-color: #0197a7;
+  --knotis-accent-color: var(--knotis-wikilink-color, #0197a7);
+  --knotis-accent-fill-color: var(--knotis-accent-color);
+  --knotis-accent-on-color: #fff;
+  --knotis-accent-bg-subtle: color-mix(in srgb, var(--knotis-accent-color) 12%, var(--md-default-bg-color));
+  --knotis-accent-border: color-mix(in srgb, var(--knotis-accent-color) 32%, transparent);
+}
+
+[data-md-color-scheme="slate"] {
+  --knotis-block-highlight-background: color-mix(in srgb, var(--content-tag-3, #86bbff) 42%, transparent);
+  --knotis-block-highlight-mid-background: color-mix(in srgb, var(--content-tag-3, #86bbff) 26%, transparent);
+  --knotis-block-highlight-outline: var(--content-tag-3, #86bbff);
+  --knotis-hyperlink-color: #0197a7;
+  --knotis-accent-color: var(--knotis-wikilink-color, #fda4af);
+  --knotis-accent-fill-color: color-mix(in srgb, var(--knotis-accent-color) 40%, #000);
+  --knotis-accent-on-color: #fff;
+  --knotis-accent-bg-subtle: color-mix(in srgb, var(--knotis-accent-color) 12%, var(--md-default-bg-color));
+  --knotis-accent-border: color-mix(in srgb, var(--knotis-accent-color) 32%, transparent);
+}
+
+
+[data-md-color-scheme="default"][data-md-color-primary],
+[data-md-color-scheme="slate"][data-md-color-primary] {
+  --md-primary-fg-color: var(--knotis-accent-fill-color);
+  --md-primary-fg-color--light: color-mix(in srgb, var(--knotis-accent-fill-color) 72%, var(--knotis-accent-on-color));
+  --md-primary-fg-color--dark: color-mix(in srgb, var(--knotis-accent-fill-color) 82%, #000);
+  --md-primary-bg-color: var(--knotis-accent-on-color);
+  --md-typeset-a-color: var(--knotis-hyperlink-color);
+  --md-accent-fg-color: var(--knotis-accent-color);
+  --md-accent-fg-color--transparent: color-mix(in srgb, var(--knotis-accent-color) 12%, transparent);
+}
+
+.md-typeset .md-button--primary,
+.md-typeset .md-button--primary:focus,
+.md-typeset .md-button--primary:hover {
+  background-color: var(--knotis-accent-fill-color);
+  color: var(--knotis-accent-on-color);
+  opacity: 1;
+}

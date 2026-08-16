@@ -1,0 +1,605 @@
+:root{
+  --knotis-heading-level-1-size: 1.5em;
+  --knotis-heading-level-2-size: 1.25em;
+  --knotis-heading-level-3-size: 1.25em;
+  --knotis-heading-level-4-size: 1em;
+  --knotis-heading-level-5-size: 1em;
+  --knotis-heading-top-level-gap: 1.6em;
+  --knotis-page-title-gap: 3em;
+  --knotis-heading-sibling-gap: 0.25em;
+  --knotis-heading-child-gap: var(--heading-flow-nested-heading-gap);
+  --knotis-heading-direct-child-gap: 0rem;
+  --knotis-heading-content-gap: 0.5rem;
+  --knotis-heading-level-1-content-gap: var(--heading-flow-h2-after-gap);
+  --knotis-heading-content-start-gap: var(--knotis-heading-sibling-gap);
+  --knotis-heading-level-1-indent: 0rem;
+  --knotis-heading-level-2-indent: 1rem;
+  --knotis-heading-level-3-indent: 2rem;
+  --knotis-heading-level-4-indent: 3rem;
+  --knotis-heading-level-5-indent: 4rem;
+  --knotis-heading-rule-color: rgba(0, 0, 0, 0.1);
+  --knotis-heading-rule-width: 2px;
+  --knotis-heading-rule-padding: 0.3rem;
+  --knotis-heading-guide-offset: 0.85rem;
+  --knotis-heading-guide-width: 1px;
+
+  
+  --knotis-card-radius-sm: 6px;
+  --knotis-card-radius-md: 12px;
+  --knotis-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 6px 16px rgba(15, 23, 42, 0.07);
+  --knotis-module-gap: 1.1rem;
+  --knotis-title-size: 1rem;
+  --knotis-title-weight: 750;
+  --knotis-list-bullet-disc: 0.45em;
+  --knotis-list-bullet-line-height: 1.5;
+  --knotis-markerless-block-child-gap: 0.5rem;
+
+  
+  --heading-flow-list-number-width: 1.5em;
+  --heading-flow-list-number-gap: 0.3em;
+  --heading-flow-h2-after-gap: 0.25rem;
+  --heading-flow-nested-heading-gap: 1.25rem;
+  --heading-flow-nested-list-indent: 0.4em;
+  --heading-flow-ul-ol-indent: 0.1em;
+  --heading-flow-ol-level1-indent: -1.3em;
+  --heading-flow-ol-level1-marker-width: var(--heading-flow-list-number-width);
+  --heading-flow-ol-level1-gap: var(--heading-flow-list-number-gap);
+  --heading-flow-ol-level2-indent: -2.3em;
+  --heading-flow-ol-level2-marker-width: 2.95em;
+  --heading-flow-ol-level2-gap: var(--heading-flow-list-number-gap);
+  --heading-flow-ol-level3-indent: -2.05em;
+  --heading-flow-ol-level3-marker-width: 3.45em;
+  --heading-flow-ol-level3-gap: var(--heading-flow-list-number-gap);
+  --heading-flow-ol-level4-indent: -2.15em;
+  --heading-flow-ol-level4-marker-width: 4em;
+  --heading-flow-ol-level4-gap: var(--heading-flow-list-number-gap);
+  --heading-flow-ol-level5-indent: -1.85em;
+  --heading-flow-ol-level5-marker-width: 4.50em;
+  --heading-flow-ol-level5-gap: var(--heading-flow-list-number-gap);
+  --heading-flow-ol-level6-indent: -1.8em;
+  --heading-flow-ol-level6-marker-width: 5.25em;
+  --heading-flow-ol-level6-gap: var(--heading-flow-list-number-gap);
+  --heading-flow-ol-level7-indent: -1.95em;
+  --heading-flow-ol-level7-marker-width: 6.15em;
+  --heading-flow-ol-level7-gap: var(--heading-flow-list-number-gap);
+}
+
+[data-md-color-scheme="slate"]{
+  --knotis-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 22px rgba(0, 0, 0, 0.5);
+}
+
+.md-typeset{
+  --heading-indent-h1: 0rem;
+  --heading-indent-h2: var(--knotis-heading-level-1-indent);
+  --heading-indent-h3: var(--knotis-heading-level-2-indent);
+  --heading-indent-h4: var(--knotis-heading-level-3-indent);
+  --heading-indent-h5: var(--knotis-heading-level-4-indent);
+  --heading-indent-h6: var(--knotis-heading-level-5-indent);
+  --heading-bullet-padding-h1: 0rem;
+  --heading-bullet-padding-h2: 0rem;
+  --heading-bullet-padding-h3: 0rem;
+  --heading-bullet-padding-h4: 0rem;
+  --heading-bullet-padding-h5: 0rem;
+  --heading-bullet-padding-h6: 0rem;
+  counter-reset: h2;
+}  :root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level1-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level1-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level1-gap);
+  list-style-type: none;
+  counter-reset: level1;
+  padding-left: calc(var(--heading-flow-ol-indent) + var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap));
+  margin-left: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level2-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level2-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level2-gap);
+  counter-reset: level2;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level3-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level3-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level3-gap);
+  counter-reset: level3;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level4-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level4-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level4-gap);
+  counter-reset: level4;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level5-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level5-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level5-gap);
+  counter-reset: level5;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level6-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level6-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level6-gap);
+  counter-reset: level6;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level7-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level7-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level7-gap);
+  counter-reset: level7;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol{
+  list-style-type: none;
+  position: relative;
+  left: 0;
+  padding-left: calc(var(--heading-flow-ol-indent) + var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap));
+  margin-left: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol > li::before{
+  position: absolute;
+  left: calc(-1 * (var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap)));
+  margin-left: 0;
+  width: var(--heading-flow-ol-marker-width);
+  text-align: right;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol > li{
+  position: relative;
+  padding-left: 0;
+  counter-increment: level1;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol > li{
+  counter-increment: level2;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol > li{
+  counter-increment: level3;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol > li{
+  counter-increment: level4;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol ol > li{
+  counter-increment: level5;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol ol ol > li{
+  counter-increment: level6;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol ol ol ol > li{
+  counter-increment: level7;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol > li::before{
+  content: counter(level1) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol > li::before{
+  content: counter(level1) "." counter(level2) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) "." counter(level5) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) "." counter(level5) "." counter(level6) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ol ol ol ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) "." counter(level5) "." counter(level6) "." counter(level7) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul ol{
+  counter-reset: level1;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul ol > li{
+  counter-increment: level1;
+  padding-left: calc(0.5em + var(--heading-flow-ul-ol-indent));
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul ol > li::before{
+  content: counter(level1) ". ";
+  width: 1.5em;
+}  :root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul{
+  list-style: disc outside;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: calc(var(--heading-flow-ol-level1-indent) + var(--heading-flow-ol-level1-marker-width) + var(--heading-flow-ol-level1-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul > li::marker{
+  font-size: 1.2em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul ul{
+  padding-left: calc(var(--heading-flow-ol-level2-indent) + var(--heading-flow-ol-level2-marker-width) + var(--heading-flow-ol-level2-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul ul ul{
+  padding-left: calc(var(--heading-flow-ol-level3-indent) + var(--heading-flow-ol-level3-marker-width) + var(--heading-flow-ol-level3-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul ul ul ul{
+  padding-left: calc(var(--heading-flow-ol-level4-indent) + var(--heading-flow-ol-level4-marker-width) + var(--heading-flow-ol-level4-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul ul ul ul ul{
+  padding-left: calc(var(--heading-flow-ol-level5-indent) + var(--heading-flow-ol-level5-marker-width) + var(--heading-flow-ol-level5-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul ul ul ul ul ul{
+  padding-left: calc(var(--heading-flow-ol-level6-indent) + var(--heading-flow-ol-level6-marker-width) + var(--heading-flow-ol-level6-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul ul ul ul ul ul ul{
+  padding-left: calc(var(--heading-flow-ol-level7-indent) + var(--heading-flow-ol-level7-marker-width) + var(--heading-flow-ol-level7-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .grid.cards > :is(ul, ol){
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> .wl-sec-code-block:first-child) > .wl-sec-code-block:first-child{
+  display: block;
+  max-width: 100%;
+  width: 100%;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> .wl-sec-table-wrap:first-child) > .wl-sec-table-wrap:first-child{
+  display: inline-table;
+  max-width: 100%;
+  vertical-align: top;
+  width: 100%;
+}  :is(.wikilink-card__context, .wikilink-card__gap-body, .wikilink-card__continuation-body) .md-content{
+  margin: 0;
+}:is(.wikilink-card__context, .wikilink-card__gap-body, .wikilink-card__continuation-body) .md-content .heading-flow__content > :first-child{
+  margin-top: 0;
+}  .md-typeset :is(h1, h2, h3, h4, h5, h6){
+  font-weight: bold;
+}.md-typeset :is(h4, h5, h6){
+  color: var(--md-default-fg-color);
+  font-size: 1em;
+  letter-spacing: 0;
+  line-height: 1.5;
+  margin: 1em 0;
+  text-transform: none;
+}.md-typeset :is(p, li){
+  line-height: 1.5;
+}.md-content :is(.md-typeset, .heading-flow__content) img{
+  height: auto;
+  margin-bottom: 0.5rem;
+  max-width: 100%;
+}  .md-typeset h2{
+  margin-left: var(--heading-indent-h2);
+  border-bottom: var(--knotis-heading-rule-width) solid var(--knotis-heading-rule-color);
+  padding-bottom: var(--knotis-heading-rule-padding);
+}  .md-typeset > h1#__skip{
+  margin: 0 0 var(--knotis-page-title-gap);
+  color: var(--md-default-fg-color);
+}.md-typeset .heading-flow--h2 > h1{
+  margin-left: var(--heading-indent-h2);
+  border-bottom: var(--knotis-heading-rule-width) solid var(--knotis-heading-rule-color);
+  padding-bottom: var(--knotis-heading-rule-padding);
+  font-size: var(--knotis-heading-level-1-size);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.4;
+  color: var(--md-default-fg-color);
+  margin-bottom: var(--knotis-heading-level-1-content-gap);
+}.md-typeset :is(
+  .heading-flow--h3 > h2,
+  .heading-flow--h4 > h3,
+  .heading-flow--h5 > h4,
+  .heading-flow--h6 > h5
+){
+  border-bottom: none;
+  color: var(--md-default-fg-color);
+  font-weight: 700;
+  line-height: 1.5;
+  margin-bottom: var(--knotis-heading-content-gap);
+  margin-top: var(--knotis-heading-child-gap);
+  padding-bottom: 0;
+  text-transform: none;
+}.md-typeset .heading-flow--h3 > h2{
+  margin-left: var(--heading-indent-h3);
+  font-size: var(--knotis-heading-level-2-size);
+  letter-spacing: -0.01em;
+}.md-typeset .heading-flow--h4 > h3{
+  margin-left: var(--heading-indent-h4);
+  font-size: var(--knotis-heading-level-3-size);
+  letter-spacing: 0;
+}.md-typeset .heading-flow--h5 > h4{
+  margin-left: var(--heading-indent-h5);
+  font-size: var(--knotis-heading-level-4-size);
+}.md-typeset .heading-flow--h6 > h5{
+  margin-left: var(--heading-indent-h6);
+  font-size: var(--knotis-heading-level-5-size);
+}.md-typeset h3{
+  margin-left: var(--heading-indent-h3);
+}.md-typeset h4{
+  margin-left: var(--heading-indent-h4);
+}.md-typeset h5{
+  margin-left: var(--heading-indent-h5);
+}.md-typeset h6{
+  margin-left: var(--heading-indent-h6);
+}.md-typeset :is(h3, h4, h5, h6){
+  margin-bottom: var(--knotis-heading-content-gap);
+}.md-typeset img + .heading-flow--h2, .md-typeset img + .heading-flow--h3{
+  margin-top: 0;
+}  .heading-flow, .heading-flow__content{
+  display: flow-root;
+}.heading-flow, .heading-flow__content > :first-child, .heading-flow__content > .heading-flow + .heading-flow > :is(h1, h2, h3, h4, h5, h6):first-child{
+  margin-top: var(--knotis-heading-content-start-gap);
+}.heading-flow__content > .heading-flow + .heading-flow > :is(h1, h2, h3, h4, h5, h6):first-child{
+  margin-top: var(--knotis-heading-sibling-gap);
+}  .md-typeset > h1:not(#__skip) + .heading-flow--h2 > h2{
+  margin-top: var(--knotis-heading-child-gap);
+}  .md-typeset > h1#__skip + h1:not(#__skip){
+  margin-top: 0;
+}.md-typeset > h1#__skip + .heading-flow--h2 > h1{
+  margin-top: 0;
+}  .md-typeset > .heading-flow--h2 + .heading-flow--h2 > :is(h1, h2){
+  margin-top: var(--knotis-heading-top-level-gap);
+}.heading-flow--h2{
+  --heading-flow-indent: var(--heading-indent-h2);
+  --heading-flow-bullet-padding: var(--heading-bullet-padding-h2);
+  counter-reset: h3;
+  counter-increment: h2;
+}.heading-flow--h3{
+  --heading-flow-indent: var(--heading-indent-h3);
+  --heading-flow-bullet-padding: var(--heading-bullet-padding-h3);
+  counter-reset: h4;
+  counter-increment: h3;
+}.md-typeset .heading-flow--h2 > h2{
+  margin-bottom: var(--knotis-heading-level-1-content-gap);
+}.md-typeset .heading-flow--h2 > h2, .md-typeset .heading-flow--h3 > h2, .md-typeset .heading-flow--h3 > h3, .md-typeset .heading-flow--h4 > h4, .md-typeset .heading-flow--h5 > h5{
+  margin-top: var(--knotis-heading-child-gap);
+}.md-typeset .heading-flow__content > .heading-flow:first-child > :is(h1, h2, h3, h4, h5, h6):first-child{
+  margin-top: var(--knotis-heading-direct-child-gap);
+}.heading-flow--h4{
+  --heading-flow-indent: var(--heading-indent-h4);
+  --heading-flow-bullet-padding: var(--heading-bullet-padding-h4);
+  counter-reset: h5;
+  counter-increment: h4;
+}.heading-flow--h5{
+  --heading-flow-indent: var(--heading-indent-h5);
+  --heading-flow-bullet-padding: var(--heading-bullet-padding-h5);
+  counter-reset: h6;
+  counter-increment: h5;
+}.heading-flow--h6{
+  --heading-flow-indent: var(--heading-indent-h6);
+  --heading-flow-bullet-padding: var(--heading-bullet-padding-h6);
+  counter-increment: h6;
+}.heading-flow__content{
+  --heading-flow-child-origin: var(--heading-flow-indent, 0rem);
+  margin-left: var(--heading-flow-indent, 0);
+}:root:not([data-knotis-heading-guides="false"]) .md-typeset:not([data-knotis-heading-guides="false"]) :is( .heading-flow--h2, .heading-flow--h3, .heading-flow--h4, .heading-flow--h5 ) > .heading-flow__content{
+  --heading-flow-child-origin: calc(var(--heading-flow-indent, 0rem) + var(--knotis-heading-guide-offset) + var(--knotis-heading-guide-width));
+  border-left: var(--knotis-heading-guide-width) solid color-mix(in srgb, var(--knotis-wikilink-color, var(--md-primary-fg-color)) 18%, transparent);
+  padding-left: var(--knotis-heading-guide-offset);
+}.heading-flow__content > .heading-flow{
+  margin-left: calc(-1 * var(--heading-flow-child-origin, 0rem));
+}:root[data-knotis-nested-numbering-lists="false"] .heading-flow__content > ul{
+  padding-left: var(--heading-flow-bullet-padding, 0);
+}:root[data-knotis-nested-numbering-lists="false"] .heading-flow__content ul{
+  list-style-position: outside;
+}:root[data-knotis-nested-numbering-lists="false"] .heading-flow__content ul ul{
+  padding-left: var(--heading-flow-nested-list-indent);
+}.heading-flow__content li > p:first-child{
+  margin-top: 0;
+}.heading-flow__content li > :last-child{
+  margin-bottom: 0;
+}  :root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content > ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level1-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level1-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level1-gap);
+  padding-left: calc(var(--heading-flow-ol-indent) + var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap));
+  margin-left: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level2-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level2-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level2-gap);
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level3-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level3-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level3-gap);
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level4-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level4-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level4-gap);
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level5-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level5-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level5-gap);
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level6-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level6-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level6-gap);
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level7-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level7-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level7-gap);
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol{
+  list-style: none !important;
+  position: relative;
+  left: 0;
+  padding-left: calc(var(--heading-flow-ol-indent) + var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap));
+  margin-left: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol > li{
+  position: relative;
+  padding-left: 0;
+  list-style: none !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol > li::marker{
+  content: "";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol > li::before{
+  display: block;
+  left: calc(-1 * (var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap)));
+  margin-right: 0;
+  min-width: var(--heading-flow-list-number-width);
+  position: absolute;
+  width: var(--heading-flow-ol-marker-width);
+  text-align: right;
+  white-space: nowrap;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol{
+  counter-reset: level2;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol{
+  counter-reset: level3;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol{
+  counter-reset: level4;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol{
+  counter-reset: level5;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol ol{
+  counter-reset: level6;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol ol ol{
+  counter-reset: level7;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol > li{
+  counter-increment: level2;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol > li{
+  counter-increment: level3;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol > li{
+  counter-increment: level4;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol > li{
+  counter-increment: level5;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol ol > li{
+  counter-increment: level6;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol ol ol > li{
+  counter-increment: level7;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content > ol > li::before{
+  content: counter(level1) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol > li::before{
+  content: counter(level1) "." counter(level2) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) "." counter(level5) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) "." counter(level5) "." counter(level6) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol ol ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) "." counter(level5) "." counter(level6) "." counter(level7) ". ";
+}  :root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content :is(ul, ol){
+  left: 0;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--heading-flow-bullet-padding, 0);
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content :is(ul, ol) ul{
+  left: 0;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--heading-flow-nested-list-indent);
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ol ol{
+  padding-left: calc(var(--heading-flow-ol-indent) + var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ul > li > ol ol{
+  --heading-flow-ol-indent: -2.3em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ul{
+  list-style: disc outside;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content .heading-flow__content ul > li::marker{
+  font-size: 1.2em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel):first-child), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > :is(img, iframe, .knotis-media-embed-fallback):only-child), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > a:only-child > img:only-child){
+  display: list-item;
+  list-style: disc outside !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel):first-child)::marker, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > :is(img, iframe, .knotis-media-embed-fallback):only-child)::marker, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > a:only-child > img:only-child)::marker, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul > li:has(> :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel):first-child)::marker{
+  font-size: 1.2em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel):first-child)::before, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > :is(img, iframe, .knotis-media-embed-fallback):only-child)::before, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > a:only-child > img:only-child)::before{
+  content: none;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> .md-typeset__scrollwrap:first-child) > .md-typeset__scrollwrap, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(.wl-sec-mermaid, .mermaid, .admonition, details, .wl-sec-admonition):first-child) > :is(.wl-sec-mermaid, .mermaid, .admonition, details, .wl-sec-admonition){
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  width: 100%;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(img, iframe, .knotis-media-embed-fallback):first-child) > :is(img, iframe, .knotis-media-embed-fallback), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > :is(img, iframe, .knotis-media-embed-fallback):only-child) > p, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > a:only-child > img:only-child) > p{
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+}  :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > .highlight:first-child:has(.highlighttable){
+  display: block;
+  max-width: 100%;
+  width: 100%;
+}  :root[data-knotis-webkit-engine="true"]:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > .highlight:first-child:has(.highlighttable){
+  display: inline-block;
+  vertical-align: top;
+}  :root[data-knotis-webkit-engine="true"] .md-typeset .highlighttable .linenodiv pre{
+  display: flex;
+  flex-direction: column;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > .highlight:first-child:not(:has(.highlighttable)), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> pre:first-child:not(.mermaid)) > pre:first-child{
+  display: block;
+  max-width: 100%;
+  width: 100%;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > .highlight:first-child:not(:has(.highlighttable)) > pre, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> pre:first-child:not(.mermaid)) > pre:first-child{
+  display: block;
+  margin: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > .highlight:first-child:not(:has(.highlighttable)) > pre > code, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> pre:first-child:not(.mermaid)) > pre:first-child > code{
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  width: 100%;
+}  :root[data-knotis-webkit-engine="true"]:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > .highlight:first-child:not(:has(.highlighttable)), :root[data-knotis-webkit-engine="true"]:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > pre:first-child:not(.mermaid){
+  display: inline-block;
+  vertical-align: top;
+}  :root[data-knotis-webkit-engine="true"]:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> .highlight:first-child):has(> ul, > ol):not(:has(.highlighttable)), :root[data-knotis-webkit-engine="true"]:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> pre:first-child:not(.mermaid)):has(> ul, > ol){
+  list-style-position: outside !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(table, .md-typeset__table):first-child) > :is(table, .md-typeset__table){
+  display: inline-table;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel):first-child) > :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel):first-child, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(table, .md-typeset__table, .md-typeset__scrollwrap):first-child) > :is(table, .md-typeset__table, .md-typeset__scrollwrap):first-child :is(table, .highlighttable), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > :is(img, iframe, .knotis-media-embed-fallback):only-child) > p:first-child, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child > a:only-child > img:only-child) > p:first-child{
+  margin-top: 0 !important;
+}  :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel)), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > :is(img, iframe, .knotis-media-embed-fallback):only-child), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > a:only-child > img:only-child), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul > li:has(> [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel)), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul > li:has(> [data-knotis-slide-marker] + p > :is(img, iframe, .knotis-media-embed-fallback):only-child), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul > li:has(> [data-knotis-slide-marker] + p > a:only-child > img:only-child){
+  display: list-item;
+  list-style: disc outside !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel))::marker, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > :is(img, iframe, .knotis-media-embed-fallback):only-child)::marker, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > a:only-child > img:only-child)::marker, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul > li:has(> [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel))::marker, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul > li:has(> [data-knotis-slide-marker] + p > :is(img, iframe, .knotis-media-embed-fallback):only-child)::marker, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content ul > li:has(> [data-knotis-slide-marker] + p > a:only-child > img:only-child)::marker{
+  font-size: 1.2em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel))::before, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > :is(img, iframe, .knotis-media-embed-fallback):only-child)::before, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > a:only-child > img:only-child)::before{
+  content: none;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + :is(table, .md-typeset__table)) > [data-knotis-slide-marker] + :is(table, .md-typeset__table){
+  display: inline-table;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + .md-typeset__scrollwrap) > [data-knotis-slide-marker] + .md-typeset__scrollwrap, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + :is(.wl-sec-mermaid, .mermaid, .admonition, details, .wl-sec-admonition)) > [data-knotis-slide-marker] + :is(.wl-sec-mermaid, .mermaid, .admonition, details, .wl-sec-admonition){
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  width: 100%;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback)) > [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > :is(img, iframe, .knotis-media-embed-fallback):only-child) > [data-knotis-slide-marker] + p, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > a:only-child > img:only-child) > [data-knotis-slide-marker] + p{
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel)) > [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > :is(img, iframe, .knotis-media-embed-fallback):only-child) > [data-knotis-slide-marker] + p, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > a:only-child > img:only-child) > [data-knotis-slide-marker] + p, :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + :is(table, .md-typeset__table, .md-typeset__scrollwrap)) > [data-knotis-slide-marker] + :is(table, .md-typeset__table, .md-typeset__scrollwrap) :is(table, .highlighttable){
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + :is(img, iframe, .knotis-media-embed-fallback, figure.knotis-media, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-tab-panel)) > :is(ul, ol), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > :is(img, iframe, .knotis-media-embed-fallback):only-child) > :is(ul, ol), :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> [data-knotis-slide-marker] + p > a:only-child > img:only-child) > :is(ul, ol){
+  margin-top: var(--knotis-markerless-block-child-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content){
+  --knotis-markerless-prose-block-gap: 0.5em;
+  --knotis-markerless-prose-code-gap: var(--knotis-markerless-block-child-gap);
+  --knotis-markerless-prose-table-gap: 1em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p:first-child + :is(ul, ol) > li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition)) > p:first-child{
+  margin-bottom: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child) > :is(ul, ol){
+  margin-top: var(--knotis-markerless-block-child-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child + :is(ul, ol)) > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child{
+  margin-bottom: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> .md-typeset__scrollwrap:first-child + :is(ul, ol)) > .md-typeset__scrollwrap:first-child{
+  line-height: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(table, .md-typeset__table, .md-typeset__scrollwrap):first-child + :is(ul, ol)) > :is(.md-typeset__table, .md-typeset__scrollwrap):first-child :is(table, .highlighttable){
+  display: block;
+  margin-bottom: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> .md-typeset__scrollwrap:first-child + :is(ul, ol)) > .md-typeset__scrollwrap:first-child > .md-typeset__table{
+  line-height: var(--knotis-list-bullet-line-height);
+  margin-bottom: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child) > :is(ul, ol) > li:first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child) > :is(ul, ol) > li:first-child > :is(p, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > p + :is(ul, ol) > li:first-child > .highlight:first-child :is(table, .highlighttable){
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid):first-child){
+  margin-top: var(--knotis-markerless-prose-code-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > p + :is(ul, ol):has(> li:first-child > :is(table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child){
+  margin-top: var(--knotis-markerless-prose-table-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child) > li:first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li:has(> p) + li:has(> :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child){
+  margin-top: var(--knotis-markerless-prose-block-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > p + :is(ul, ol):has(> li:first-child > :is(.admonition, details, .wl-sec-admonition):first-child) > li:first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > p + :is(ul, ol) > li:first-child > :is(table, .md-typeset__table, .md-typeset__scrollwrap):first-child :is(table){
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child) > li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) ol > li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid):first-child){
+  margin-top: var(--knotis-markerless-prose-code-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) ol > li > p + :is(ul, ol):has(> li:first-child > :is(table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child){
+  margin-top: var(--knotis-markerless-prose-table-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) ol > li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details, .wl-sec-admonition):first-child) > li:first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) ol > li > p:first-child{
+  display: inline;
+  margin: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) ol > li > p:first-child + *{
+  margin-top: 0.1rem;
+}  :root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li.knotis-nested-list-shell{
+  list-style: none !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li.knotis-nested-list-shell::marker{
+  content: none;
+}:root:not([data-knotis-nested-numbering-lists="false"]) .md-content :is(.md-typeset, .heading-flow__content) li.knotis-nested-list-shell::before{
+  content: none !important;
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h2 > h1::before{
+  content: counter(h2) ". ";
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h3 > h2::before{
+  content: counter(h2) "." counter(h3) ". ";
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h4 > h3::before{
+  content: counter(h2) "." counter(h3) "." counter(h4) ". ";
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h5 > h4::before{
+  content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) ". ";
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h6 > h5::before{
+  content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) "." counter(h6) ". ";
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h2 > h2::before{
+  content: counter(h2) ". ";
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h3 > h3::before{
+  content: counter(h2) "." counter(h3) ". ";
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h4 > h4::before{
+  content: counter(h2) "." counter(h3) "." counter(h4) ". ";
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h5 > h5::before{
+  content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) ". ";
+}:root:not([data-knotis-heading-numbering="false"]) .md-typeset:not([data-knotis-heading-numbering="false"]) .heading-flow--h6 > h6::before{
+  content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) "." counter(h6) ". ";
+}:root[data-knotis-heading-numbering="false"] .md-typeset :is(h1, h2, h3, h4, h5, h6)::before{
+  content: none;
+}.md-typeset[data-knotis-heading-numbering="false"] :is(h1, h2, h3, h4, h5, h6)::before{
+  content: none;
+}

@@ -1,0 +1,79 @@
+/* Knotis site theme overrides.
+ * Color palette defaults ship in assets/knotis/knotis-palette.css (synced from the extension).
+ * Edit this file for site layout, chrome, and color overrides.
+ */
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #1E1E2E;
+}
+
+.md-grid {
+  max-width: 1440px;
+}
+
+:root:not([data-knotis-styled-section-groups="false"]) .md-sidebar--primary .md-nav--primary > .md-nav__title {
+  display: none;
+}
+
+:root:not([data-knotis-styled-section-groups="false"]) .md-sidebar--primary .md-nav__list,
+.md-sidebar--secondary .md-nav__list {
+  gap: 0.05rem;
+}
+
+:root:not([data-knotis-styled-section-groups="false"]) .md-sidebar--primary .md-nav__link {
+  padding-top: 0.22rem;
+  padding-bottom: 0.22rem;
+}
+
+.md-sidebar--secondary .md-nav__link {
+  padding-top: 0.12rem;
+  padding-bottom: 0.12rem;
+}
+
+.md-header,
+.md-tabs {
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+}
+
+.md-code__button[data-md-type="copy"] {
+  color: var(--md-default-fg-color--light);
+}
+
+.md-code__button[data-md-type="copy"].focus-visible,
+.md-code__button[data-md-type="copy"]:hover {
+  color: var(--md-primary-fg-color);
+}
+
+/* Primary sidebar: top-level collapsible groups styled as section labels (desktop). */
+@media screen and (min-width: 76.25em) {
+  :root:not([data-knotis-styled-section-groups="false"]) .md-sidebar--primary .md-nav--primary {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  :root:not([data-knotis-styled-section-groups="false"]) .md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__link {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--md-default-fg-color);
+    opacity: 0.72;
+  }
+
+  :root:not([data-knotis-styled-section-groups="false"]) .md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item--nested {
+    margin-top: 1.25rem;
+  }
+
+  :root:not([data-knotis-styled-section-groups="false"]) .md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__link .md-nav__icon {
+    width: 0.9rem;
+    height: 0.9rem;
+    opacity: 0.55;
+  }
+
+  :root:not([data-knotis-styled-section-groups="false"]) .md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__link:hover {
+    opacity: 1;
+    color: var(--md-default-fg-color);
+    background-color: var(--md-default-fg-color--lightest);
+  }
+}

@@ -1,0 +1,72 @@
+:root,
+[data-md-color-scheme="default"] {
+  --knotis-wikilink-color: #0197a7;
+  --knotis-wikilink-hover-bg: color-mix(in srgb, var(--knotis-wikilink-color) 12%, transparent);
+  --knotis-wikilink-flash-bg: color-mix(in srgb, var(--knotis-wikilink-color) 28%, transparent);
+  --knotis-wikilink-text: var(--knotis-wikilink-color);
+  --knotis-wikilink-hover-background: var(--knotis-wikilink-hover-bg);
+  --knotis-wikilink-flash-background: var(--knotis-wikilink-flash-bg);
+  --knotis-wikilink-flash-outline: var(--knotis-wikilink-color);
+}
+
+[data-md-color-scheme="slate"] {
+  --knotis-wikilink-color: #fda4af;
+  --knotis-wikilink-hover-bg: color-mix(in srgb, var(--knotis-wikilink-color) 12%, transparent);
+  --knotis-wikilink-flash-bg: color-mix(in srgb, var(--knotis-wikilink-color) 28%, transparent);
+  --knotis-wikilink-text: var(--knotis-wikilink-color);
+  --knotis-wikilink-hover-background: var(--knotis-wikilink-hover-bg);
+  --knotis-wikilink-flash-background: var(--knotis-wikilink-flash-bg);
+  --knotis-wikilink-flash-outline: var(--knotis-wikilink-color);
+}
+
+
+
+.wikilink {
+  color: var(--knotis-wikilink-text, var(--knotis-wikilink-color));
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 2px;
+  padding: 0 1px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.wikilink--highlighted {
+  animation: wikilink-flash 2.5s ease-out forwards;
+}
+
+@keyframes wikilink-flash {
+  0%   { background-color: var(--knotis-wikilink-flash-background, color-mix(in srgb, var(--knotis-wikilink-color) 28%, transparent)); outline: 2px solid var(--knotis-wikilink-flash-outline, var(--knotis-wikilink-color)); outline-offset: 2px; }
+  100% { background-color: transparent; outline-color: transparent; }
+}
+
+
+
+
+.wikilink--block-highlighted {
+  animation: wikilink-block-flash 2s ease-out forwards;
+  border-radius: 3px;
+}
+
+@keyframes wikilink-block-flash {
+  0%   { background-color: var(--knotis-block-highlight-background, rgba(245, 196, 114, 0.55)); outline: 2px solid var(--knotis-block-highlight-outline, #f5c472); outline-offset: 3px; }
+  60%  { background-color: var(--knotis-block-highlight-mid-background, rgba(245, 196, 114, 0.35)); outline-color: var(--knotis-block-highlight-outline, #f5c472); }
+  100% { background-color: transparent; outline-color: transparent; }
+}
+
+.wikilink:hover,
+.wikilink:focus-visible {
+  background-color: var(--knotis-wikilink-hover-background, color-mix(in srgb, var(--knotis-wikilink-color) 12%, transparent));
+  text-decoration: underline;
+}
+
+
+.wikilink--inline {
+  color: var(--knotis-wikilink-text, var(--knotis-wikilink-color));
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.wikilink--inline:hover {
+  text-decoration: underline;
+  background-color: var(--knotis-wikilink-hover-background, color-mix(in srgb, var(--knotis-wikilink-color) 12%, transparent));
+}

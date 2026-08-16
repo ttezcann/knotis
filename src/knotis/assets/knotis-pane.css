@@ -1,0 +1,1246 @@
+  .wikilink-pane{
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(var(--wikilink-pane-width, 560px), 100vw);
+  max-width: 100vw;
+  height: 100vh;
+  background-color: var(--md-default-bg-color);
+  border-left: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+
+  
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none; 
+}.wikilink-pane--open{
+  transform: translateX(0);
+}  .wikilink-pane__header{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+  flex-shrink: 0;
+  background-color: var(--md-default-bg-color);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  gap: 0.9rem;
+}.wikilink-pane__header-main{
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  flex: 1 1 auto;
+}.wikilink-pane__history{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding-top: 0.08rem;
+  flex-shrink: 0;
+}.wikilink-pane__nav-btn{
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--md-default-bg-color) 92%, var(--knotis-accent-color) 8%);
+  color: var(--md-default-fg-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}.wikilink-pane__nav-btn:hover, .wikilink-pane__nav-btn:focus-visible{
+  background: color-mix(in srgb, var(--md-default-bg-color) 82%, var(--knotis-accent-color) 18%);
+  border-color: color-mix(in srgb, var(--knotis-accent-color) 42%, transparent);
+  color: var(--knotis-accent-color);
+  outline: none;
+  transform: translateY(-1px);
+}.wikilink-pane__nav-btn:disabled, .wikilink-pane__nav-btn[aria-disabled="true"]{
+  cursor: default;
+  color: var(--md-default-fg-color--lighter);
+  border-color: var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+  background: color-mix(in srgb, var(--md-default-bg-color) 96%, var(--md-default-fg-color) 4%);
+  transform: none;
+}.wikilink-pane__heading{
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}.wikilink-pane__title{
+  font-weight: 800;
+  font-size: 1.28rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--md-default-fg-color);
+  word-break: break-word;
+  font-family: var(--md-text-font-family, var(--md-text-font, sans-serif));
+}.wikilink-pane__meta{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}.wikilink-pane__meta-badge{
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.48rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--knotis-accent-color) 10%, var(--md-default-bg-color, #fff));
+  color: var(--md-default-fg-color--light);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}.wikilink-pane__graph-return{
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.38rem;
+  width: fit-content;
+  margin-top: 0.05rem;
+  min-height: 30px;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid var(--knotis-accent-color);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--knotis-accent-color);
+  font: 600 0.78rem/1.2 var(--md-text-font-family, var(--md-text-font, sans-serif));
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}.wikilink-pane__graph-return:hover, .wikilink-pane__graph-return:focus-visible{
+  background: var(--knotis-accent-fill-color);
+  color: var(--knotis-accent-on-color);
+  outline: none;
+}.wikilink-pane__graph-return-icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}.wikilink-pane__graph-return-icon svg{
+  width: 0.86rem;
+  height: 0.86rem;
+}  .wikilink-pane__title--edge mark{
+  background: none;
+  color: var(--knotis-accent-color, var(--knotis-wikilink-color));
+  font-weight: 700;
+}  .wikilink-pane__edge-sub{
+  font-weight: 400;
+  color: var(--md-default-fg-color--light);
+}.wikilink-pane__close{
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--md-default-fg-color--light);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}.wikilink-pane__close:hover, .wikilink-pane__close:focus-visible{
+  background-color: var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.08));
+  color: var(--md-default-fg-color);
+  outline: 2px solid var(--knotis-accent-color);
+}.wikilink-pane__header-actions{
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  flex-shrink: 0;
+}.wikilink-pane__copy-link{
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--md-default-fg-color--light);
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}.wikilink-pane__copy-link svg{
+  width: 1rem;
+  height: 1rem;
+}.wikilink-pane__copy-link:hover, .wikilink-pane__copy-link:focus-visible{
+  background-color: var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.08));
+  color: var(--md-default-fg-color);
+  outline: 2px solid var(--knotis-accent-color);
+}  .wikilink-pane__learning-panel{
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 0.6rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+  flex-shrink: 0;
+}@media (max-width: 720px){
+  .wikilink-pane__learning-panel {
+    grid-template-columns: 1fr;
+  }
+}  .wikilink-pane__learning-panel:not(:has(> .wikilink-pane__graph-section)):not(:has(> .learning-path:not([hidden]))){
+  display: none;
+}.wikilink-pane__learning-panel:not(:has(> .wikilink-pane__graph-section)){
+  grid-template-columns: 1fr;
+}.wikilink-pane__learning-panel:not(:has(> .learning-path:not([hidden]))){
+  grid-template-columns: 1fr;
+}.wikilink-pane__graph-section{
+  min-width: 0;
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}.learning-path:not([hidden]){
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}.learning-path__header{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.08rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+}.learning-path__icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--knotis-accent-color);
+}.learning-path__icon svg{
+  width: 0.9rem;
+  height: 0.9rem;
+}.learning-path__list{
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 280px;
+  overflow: auto;
+}.learning-path__item{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  align-items: start;
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+  border-radius: 8px;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}.learning-path__item:hover, .learning-path__item:focus-visible{
+  border-color: var(--knotis-accent-color);
+  background: color-mix(in srgb, var(--md-default-bg-color) 92%, var(--knotis-accent-color) 8%);
+  outline: none;
+}.learning-path__step{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--knotis-accent-on-color);
+  background: var(--knotis-accent-color);
+}[data-md-color-scheme="slate"] .learning-path__step{
+  color: var(--md-default-bg-color);
+}.learning-path__label{
+  font-size: 0.82rem;
+  line-height: 1.35;
+}.wikilink-pane__graph-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}.wikilink-pane__graph-title{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+}.wikilink-pane__graph-icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--knotis-accent-color);
+}.wikilink-pane__graph-icon svg{
+  width: 0.9rem;
+  height: 0.9rem;
+}.wikilink-pane__graph-hint{
+  margin-top: 0.3rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+}.wikilink-pane__concept-graph-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}.wikilink-pane__concept-graph-btn:hover, .wikilink-pane__concept-graph-btn:focus-visible{
+  outline: none;
+}  .wikilink-pane__graph-section .graph-tabs{
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0.2rem;
+  margin-bottom: 0.5rem;
+}.wikilink-pane__graph-section .graph-tabs .graph-tab{
+  flex: 0 1 auto;
+  padding: 0.34rem 0.72rem;
+  font-size: 0.82rem;
+}.wikilink-pane__graph-section .graph-tabs--single{
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+}.wikilink-pane__graph-section .graph-tabs--single .graph-tab{
+  min-height: 2.08rem;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}.wikilink-pane__graph-section .graph-tabs--single .graph-tab:hover, .wikilink-pane__graph-section .graph-tabs--single .graph-tab:focus-visible{
+  border-color: transparent;
+  background: transparent;
+  color: var(--md-default-fg-color);
+}.wikilink-pane__graph-section .graph-tabs .wikilink-pane__graph-return{
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  margin-top: 0;
+  border-color: transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--md-default-fg-color--light);
+  font: 600 0.82rem/1.2 var(--md-text-font-family, var(--md-text-font, sans-serif));
+}.wikilink-pane__graph-section .graph-tabs .wikilink-pane__graph-return:hover, .wikilink-pane__graph-section .graph-tabs .wikilink-pane__graph-return:focus-visible{
+  border-color: var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.15));
+  background: color-mix(in srgb, var(--md-default-bg-color) 86%, var(--md-default-fg-color) 14%);
+  color: var(--md-default-fg-color);
+}.wikilink-pane__graph-section .graph-tabs .graph-tab__icon svg{
+  width: 0.9rem;
+  height: 0.9rem;
+}.wikilink-pane__graph-section .graph-tabs .graph-tab__return svg{
+  width: 0.68rem;
+  height: 0.68rem;
+}.concept-graph-preview__graph{
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 200px;
+  max-height: 300px;
+  overflow: hidden;
+  contain: paint;
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+  border-radius: 10px;
+  background: transparent;
+}[data-md-color-scheme="slate"] .concept-graph-preview__graph{
+  background: transparent;
+}.wikilink-pane .concept-graph-preview__graph .graph-controls{
+  z-index: 1;
+}.wikilink-pane .concept-graph-preview__graph .page-graph-zoom{
+  z-index: 10;
+}.concept-graph-preview__graph .graph-controls{
+  width: min(188px, calc(100% - 12px));
+}.concept-graph-preview__graph .graph-hop-control{
+  padding: 0.48rem 0.58rem 0.42rem;
+}  .wikilink-pane__cards{
+  overflow: visible;
+  flex: 0 0 auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}.wikilink-pane__empty{
+  color: var(--md-default-fg-color--light);
+  font-style: italic;
+  font-size: 0.875rem;
+  text-align: center;
+  margin-top: 2rem;
+}.wikilink-pane__placeholder{
+  font-style: normal;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 18rem;
+  margin-inline: auto;
+}   .wikilink-pane__cards{
+  gap: var(--knotis-module-gap, 1.1rem);
+}  .wikilink-module{
+  position: relative;
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+  border-radius: var(--knotis-card-radius-md, 12px);
+  padding: 0;
+  background-color: var(--md-default-bg-color, #fff);
+  box-shadow: var(--knotis-card-shadow);
+  overflow: hidden;
+}  .wikilink-module__header{
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem 0.65rem;
+  background-color: color-mix(in srgb, var(--md-default-fg-color) 8%, var(--md-default-bg-color, #fff));
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+}.wikilink-module__page{
+  min-width: 0;
+  flex: 1 1 auto;
+  font-weight: var(--knotis-title-weight, 750);
+  font-size: var(--knotis-title-size, 1rem);
+  letter-spacing: -0.01em;
+  color: var(--md-default-fg-color);
+  text-decoration: none;
+  word-break: break-word;
+}.wikilink-module__page:hover, .wikilink-module__page:focus-visible{
+  text-decoration: underline;
+}.wikilink-module__header-actions{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}.wikilink-module__count{
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--light);
+  white-space: nowrap;
+}.wikilink-module__minimize{
+  flex-shrink: 0;
+  background: none;
+  border: 1.5px solid var(--md-default-fg-color--light, rgba(0,0,0,0.4));
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--md-default-fg-color);
+  padding: 0;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}.wikilink-module__minimize:hover{
+  background-color: var(--md-default-fg-color--lightest, rgba(0,0,0,0.08));
+  border-color: var(--md-default-fg-color);
+  color: var(--md-default-fg-color);
+}  .wikilink-module__body{
+  padding: 0.35rem 0.7rem 0.6rem;
+  background-color: var(--md-default-bg-color, #fff);
+}.wikilink-module--minimized .wikilink-module__body{
+  display: none;
+}.wikilink-module__cards{
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}  .wikilink-card{
+  position: relative;
+  border: 0;
+  border-radius: var(--knotis-card-radius-sm, 6px);
+  padding: 0.5rem 0.55rem 0.55rem;
+  background-color: transparent;
+  box-shadow: none;
+  transition: background-color 0.15s ease;
+  --wl-list-indent-step: var(--heading-flow-nested-list-indent, 0.4em);
+  --wl-list-marker-width: var(--heading-flow-list-number-width, 1.5em);
+  --wl-list-marker-gap: var(--heading-flow-list-number-gap, 0.3em);
+}  .wikilink-module__cards > .wikilink-card + .wikilink-card{
+  margin-top: 0.45rem;
+  padding-top: 0.6rem;
+  border-top: none;
+}.wikilink-module__cards > .wikilink-card + .wikilink-card::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.14rem;
+  background-color: var(--md-default-fg-color);
+  border-radius: 0;
+}[data-md-color-scheme="slate"] .wikilink-module__cards > .wikilink-card + .wikilink-card::before{
+  background-color: color-mix(in srgb, var(--md-default-fg-color) 82%, #fff);
+}  .wikilink-card:hover{
+  background-color: color-mix(in srgb, var(--md-default-fg-color) 4%, transparent);
+}  .wikilink-card__header{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.4rem;
+}.wikilink-card__header-actions{
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}.wikilink-card--title-suppressed > .wikilink-card__header{
+  float: right;
+  position: relative;
+  z-index: 2;
+  margin: 0 0 0.2rem 0.6rem;
+}.wikilink-card--title-suppressed > .wikilink-card__header .wikilink-card__header-actions{
+  margin-left: 0;
+}.wikilink-card--title-suppressed > .wikilink-card__header + .wikilink-card__body{
+  margin-top: 0;
+}.wikilink-card__page{
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--md-default-fg-color);
+  text-decoration: none;
+  word-break: break-word;
+}.wikilink-card__page:hover{
+  text-decoration: underline;
+}.wikilink-card__page--section{
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+}  .wikilink-card__minimize{
+  flex-shrink: 0;
+  background: none;
+  border: 1.5px solid var(--md-default-fg-color--light, rgba(0,0,0,0.4));
+  border-radius: 3px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--md-default-fg-color);
+  padding: 0;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}.wikilink-card__minimize:hover{
+  background-color: var(--md-default-fg-color--lightest, rgba(0,0,0,0.08));
+  border-color: var(--knotis-accent-color);
+  color: var(--knotis-accent-color);
+}  .wikilink-card__body{
+  margin-top: 0.35rem;
+}.wikilink-card--minimized .wikilink-card__controls{
+  display: none;
+}.wikilink-card--minimized .wikilink-card__body{
+  display: none;
+}  .wikilink-card__content{
+  overflow: visible;
+}  .wikilink-card__controls{
+  display: flex;
+  gap: 0.2rem;
+}.wikilink-card__ctx-btn{
+  background: none;
+  border: 1.5px solid var(--md-default-fg-color--light, rgba(0,0,0,0.4));
+  border-radius: 3px;
+  font-size: 1rem;
+  font-weight: 700;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--md-default-fg-color);
+  padding: 0;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}.wikilink-card__ctx-btn:hover{
+  background-color: var(--md-default-fg-color--lightest, rgba(0,0,0,0.08));
+  border-color: var(--knotis-accent-color);
+  color: var(--knotis-accent-color);
+}.wikilink-card__ctx-btn:disabled, .wikilink-card__ctx-btn[aria-disabled="true"]{
+  opacity: 0.45;
+  cursor: default;
+}.wikilink-card__ctx-btn:disabled:hover, .wikilink-card__ctx-btn[aria-disabled="true"]:hover{
+  background: none;
+  border-color: var(--md-default-fg-color--light, rgba(0,0,0,0.4));
+  color: var(--md-default-fg-color);
+}.wikilink-card__context{
+  display: block;
+  font-size: 0.8rem;
+  color: var(--md-default-fg-color--light);
+  line-height: 1.5;
+  margin: 0 0 0.3rem;
+  word-break: break-word;
+  text-decoration: none;
+  border-radius: 3px;
+  padding: 2px 0;
+  transition: color 0.15s;
+  cursor: pointer;
+}.wikilink-card__context:hover{
+  color: var(--md-default-fg-color);
+}.wikilink-card__context:focus-visible{
+  outline: 2px solid var(--knotis-accent-color);
+  outline-offset: 3px;
+}.wikilink-card__context--edge-anchor + .wikilink-card__gap-toggle, .wikilink-card__gap-body + .wikilink-card__context--edge-anchor, .wikilink-card__context + .wikilink-card__continuation-toggle, .wikilink-card__continuation-body + .wikilink-card__context{
+  margin-top: 0.35rem;
+}.wikilink-card__gap-toggle, .wikilink-card__continuation-toggle{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  min-height: 1.7rem;
+  padding: 0.22rem 0.72rem 0.22rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--knotis-accent-color) 28%, transparent);
+  border-radius: 4px;
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--knotis-accent-color) 12%, var(--md-default-bg-color, #fff)),
+      color-mix(in srgb, var(--md-accent-fg-color, var(--knotis-accent-color)) 8%, var(--md-default-bg-color, #fff)));
+  color: var(--knotis-accent-color);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+  box-shadow: 0 0.15rem 0.45rem rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}.wikilink-card__gap-icon{
+  width: 1.05rem;
+  height: 1.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--knotis-accent-color) 16%, var(--md-default-bg-color, #fff));
+}.wikilink-card__gap-icon svg{
+  width: 0.78rem;
+  height: 0.78rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}.wikilink-card__gap-toggle:hover, .wikilink-card__gap-toggle:focus-visible, .wikilink-card__continuation-toggle:hover, .wikilink-card__continuation-toggle:focus-visible{
+  color: var(--knotis-accent-color);
+  border-color: color-mix(in srgb, var(--knotis-accent-color) 58%, transparent);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--knotis-accent-color) 16%, var(--md-default-bg-color, #fff)),
+      color-mix(in srgb, var(--md-accent-fg-color, var(--knotis-accent-color)) 12%, var(--md-default-bg-color, #fff)));
+  box-shadow: 0 0.22rem 0.75rem rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+  outline: none;
+}.wikilink-card__gap-body, .wikilink-card__continuation-body{
+  margin-top: 0.35rem;
+  padding: 0.1rem 0 0.15rem 0.55rem;
+  border-left: 2px solid color-mix(in srgb, var(--knotis-accent-color) 18%, transparent);
+  color: var(--md-default-fg-color--light);
+}.wikilink-card__context mark, .wl-sec-bullet mark, .wl-sec-prose mark, .wl-sec-h mark, .wl-chunk mark{
+  background-color: rgba(245, 196, 114, 0.55);  
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 2px;
+}.wikilink-card__context mark.knotis-search-query-mark, .wl-sec-bullet mark.knotis-search-query-mark, .wl-sec-prose mark.knotis-search-query-mark, .wl-sec-h mark.knotis-search-query-mark, .wl-chunk mark.knotis-search-query-mark, .wikilink-card__section-view mark.knotis-search-query-mark{
+  background: rgba(245, 196, 114, 0.45);
+  color: var(--md-default-fg-color);
+  padding: 0;
+}.wikilink-card__context .wikilink mark.knotis-search-query-mark, .wikilink-card__section-view .wikilink mark.knotis-search-query-mark{
+  color: inherit;
+}.wikilink-card__context .knotis-search-wikilink-match, .wl-sec-prose .knotis-search-wikilink-match, .wl-sec-h .knotis-search-wikilink-match, .wikilink-card__section-view .knotis-search-wikilink-match, .wikilink-card__section .knotis-search-wikilink-match, .wikilink-card__breadcrumb .knotis-search-wikilink-match, .wikilink--inline.knotis-search-wikilink-match{
+  background: color-mix(in srgb, var(--knotis-wikilink-text, var(--md-accent-fg-color)) 14%, transparent);
+  border-radius: 2px;
+  color: var(--knotis-wikilink-text, var(--md-accent-fg-color));
+  font-weight: 500;
+  outline: 1.5px solid color-mix(in srgb, var(--knotis-wikilink-text, var(--md-accent-fg-color)) 55%, transparent);
+  outline-offset: 1px;
+  padding: 0 1px;
+  text-decoration: none;
+}[data-md-color-scheme="slate"] .wikilink-card__context mark.knotis-search-query-mark, [data-md-color-scheme="slate"] .wl-sec-prose mark.knotis-search-query-mark, [data-md-color-scheme="slate"] .wl-sec-h mark.knotis-search-query-mark, [data-md-color-scheme="slate"] .wikilink-card__section-view mark.knotis-search-query-mark{
+  background: rgba(245, 196, 114, 0.28);
+}[data-md-color-scheme="slate"] .wikilink-card__context mark, [data-md-color-scheme="slate"] .wl-sec-bullet mark, [data-md-color-scheme="slate"] .wl-sec-prose mark, [data-md-color-scheme="slate"] .wl-sec-h mark, [data-md-color-scheme="slate"] .wl-chunk mark{
+  background-color: rgba(245, 196, 114, 0.35);
+}.wikilink-card__section{
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--md-default-fg-color, rgba(0, 0, 0, 0.75));
+  margin: 0.25rem 0 0.35rem;
+  letter-spacing: 0.01em;
+}.wikilink-card__breadcrumb{
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 0.14rem;
+  column-gap: 0.32rem;
+  max-width: 100%;
+}.wikilink-card__breadcrumb-part{
+  color: var(--md-default-fg-color--light, rgba(0, 0, 0, 0.62));
+  min-width: 0;
+}.wikilink-card__breadcrumb-part--current{
+  color: var(--md-default-fg-color, rgba(0, 0, 0, 0.84));
+  font-weight: 800;
+}.wikilink-card__breadcrumb mark{
+  background-color: rgba(245, 196, 114, 0.55);
+  border-radius: 2px;
+  color: inherit;
+  font-weight: inherit;
+  padding: 0 2px;
+}[data-md-color-scheme="slate"] .wikilink-card__breadcrumb mark{
+  background-color: rgba(245, 196, 114, 0.35);
+}.wikilink-card__breadcrumb-sep{
+  width: 0.68rem;
+  height: 0.68rem;
+  flex: 0 0 auto;
+  background-color: var(--md-default-fg-color--lighter, rgba(0, 0, 0, 0.36));
+  -webkit-mask-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>');
+  mask-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  transform: translateY(0.01rem);
+}.wikilink-card__breadcrumb-sep-text{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}[data-md-color-scheme="slate"] .wikilink-card__breadcrumb-part{
+  color: var(--md-default-fg-color--light, rgba(255, 255, 255, 0.62));
+}[data-md-color-scheme="slate"] .wikilink-card__breadcrumb-part--current{
+  color: var(--md-default-fg-color, rgba(255, 255, 255, 0.9));
+}[data-md-color-scheme="slate"] .wikilink-card__breadcrumb-sep{
+  background-color: var(--md-default-fg-color--lighter, rgba(255, 255, 255, 0.4));
+}  .wikilink-card__extended{
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  color: var(--md-default-fg-color--light);
+  word-break: break-word;
+}  .wikilink-card__ext-line{
+  display: none;
+  line-height: 1.6;
+}.wikilink-card__ext-line--visible{
+  display: block;
+}  .wikilink-card__children{
+  margin: 0.35rem 0 0 1rem;
+  padding: 0;
+  list-style: disc;
+  font-size: 0.78rem;
+  color: var(--md-default-fg-color--light);
+  line-height: 1.5;
+}.wikilink-card__children li{
+  margin-bottom: 0.15rem;
+}  .wikilink-card__section-view{
+  font-size: 0.8rem;
+  line-height: var(--knotis-list-bullet-line-height, 1.5);
+  color: var(--md-default-fg-color--light);
+  word-break: break-word;
+}.wikilink-card__section-view .md-typeset :is(ul, ol){
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+}.wikilink-card__section-view .md-typeset :is(ul, ol) :is(ul, ol){
+  margin-top: 0.15em;
+  margin-bottom: 0.15em;
+}.wikilink-card__section-view .md-typeset :is(ul, ol) li{
+  margin-bottom: 0.15em;
+}.wikilink-card__section-view .md-typeset :is(ul, ol) li :is(p, blockquote){
+  margin-top: 0.15em;
+  margin-bottom: 0.15em;
+}.wikilink-card__md-link{
+  color: var(--knotis-wikilink-text, var(--knotis-wikilink-color));
+  text-decoration: none;
+}.wikilink-card__md-link:hover, .wikilink-card__md-link:focus-visible{
+  text-decoration: underline;
+  outline: none;
+}.wikilink-card__context :is(.wikilink, .wikilink--inline), .wikilink-card__section-view :is(.wikilink, .wikilink--inline){
+  color: var(--knotis-wikilink-text, var(--knotis-wikilink-color));
+}.wikilink-card__context :is(.wikilink, .wikilink--inline):hover, .wikilink-card__context :is(.wikilink, .wikilink--inline):focus-visible, .wikilink-card__section-view :is(.wikilink, .wikilink--inline):hover, .wikilink-card__section-view :is(.wikilink, .wikilink--inline):focus-visible{
+  color: var(--knotis-wikilink-text, var(--knotis-wikilink-color));
+}.wl-inline-icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15em;
+  margin: 0 0.08em;
+  color: var(--md-default-fg-color);
+  vertical-align: text-bottom;
+  font-size: 0.95em;
+  line-height: 1;
+}.wl-inline-icon svg{
+  width: 1.1em;
+  height: 1.1em;
+  display: block;
+}.wikilink-card__section-view mark{
+  background-color: rgba(245, 196, 114, 0.55);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 2px;
+}[data-md-color-scheme="slate"] .wikilink-card__section-view mark{
+  background-color: rgba(245, 196, 114, 0.35);
+}.keys{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18rem;
+  vertical-align: middle;
+}.keys kbd{
+  border-radius: 0.2rem;
+  box-shadow: 0 0 0 0.05rem var(--md-typeset-kbd-border-color), 0 0.15rem 0 var(--md-typeset-kbd-border-color);
+  background: var(--md-typeset-kbd-color);
+  color: var(--md-default-fg-color);
+  display: inline-block;
+  font-size: 0.75em;
+  line-height: 1.2;
+  padding: 0 0.45rem;
+  vertical-align: text-top;
+}.wl-key-sep{
+  color: var(--md-default-fg-color--light);
+  font-size: 0.8em;
+}.wl-sec-h{ font-weight: 700; color: var(--md-default-fg-color); margin: 0.3rem 0 0.1rem; }.wl-sec-h1, .wl-sec-h2{ font-size: 0.9rem; }.wl-sec-h3, .wl-sec-h4{ font-size: 0.82rem; }.wl-sec-h5, .wl-sec-h6{ font-size: 0.78rem; }.wl-sec-list-item{
+  margin: 0.04rem 0;
+}.wl-sec-list-item--bullet{
+  display: grid;
+  padding-left: var(--wl-padding-left, calc(var(--wl-depth, 0) * var(--wl-list-indent-step)));
+  grid-template-columns: var(--wl-list-marker-width) minmax(0, 1fr);
+  column-gap: var(--wl-list-marker-gap);
+  align-items: baseline;
+}.wl-sec-list-item--bullet .wl-sec-list-item__marker{
+  display: block;
+  font-size: 1.2em;
+  line-height: var(--knotis-list-bullet-line-height, 1.5);
+  color: var(--md-default-fg-color);
+  text-align: right;
+}:root .wl-sec-list-item--markerless-block.wl-sec-list-item--bullet > .wl-sec-list-item__content > :is( .wl-sec-prose, .wl-sec-code-block, .wl-sec-table-wrap, .wl-sec-mermaid, .admonition, details ):first-child{
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  width: 100%;
+}:root .wl-sec-list-item--markerless-block.wl-sec-list-item--bullet > .wl-sec-list-item__content > .wl-sec-prose:first-child img.wl-img{
+  margin-top: 0;
+}.wl-sec-list-item--number{
+  --wl-number-marker-width: var(--heading-flow-ol-level1-marker-width, var(--wl-list-marker-width));
+  display: grid;
+  padding-left: var(--wl-padding-left, calc(var(--wl-depth, 0) * var(--wl-list-indent-step)));
+  grid-template-columns: var(--wl-number-marker-width) minmax(0, 1fr);
+  column-gap: var(--wl-list-marker-gap);
+  align-items: baseline;
+}.wl-sec-list-item--number[style*="--wl-depth:1"]{
+  --wl-number-marker-width: var(--heading-flow-ol-level2-marker-width);
+}.wl-sec-list-item--number[style*="--wl-depth:2"]{
+  --wl-number-marker-width: var(--heading-flow-ol-level3-marker-width);
+}.wl-sec-list-item--number[style*="--wl-depth:3"]{
+  --wl-number-marker-width: var(--heading-flow-ol-level4-marker-width);
+}.wl-sec-list-item--number[style*="--wl-depth:4"]{
+  --wl-number-marker-width: var(--heading-flow-ol-level5-marker-width);
+}.wl-sec-list-item--number[style*="--wl-depth:5"]{
+  --wl-number-marker-width: var(--heading-flow-ol-level6-marker-width);
+}.wl-sec-list-item--number[style*="--wl-depth:6"]{
+  --wl-number-marker-width: var(--heading-flow-ol-level7-marker-width);
+}.wl-sec-list-item__marker{
+  white-space: nowrap;
+  color: var(--md-default-fg-color);
+  line-height: var(--knotis-list-bullet-line-height, 1.5);
+}.wl-sec-list-item--number .wl-sec-list-item__marker{
+  text-align: right;
+}:root .wl-sec-list-item--bullet .wl-sec-list-item__marker::after{
+  content: none;
+}.wl-sec-list-item__content{
+  min-width: 0;
+}.wl-sec-list-item--markerless-block .wl-sec-table-wrap, .wl-sec-list-item--markerless-block .wl-sec-code-block, .wl-sec-list-item--markerless-block .wl-sec-mermaid, .wl-sec-list-item--markerless-block :is(.admonition, details), .wl-sec-list-item--markerless-block .wl-sec-prose{
+  margin-top: 0;
+}:root .wl-sec-list-item--markerless-block .wl-sec-table-wrap{
+  margin: 0;
+}.wl-sec-outline-block{
+  padding-left: var(--wl-padding-left, calc(var(--wl-depth, 0) * var(--wl-list-indent-step)));
+}.wl-sec-prose{ margin: 0.15rem 0; }.wl-sec-gap{ height: 0.4rem; }.wl-sec-table-wrap{
+  margin: 0.35rem 0 0.45rem;
+  overflow-x: auto;
+}.wl-sec-table{
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  font-size: inherit;
+  line-height: 1.1;
+  color: inherit;
+}.wl-sec-table__cell{
+  padding: 2px 6px;
+  line-height: 1.1;
+  vertical-align: top;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, rgba(0,0,0,0.12));
+  overflow-wrap: anywhere;
+}.wl-sec-table__cell--th{
+  font-weight: 700;
+  text-align: left;
+  border-bottom: 2px solid var(--md-default-fg-color--light, rgba(0,0,0,0.28));
+}.wl-sec-table tbody tr:last-child .wl-sec-table__cell{
+  border-bottom: none;
+}.wl-sec-empty{ font-style: italic; opacity: 0.6; }.wl-img{
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.3rem 0;
+  display: block;
+}.wl-sec-prose code, .wl-sec-bullet code, .wikilink-card__context code{
+  background: var(--md-code-bg-color, rgba(0,0,0,0.05));
+  border-radius: 3px;
+  padding: 0 3px;
+  font-size: 0.9em;
+}.wl-sec-code-block{
+  margin: 0.25rem 0 0.35rem;
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(0,0,0,0.12));
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--md-code-bg-color, rgba(0,0,0,0.05)) 92%, var(--md-default-bg-color));
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}.wl-sec-code__toolbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.38rem 0.55rem 0.34rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, rgba(0,0,0,0.12));
+  background: color-mix(in srgb, var(--md-default-bg-color) 88%, var(--md-code-bg-color, rgba(0,0,0,0.05)));
+}.wl-sec-code__lang{
+  font-size: 0.66rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--light, rgba(0,0,0,0.54));
+}.wl-sec-code__copy{
+  appearance: none;
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(0,0,0,0.14));
+  border-radius: 4px;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.28rem 0.55rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}.wl-sec-code__copy:hover, .wl-sec-code__copy:focus-visible{
+  border-color: var(--knotis-accent-color);
+  color: var(--knotis-accent-color);
+  outline: none;
+}.wl-sec-code__copy--done{
+  border-color: color-mix(in srgb, var(--knotis-accent-color) 35%, transparent);
+  background: color-mix(in srgb, var(--knotis-accent-color) 10%, var(--md-default-bg-color));
+  color: var(--knotis-accent-color);
+}.wl-sec-code__body{
+  overflow-x: auto;
+  padding: 0.55rem 0.7rem 0.6rem;
+}.wl-sec-code{
+  display: block;
+  min-width: max-content;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--md-code-fg-color, inherit);
+}.wl-sec-code__line{
+  display: grid;
+  grid-template-columns: 2.2rem 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  min-height: 1.3em;
+}.wl-sec-code__line + .wl-sec-code__line{
+  margin-top: 0.04rem;
+}.wl-sec-code__line-number{
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  color: var(--md-default-fg-color--light, rgba(0,0,0,0.54));
+  font-size: 0.72rem;
+  line-height: 1.55;
+  user-select: none;
+  border-right: 1px solid var(--md-default-fg-color--lightest, rgba(0,0,0,0.12));
+  padding-right: 0.45rem;
+}.wl-sec-code__line-text{
+  display: block;
+  white-space: pre;
+}.wl-sec-code__annotation{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: start;
+  min-width: 1.4rem;
+  height: 1.2rem;
+  margin-top: 0.08rem;
+  padding: 0 0.35rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--knotis-accent-color) 12%, var(--md-default-bg-color));
+  color: var(--knotis-accent-color);
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1;
+}.wl-sec-list-item--annotation .wl-sec-list-item__marker{
+  color: var(--knotis-accent-color);
+  font-weight: 800;
+}  .wl-sec-mermaid{
+  font-size: 16px;
+  line-height: normal;
+  margin: 0.5rem 0;
+  overflow-x: auto;
+}.wl-sec-mermaid .mermaid{
+  display: flex;
+  font-size: 16px;
+  justify-content: center;
+  line-height: normal;
+}.wl-sec-mermaid svg{
+  font-size: 16px;
+  max-width: 100%;
+  height: auto;
+}  .wikilink-pane .wl-sec-mermaid, .knotis-search .wl-sec-mermaid{
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}.wikilink-pane .wl-sec-mermaid .mermaid, .knotis-search .wl-sec-mermaid .mermaid{
+  margin-inline: auto;
+  max-width: 100%;
+  min-width: 0;
+  text-align: center;
+  width: 100%;
+}.wikilink-pane .wl-sec-mermaid svg, .knotis-search .wl-sec-mermaid svg{
+  display: block;
+  height: auto;
+  margin-inline: auto;
+  max-height: min(62vh, 40em);
+  max-width: min(100%, 64em) !important;
+  width: 100%;
+}.wl-sec-mermaid--pane-fit{
+  overflow: hidden;
+}.wl-sec-mermaid__fit-shell{
+  display: block;
+  max-width: 100%;
+}.wl-sec-mermaid__fit-inner{
+  display: block;
+}  :is(.wikilink-pane, .knotis-search) :is(.mermaid, .knotis-search-diagram__surface) .node :is(rect, circle, ellipse, polygon, path){
+  fill: var(--md-mermaid-node-bg-color) !important;
+  stroke: var(--md-mermaid-node-fg-color) !important;
+}:is(.wikilink-pane, .knotis-search) :is(.mermaid, .knotis-search-diagram__surface) .cluster rect{
+  fill: var(--md-mermaid-label-bg-color) !important;
+  stroke: var(--md-mermaid-node-fg-color) !important;
+}:is(.wikilink-pane, .knotis-search) :is(.mermaid, .knotis-search-diagram__surface) :is(.nodeLabel, .cluster-label, .label, text.nodeLabel){
+  color: var(--md-mermaid-label-fg-color) !important;
+  fill: var(--md-mermaid-label-fg-color) !important;
+}:is(.wikilink-pane, .knotis-search) :is(.mermaid, .knotis-search-diagram__surface) :is(.edgeLabel, .edgeLabel p){
+  color: var(--md-mermaid-label-fg-color) !important;
+  background-color: var(--md-mermaid-label-bg-color) !important;
+}:is(.wikilink-pane, .knotis-search) :is(.mermaid, .knotis-search-diagram__surface) :is(.edgeLabel rect, .edgeLabel .label rect){
+  fill: var(--md-mermaid-label-bg-color) !important;
+}:is(.wikilink-pane, .knotis-search) :is(.mermaid, .knotis-search-diagram__surface) :is(.edgePath .path, .edgePath path, .flowchart-link){
+  stroke: var(--md-mermaid-edge-color) !important;
+}:is(.wikilink-pane, .knotis-search) :is(.mermaid, .knotis-search-diagram__surface) :is(marker path, .arrowheadPath, .arrowMarkerPath){
+  fill: var(--md-mermaid-edge-color) !important;
+  stroke: none !important;
+}  .wl-sec-html-table{
+  margin: 0.35rem 0 0.45rem;
+  overflow-x: auto;
+  font-size: 0.82rem;
+}.wl-sec-html-table table{
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 1px solid var(--md-default-fg-color--light);
+  border-bottom: 1px solid var(--md-default-fg-color--light);
+}.wl-sec-html-table th, .wl-sec-html-table td{
+  padding: 2px 6px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, rgba(0,0,0,0.12));
+  overflow-wrap: anywhere;
+}.wl-sec-html-table th{
+  font-weight: 700;
+  text-align: left;
+  border-bottom: 2px solid var(--md-default-fg-color--light, rgba(0,0,0,0.28));
+}.wl-sec-html-table tbody tr:last-child td{ border-bottom: none; }.wl-sec-html-embed{
+  margin: 0.45rem 0;
+  max-width: 100%;
+}.wl-sec-html-embed iframe{
+  max-width: 100%;
+}.wl-sec-tab-panel{
+  margin: 0.6rem 0;
+}  .wikilink-card__context .md-typeset :is(.admonition, details){
+  margin: 0.6rem 0;
+}.wl-sec-tab-panel{
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(0,0,0,0.12));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--md-code-bg-color, rgba(0,0,0,0.04)) 35%, var(--md-default-bg-color, #fff));
+  padding: 0.7rem 0.8rem;
+}.wl-sec-tab-panel__title{
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+  margin-bottom: 0.4rem;
+}  .img-lightbox{
+  position: fixed;
+  inset: 0;
+  z-index: 10100;               
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  animation: img-lightbox-fade-in 0.18s ease;
+}@keyframes img-lightbox-fade-in{
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}.img-lightbox__img{
+  max-width: 92vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.55);
+  cursor: default;
+  user-select: none;
+}.img-lightbox__close{
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--md-default-fg-color--lightest, rgba(255,255,255,0.15));
+  border-radius: 6px;
+  color: var(--md-default-fg-color--light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s;
+}.img-lightbox__close:hover, .img-lightbox__close:focus-visible{
+  color: var(--md-default-fg-color);
+  border-color: var(--md-default-fg-color);
+  outline: none;
+}.img-lightbox__caption{
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80vw;
+  background: rgba(0, 0, 0, 0.6);
+  color: #e8e8e8;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+  text-align: center;
+  pointer-events: none;
+}  .md-typeset img:not(.no-lightbox), .wl-img{ cursor: zoom-in; }  @media (max-width: 560px){
+  .wikilink-pane {
+    width: 100vw;
+    border-left: none;
+  }
+}  .wl-sec-code-block--rendered{
+  background: none;
+  border: none;
+  padding: 0;
+  position: relative;
+}.wl-sec-code-block--rendered .wl-sec-code__rendered{
+  color: var(--md-default-fg-color);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  min-width: 0;
+  width: 100%;
+}.wl-sec-code-block--rendered .wl-sec-code__rendered .highlight{
+  display: block;
+  margin: 0;
+  max-width: 100%;
+  width: 100%;
+}.wl-sec-code-block--rendered .wl-sec-code__rendered .highlighttable{
+  margin: 0 !important;
+}.wl-sec-code-block--rendered .wl-sec-code__rendered pre{
+  margin: 0;
+}.wl-sec-code-block--rendered .wl-sec-code__rendered .highlight code{
+  background: var(--md-code-bg-color);
+  border-radius: 0 0.4rem 0.4rem 0;
+  font-size: 0.64rem;
+  line-height: 1.5;
+  overflow: visible;
+  padding: 0.525rem 0.8rem;
+}  .wl-sec-code-block--rendered .wl-sec-code__rendered .highlight{
+  -ms-overflow-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}.wl-sec-code-block--rendered .wl-sec-code__rendered .highlight::-webkit-scrollbar{
+  display: none;
+  height: 0;
+  width: 0;
+}.wl-sec-code-block--rendered .wl-sec-code__rendered .highlighttable{
+  min-width: 100%;
+  width: max-content;
+}.wl-sec-code-block--rendered .wl-sec-code__rendered .highlighttable .linenodiv pre > .normal{
+  box-sizing: border-box;
+  display: block;
+  flex: 0 0 var(--wl-rendered-code-line-height, 1.5em);
+  height: var(--wl-rendered-code-line-height, 1.5em);
+  line-height: var(--wl-rendered-code-line-height, 1.5em);
+}.wl-sec-code-block--rendered .wl-sec-code__rendered :is(pre, code){
+  overflow-wrap: normal;
+  white-space: pre;
+  word-break: normal;
+}  .wl-sec-code-block--rendered .md-code__nav{
+  align-items: center;
+  display: flex;
+  height: 1.5rem;
+  position: absolute;
+  top: 0.125rem;
+  inset-inline-start: auto;
+  inset-inline-end: 0.25rem;
+  margin: 0;
+  padding: 0;
+}.wl-sec-code-block--rendered .md-code__button{
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  height: 1.5rem;
+  justify-content: center;
+  width: 1.5rem;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  color: var(--md-default-fg-color--lighter, rgba(0, 0, 0, 0.32));
+  background: transparent;
+}.wl-sec-code-block--rendered .md-code__button::after{
+  content: "";
+  display: block;
+  width: 0.95rem;
+  height: 0.95rem;
+  margin: 0;
+  background-color: currentColor;
+  -webkit-mask-image: var(--md-code-copy-icon);
+  mask-image: var(--md-code-copy-icon);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}.wl-sec-code-block--rendered .md-code__button:hover, .wl-sec-code-block--rendered .md-code__button.wl-sec-code__copy--done{
+  color: var(--md-accent-fg-color, #009485);
+}  :root[data-knotis-webkit-engine="true"] .wl-pane-list-item > .wl-sec-code-block--rendered:first-child{
+  display: inline-block !important;
+  max-width: 100%;
+  vertical-align: top;
+  width: 100%;
+}:root[data-knotis-webkit-engine="true"] .wl-sec-code-block--rendered .wl-sec-code__rendered .highlighttable .linenodiv pre{
+  display: block;
+}

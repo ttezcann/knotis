@@ -1,0 +1,22 @@
+{#-
+  Resolve Knotis content flags for every page from zensical.toml plus optional
+  page-level knotis_content front matter.
+-#}
+{% set site_content = config.extra.knotis.content if config.extra.knotis and config.extra.knotis.content else {} %}
+{% set page_content = page.meta.knotis_content if page.meta and page.meta.knotis_content else {} %}
+{% set heading_numbering = page_content.heading_numbering if page_content.heading_numbering is defined else site_content.heading_numbering | default(true) %}
+{% set nested_numbering_lists = true %}
+{% set heading_guides = page_content.heading_guides if page_content.heading_guides is defined else site_content.heading_guides | default(true) %}
+<div class="md-content" data-md-component="content">
+  {% if "navigation.path" in features %}
+    {% include "partials/path.html" %}
+  {% endif %}
+  <article
+    class="md-content__inner md-typeset"
+    data-knotis-heading-numbering="{{ heading_numbering | string | lower }}"
+    data-knotis-nested-numbering-lists="{{ nested_numbering_lists | string | lower }}"
+    data-knotis-heading-guides="{{ heading_guides | string | lower }}"
+  >
+    {% include "partials/content.html" %}
+  </article>
+</div>

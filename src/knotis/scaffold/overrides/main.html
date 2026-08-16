@@ -1,0 +1,58 @@
+{#-
+  Site-wide main layout: every page resolves Knotis content flags from
+  zensical.toml plus optional knotis_content front matter.
+-#}
+{% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+{%- for path in [
+  "assets/knotis/knotis-palette.css",
+  "assets/knotis/knotis-content-tags.css",
+  "assets/knotis/knotis-content.css",
+  "assets/knotis/knotis-wikilinks.css",
+  "assets/knotis/knotis-pane.css",
+  "assets/knotis/knotis-graph.css",
+  "assets/knotis/knotis-search.css",
+  "assets/knotis/knotis-slides.css",
+  "assets/knotis/knotis-readaloud.css",
+  "assets/knotis/knotis-media.css",
+  "stylesheets/knotis-theme.css",
+] %}
+<link rel="stylesheet" href="{{ path | url }}">
+{%- endfor %}
+{% endblock %}
+
+{% block extrahead %}
+{{ super() }}
+{%- set site_content = config.extra.knotis.content if config.extra.knotis and config.extra.knotis.content else {} -%}
+{%- set styled_section_groups = site_content.styled_section_groups | default(true) -%}
+<script>
+  document.documentElement.setAttribute("data-knotis-styled-section-groups", "{{ styled_section_groups | string | lower }}");
+</script>
+{% endblock %}
+
+{% block container %}
+  {% include "partials/knotis-content-container.html" %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{%- for path in [
+  "assets/knotis/vendor/mermaid-10.9.6.min.js",
+  "assets/knotis/knotis-core.js",
+  "assets/knotis/knotis-media.js",
+  "assets/knotis/knotis-icon-map.js",
+  "assets/knotis/knotis-wikilinks.js",
+  "assets/knotis/lunr.min.js",
+  "assets/knotis/knotis-search.js",
+  "assets/knotis/knotis-slides.js",
+  "assets/knotis/knotis-graph.js",
+  "assets/knotis/knotis-readaloud.js",
+  "javascripts/mathjax.js",
+  "javascripts/glossary.js",
+  "assets/knotis/vendor/mathjax-3.2.2-tex-mml-chtml.js",
+] %}
+<script src="{{ path | url }}"></script>
+{%- endfor %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{#-
+  Knotis override: when a page sets title in YAML front matter, always render
+  the page title as h1#__skip even if the Markdown body also contains h1
+  section headings.
+-#}
+{% include "partials/actions.html" %}
+{% if page.meta and page.meta.title %}
+  <h1 id="__skip">{{ page.title | d(config.site_name, true) }}</h1>
+{% elif "\u003ch1" not in page.content %}
+  <h1 id="__skip">{{ page.title | d(config.site_name, true) }}</h1>
+{% endif %}
+{{ page.content }}
+{% include "partials/tags.html" %}
+{% include "partials/source-file.html" %}
+{% include "partials/feedback.html" %}
+{% include "partials/comments.html" %}

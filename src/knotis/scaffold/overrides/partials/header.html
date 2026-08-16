@@ -1,0 +1,155 @@
+{#-
+  Knotis header override.
+
+  Based on Zensical 0.0.46's partials/header.html, with Knotis chrome rendered
+  server-side so header width is stable before the browser hydrates controls.
+-#}
+{% set class = "md-header" %}
+{% if "navigation.tabs.sticky" in features %}
+  {% set class = class ~ " md-header--shadow md-header--lifted" %}
+{% elif "navigation.tabs" not in features %}
+  {% set class = class ~ " md-header--shadow" %}
+{% endif %}
+{% set knotis = config.extra.knotis if config.extra and config.extra.knotis else {} %}
+{% set knotis_search = knotis.search if knotis.search is defined else {} %}
+{% set knotis_search_enabled = knotis_search.enabled if knotis_search.enabled is defined else false %}
+{% set knotis_slides = knotis.slides if knotis.slides is defined else {} %}
+{% set knotis_slides_enabled = knotis_slides.enabled if knotis_slides.enabled is defined else false %}
+{% set page_src = (page.file.src_uri if page.file and page.file.src_uri else "") | replace('\\', '/') | replace('docs/', '') %}
+{% set page_route = (page.url if page.url else "") | replace('\\', '/') | replace('index.html', '') %}
+{% set include_paths = knotis_slides.include_paths if knotis_slides.include_paths is defined else (knotis_slides.include_pages if knotis_slides.include_pages is defined else []) %}
+{% set exclude_paths = knotis_slides.exclude_paths if knotis_slides.exclude_paths is defined else (knotis_slides.exclude_pages if knotis_slides.exclude_pages is defined else []) %}
+{% set slides_match = namespace(included=false, excluded=false) %}
+{% if knotis_slides_enabled %}
+  {% for token in include_paths %}
+    {% set item = token | string | trim | replace('\\', '/') | replace('docs/', '') %}
+    {% set item_prefix = item ~ "/" %}
+    {% if page_src == item or page_src == item ~ ".md" or page_src[:item_prefix | length] == item_prefix or page_route == item_prefix or page_route[:item_prefix | length] == item_prefix %}
+      {% set slides_match.included = true %}
+    {% endif %}
+  {% endfor %}
+  {% for token in exclude_paths %}
+    {% set item = token | string | trim | replace('\\', '/') | replace('docs/', '') %}
+    {% set item_prefix = item ~ "/" %}
+    {% if page_src == item or page_src == item ~ ".md" or page_src[:item_prefix | length] == item_prefix or page_route == item_prefix or page_route[:item_prefix | length] == item_prefix %}
+      {% set slides_match.excluded = true %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+{% set knotis_slides_page = knotis_slides_enabled and slides_match.included and not slides_match.excluded %}
+<style id="knotis-header-critical">
+  .knotis-readaloud-trigger{align-items:center;display:inline-flex;flex:0 0 auto;position:relative}
+  .knotis-readaloud-panel[hidden]{display:none!important}
+  .knotis-readaloud-hp{align-items:center;background:transparent;border:0;color:currentColor;display:flex;flex:0 0 auto;height:2rem;padding:.4rem;width:2rem}
+  .md-search.knotis-search-trigger{display:block;flex:0 0 auto;height:2rem;width:8.9rem}
+  .knotis-slides-trigger,.knotis-pane-trigger{align-items:center;border:0;display:inline-flex;flex:0 0 auto;height:1.65rem;justify-content:center;margin-inline-start:.35rem;min-width:5.5rem;padding:0 .5rem}
+  .knotis-slides-restart{align-items:center;border:0;display:inline-flex;flex:0 0 auto;height:1.65rem;justify-content:center;margin-inline-start:.25rem;min-width:1.75rem;padding:0;width:1.75rem}
+  .knotis-slides-restart[hidden]{display:inline-flex!important;pointer-events:none;visibility:hidden}
+</style>
+<header class="{{ class }}" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="{{ lang.t('header') }}">
+    <a href="{{ config.extra.homepage | d(nav.homepage.url, true) | url }}" title="{{ config.site_name | e }}" class="md-header__button md-logo" aria-label="{{ config.site_name }}" data-md-component="logo">
+      {% include "partials/logo.html" %}
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="{{ lang.t('nav') }}">
+      {% set icon = config.theme.icon.menu or "material/menu" %}
+      {% include ".icons/" ~ icon ~ ".svg" %}
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            {{ config.site_name }}
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            {% if page.meta and page.meta.title %}
+              {{ page.meta.title }}
+            {% else %}
+              {{ page.title }}
+            {% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+    <span class="knotis-readaloud-trigger">
+      <span class="knotis-readaloud-panel" role="group" aria-label="Read aloud controls" hidden>
+        <button type="button" class="knotis-readaloud-btn knotis-readaloud-play" aria-label="Read page aloud" title="Read page aloud">
+          <span class="knotis-readaloud-play-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="5,3 19,12 5,21"/></svg>
+          </span>
+        </button>
+        <div class="knotis-readaloud-setting">
+          <select id="knotis-readaloud-rate-select" class="knotis-readaloud-setting__select knotis-readaloud-rate" aria-label="Speed">
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1">1.0x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2.0x</option>
+          </select>
+        </div>
+        <div class="knotis-readaloud-setting">
+          <select id="knotis-readaloud-voice-select" class="knotis-readaloud-setting__select knotis-readaloud-voice" aria-label="Voice"></select>
+        </div>
+        <span class="knotis-readaloud-no-voices" hidden>No speech voices available on this device</span>
+      </span>
+      <button type="button" class="knotis-readaloud-hp" aria-label="Read Aloud" aria-expanded="false" title="Read Aloud">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/><circle cx="12" cy="12" r="1"/></svg>
+      </button>
+    </span>
+    {% if config.theme.palette %}
+      {% if not config.theme.palette is mapping %}
+        {% include "partials/palette.html" %}
+      {% endif %}
+    {% endif %}
+    {% if not config.theme.palette is mapping %}
+      {% include "partials/javascripts/palette.html" %}
+    {% endif %}
+    {% if config.extra.alternate %}
+      {% include "partials/alternate.html" %}
+    {% endif %}
+    {% if knotis_search_enabled %}
+      <div class="md-search knotis-search-trigger" role="search" aria-label="Search" aria-keyshortcuts="Control+K Meta+K">
+        <button type="button" class="md-search__button" aria-label="Search" aria-keyshortcuts="Control+K Meta+K" title="Search">Search</button>
+      </div>
+    {% elif "search" in config.plugins %}
+      {% set search = config.plugins["search"] | attr("config") %}
+      {% if search.enabled %}
+        <label class="md-header__button md-icon" for="__search" aria-label="{{ lang.t('search') }}">
+          {% set icon = config.theme.icon.search or "material/magnify" %}
+          {% include ".icons/" ~ icon ~ ".svg" %}
+        </label>
+        {% include "partials/search.html" %}
+      {% endif %}
+    {% endif %}
+    {% if knotis_slides_page %}
+      <button type="button" class="knotis-slides-trigger" aria-label="Open module slides" title="Open module slides">
+        <span class="knotis-slides-trigger__icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9A2.5 2.5 0 0 1 17.5 17H13v2h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2H6.5A2.5 2.5 0 0 1 4 14.5v-9Zm2 0v9c0 .28.22.5.5.5h11a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5Z"/></svg>
+        </span>
+        <span class="knotis-slides-trigger__label">Slides</span>
+      </button>
+      <button type="button" class="knotis-slides-restart" aria-label="Restart module slides" aria-hidden="true" title="Restart module slides" hidden>
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path fill="currentColor" d="M125.7 160H176c17.7 0 32 14.3 32 32s-14.3 32-32 32H48c-17.7 0-32-14.3-32-32V64c0-17.7 14.3-32 32-32s32 14.3 32 32v51.2l17.6-17.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"/></svg>
+      </button>
+    {% endif %}
+    <button type="button" class="knotis-pane-trigger" aria-label="Open concept pane" aria-expanded="false" title="Open concept pane">
+      <span class="knotis-pane-trigger__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-panel-right-open" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/><path d="m10 15-3-3 3-3"/></svg>
+      </span>
+      <span class="knotis-pane-trigger__label">Pane</span>
+    </button>
+    <div class="md-header__source">
+      {% if config.repo_url %}
+        {% include "partials/source.html" %}
+      {% endif %}
+    </div>
+  </nav>
+  {% if "navigation.tabs.sticky" in features %}
+    {% if "navigation.tabs" in features %}
+      {% include "partials/tabs.html" %}
+    {% endif %}
+  {% endif %}
+</header>

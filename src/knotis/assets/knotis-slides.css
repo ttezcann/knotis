@@ -1,0 +1,855 @@
+.knotis-slides-trigger, .knotis-slides-restart, .knotis-pane-trigger{
+  align-items: center;
+  background: color-mix(in srgb, var(--md-default-bg-color, #ffffff) 92%, var(--md-default-fg-color, #111827) 8%);
+  border: 0;
+  border-radius: 0.2rem;
+  color: var(--md-default-fg-color, #111827) !important;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.38rem;
+  height: 1.65rem;
+  justify-content: center;
+  line-height: 1;
+  margin-inline-start: 0.35rem;
+  max-width: 9.5rem;
+  min-width: 5.5rem;
+  padding: 0 0.5rem;
+}.knotis-slides-trigger:hover, .knotis-slides-trigger:focus, .knotis-slides-restart:hover, .knotis-slides-restart:focus, .knotis-pane-trigger:hover, .knotis-pane-trigger:focus{
+  background: color-mix(in srgb, var(--md-default-bg-color, #ffffff) 84%, var(--md-default-fg-color, #111827) 16%);
+  color: var(--md-default-fg-color, #111827) !important;
+}.knotis-slides-trigger::before, .knotis-slides-trigger::after, .knotis-slides-restart::before, .knotis-slides-restart::after, .knotis-pane-trigger::before, .knotis-pane-trigger::after{
+  content: none !important;
+  display: none !important;
+}.knotis-slides-restart{
+  margin-inline-start: 0.25rem;
+  max-width: 1.75rem;
+  min-width: 1.75rem;
+  padding: 0;
+  width: 1.75rem;
+}.knotis-slides-restart[hidden]{
+  display: inline-flex !important;
+  pointer-events: none;
+  visibility: hidden;
+}.knotis-slides-trigger__icon, .knotis-pane-trigger__icon{
+  display: inline-flex;
+  flex: 0 0 auto;
+}.knotis-slides-trigger__icon svg, .knotis-slides-restart svg, .knotis-pane-trigger__icon svg{
+  height: 0.9rem;
+  pointer-events: none;
+  width: 0.9rem;
+}.knotis-slides-trigger__label, .knotis-pane-trigger__label{
+  font-size: 0.68rem;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}body[data-knotis-slides-lock]{
+  overflow: hidden !important;
+}.knotis-slides{
+  --knotis-slides-ink: var(--md-default-fg-color, #172033);
+  --knotis-slides-muted: var(--md-default-fg-color--light, #687084);
+  --knotis-slides-panel: var(--md-default-bg-color, #ffffff);
+  --knotis-slides-line: var(--md-default-fg-color--lightest, rgba(23, 32, 51, 0.14));
+  --knotis-slides-accent: var(--md-accent-fg-color, var(--md-primary-fg-color, #315f72));
+  --knotis-slides-button-bg: color-mix(in srgb, var(--knotis-slides-panel) 94%, var(--knotis-slides-ink) 6%);
+  --knotis-slides-button-bg-hover: color-mix(in srgb, var(--knotis-slides-panel) 88%, var(--knotis-slides-ink) 12%);
+  --knotis-slides-danger: #7a2532;
+  background: var(--knotis-slides-panel);
+  color: var(--knotis-slides-ink);
+  display: none;
+  inset: 0;
+  overflow: hidden;
+  position: fixed;
+  z-index: 9200;
+}[data-md-color-scheme="slate"] .knotis-slides{
+  --knotis-slides-danger: #ffb4c0;
+}.knotis-slides.knotis-slides--active{
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100vh;
+  min-height: 100dvh;
+}.knotis-slides.knotis-slides--preview{
+  overflow: auto;
+}.knotis-slides__chrome{
+  align-items: start;
+  background: var(--knotis-slides-panel);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: clamp(0.8rem, 2vw, 1.35rem) clamp(1rem, 3vw, 2.2rem) clamp(0.35rem, 0.8vw, 0.7rem);
+}.knotis-slides__meta{
+  min-width: 0;
+}.knotis-slides__crumb{
+  color: var(--knotis-slides-muted);
+  font-size: clamp(0.68rem, 1.1vw, 0.88rem);
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  margin-block-end: 0.22rem;
+}.knotis-slides__crumb:empty{
+  display: none;
+}.knotis-slides__crumb-link, .knotis-slides__toc-crumb-link{
+  background: transparent;
+  border: 0;
+  border-radius: 0.25rem;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 750;
+  padding: 0;
+  text-align: left;
+}.knotis-slides__crumb-link:hover, .knotis-slides__crumb-link:focus-visible, .knotis-slides__toc-crumb-link:hover, .knotis-slides__toc-crumb-link:focus-visible{
+  color: var(--knotis-slides-accent);
+  text-decoration: underline;
+}.knotis-slides__crumb-separator{
+  color: color-mix(in srgb, var(--knotis-slides-muted) 78%, transparent);
+  margin-inline: 0.35rem;
+}.knotis-slides__title{
+  color: var(--knotis-slides-ink);
+  font-size: clamp(1.05rem, 2vw, 1.75rem);
+  line-height: 1.1;
+  margin: 0;
+}.knotis-slides__title .wikilink, .knotis-slides__title .content-tag{
+  cursor: pointer;
+}.knotis-slides__topline{
+  align-items: center;
+  display: inline-flex;
+  gap: 0.6rem;
+  justify-self: end;
+}.knotis-slides__toc-button, .knotis-slides__slideshow-button, .knotis-slides__close-button{
+  align-items: center;
+  background: var(--knotis-slides-button-bg);
+  border: 1px solid var(--knotis-slides-line);
+  border-radius: 999px;
+  color: var(--knotis-slides-ink);
+  cursor: pointer;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  padding: 0;
+  width: 2rem;
+}.knotis-slides__toc-button:hover, .knotis-slides__toc-button:focus-visible, .knotis-slides__slideshow-button:hover, .knotis-slides__slideshow-button:focus-visible, .knotis-slides__close-button:hover, .knotis-slides__close-button:focus-visible{
+  background: var(--knotis-slides-button-bg-hover);
+  outline: 2px solid color-mix(in srgb, var(--knotis-slides-accent) 22%, transparent);
+  outline-offset: 2px;
+}.knotis-slides__toc-button svg, .knotis-slides__close-button svg{
+  height: 1rem;
+  pointer-events: none;
+  width: 1rem;
+}.knotis-slides__slideshow-button{
+  display: none;
+  font-size: 0.72rem;
+  font-weight: 750;
+  padding-inline: 0.8rem;
+  width: auto;
+}.knotis-slides--preview .knotis-slides__slideshow-button{
+  display: inline-flex;
+}.knotis-slides__close-button{
+  color: var(--knotis-slides-danger);
+}.knotis-slides__count{
+  color: var(--knotis-slides-muted);
+  font-size: clamp(0.68rem, 1vw, 0.82rem);
+  font-weight: 750;
+  padding-top: 0.2rem;
+  white-space: nowrap;
+}.knotis-slides__stage{
+  box-sizing: border-box;
+  display: grid;
+  cursor: pointer;
+  min-height: 0;
+  padding: 0;
+  place-items: stretch;
+  position: relative;
+}.knotis-slides--preview .knotis-slides__stage{
+  display: none;
+}.knotis-slides__card, .knotis-slides__measure{
+  background: var(--knotis-slides-panel);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--knotis-slides-ink);
+  font-size: var(--knotis-slides-font-size, calc(clamp(0.82rem, 1.35vw, 1.22rem) * var(--knotis-slides-scale, 1)));
+  line-height: 1.48;
+  height: 100%;
+  max-height: none;
+  max-width: none;
+  min-height: 0;
+  overflow: auto;
+  padding: clamp(1rem, 3vw, 2.4rem) clamp(1rem, 4vw, 3.6rem);
+  scrollbar-gutter: stable;
+  width: 100%;
+}.knotis-slides__title-slide{
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+  width: 100%;
+}.knotis-slides__title-slide-label{
+  color: var(--knotis-slides-ink);
+  font-size: var(--knotis-slides-title-slide-font-size, clamp(2rem, 6vw, 3.5rem));
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  text-align: center;
+  width: 100%;
+}.knotis-slides__measure{
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  position: absolute;
+  visibility: hidden;
+  z-index: -1;
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__stage{
+  align-items: stretch;
+  justify-items: center;
+  padding:
+    var(--knotis-slides-inset-top, 3vh)
+    var(--knotis-slides-inset-right, 5vw)
+    var(--knotis-slides-inset-bottom, 4vh)
+    var(--knotis-slides-inset-left, 5vw);
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure{
+  height: 100%;
+  max-width: 96rem;
+  overflow: hidden;
+  padding: 1rem 1.5rem;
+}.knotis-slides__card:focus{
+  outline: none;
+}.knotis-slides__body > :first-child{
+  margin-top: 0;
+}.knotis-slides__body > :last-child{
+  margin-bottom: 0;
+}.knotis-slides__card p, .knotis-slides__card li, .knotis-slides__measure p, .knotis-slides__measure li{
+  max-width: none;
+}:root[data-knotis-nested-numbering-lists="false"] :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body :is(ul, ol), :root[data-knotis-nested-numbering-lists="false"] .knotis-slides__preview-body-inner :is(ul, ol){
+  margin-left: 0;
+  padding-left: 1.3em;
+}:root[data-knotis-nested-numbering-lists="false"] :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body :is(ul, ol) :is(ul, ol), :root[data-knotis-nested-numbering-lists="false"] .knotis-slides__preview-body-inner :is(ul, ol) :is(ul, ol){
+  margin-left: 0;
+  padding-left: 1.3em;
+}.knotis-slides__card .knotis-slides__body ol, .knotis-slides__measure .knotis-slides__body ol{
+  list-style-type: decimal;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level1-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level1-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level1-gap);
+  counter-reset: level1 var(--knotis-ol-start, 0);
+  list-style: none !important;
+  padding-left: calc(var(--heading-flow-ol-indent) + var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level2-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level2-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level2-gap);
+  counter-reset: level2 var(--knotis-ol-start, 0);
+  padding-left: calc(var(--heading-flow-ol-indent) + var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level3-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level3-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level3-gap);
+  counter-reset: level3 var(--knotis-ol-start, 0);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level4-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level4-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level4-gap);
+  counter-reset: level4 var(--knotis-ol-start, 0);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level5-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level5-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level5-gap);
+  counter-reset: level5 var(--knotis-ol-start, 0);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level6-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level6-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level6-gap);
+  counter-reset: level6 var(--knotis-ol-start, 0);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol ol ol ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level7-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-ol-level7-marker-width);
+  --heading-flow-ol-gap: var(--heading-flow-ol-level7-gap);
+  counter-reset: level7 var(--knotis-ol-start, 0);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol > li{
+  padding-left: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ul{
+  list-style: disc outside;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) ul{
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--heading-flow-bullet-padding, 0);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) :is(ul, ol) ul{
+  list-style: disc outside;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--heading-flow-nested-list-indent);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) .heading-flow__content :is(ul, ol){
+  left: 0;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--heading-flow-bullet-padding, 0);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) .heading-flow__content :is(ul, ol) ul{
+  left: 0;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--heading-flow-nested-list-indent);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) .heading-flow__content ol ol{
+  padding-left: calc(var(--heading-flow-ol-indent) + var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap));
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) :is(.knotis-slides__body, .heading-flow__content) ul > li > ol ol{
+  --heading-flow-ol-indent: -2.3em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol > li{
+  counter-increment: level1;
+  list-style: none !important;
+  position: relative;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol > li{
+  counter-increment: level2;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol > li{
+  counter-increment: level3;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol > li{
+  counter-increment: level4;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol ol > li{
+  counter-increment: level5;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol ol ol > li{
+  counter-increment: level6;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol ol ol ol > li{
+  counter-increment: level7;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol > li::marker{
+  content: "";
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol > li::before{
+  display: block;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  font-weight: bold;
+  left: calc(-1 * (var(--heading-flow-ol-marker-width) + var(--heading-flow-ol-gap)));
+  margin-right: 0;
+  min-width: var(--heading-flow-list-number-width);
+  position: absolute;
+  text-align: right;
+  white-space: nowrap;
+  width: var(--heading-flow-ol-marker-width);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol > li::before{
+  content: counter(level1) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol > li::before{
+  content: counter(level1) "." counter(level2) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) "." counter(level5) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) "." counter(level5) "." counter(level6) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol ol ol ol ol ol ol > li::before{
+  content: counter(level1) "." counter(level2) "." counter(level3) "." counter(level4) "." counter(level5) "." counter(level6) "." counter(level7) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ul > li > ol{
+  --heading-flow-ol-indent: var(--heading-flow-ol-level1-indent);
+  --heading-flow-ol-marker-width: var(--heading-flow-list-number-width);
+  --heading-flow-ol-gap: var(--heading-flow-list-number-gap);
+  counter-reset: level1 var(--knotis-ol-start, 0);
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ul > li > ol > li{
+  counter-increment: level1;
+  padding-left: calc(0.5em + var(--heading-flow-ul-ol-indent));
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ul > li > ol > li::before{
+  content: counter(level1) ". ";
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) ul > li::marker{
+  font-size: 1.2em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block{
+  display: list-item;
+  list-style: disc outside !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block::marker{
+  font-size: 1.2em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block::before{
+  content: none;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > :is(.md-typeset__scrollwrap, .wl-sec-mermaid, .mermaid, .admonition, details):first-child{
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  width: 100%;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > .highlight:first-child:has(.highlighttable){
+  display: inline-table;
+  max-width: 100%;
+  vertical-align: top;
+  width: 100%;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > .highlight:first-child:not(:has(.highlighttable)), :root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > pre:first-child:not(.mermaid){
+  display: block;
+  max-width: 100%;
+  width: 100%;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > .highlight:first-child:not(:has(.highlighttable)) > pre, :root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > pre:first-child:not(.mermaid){
+  display: contents;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > .highlight:first-child:not(:has(.highlighttable)) > pre > code, :root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > pre:first-child:not(.mermaid) > code{
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  width: 100%;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > :is(img, figure):first-child, :root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > p:first-child:has(> img:only-child, > a:only-child > img:only-child){
+  display: inline-block;
+  margin: 0.8rem 0 !important;
+  max-width: 100%;
+  text-align: left;
+  vertical-align: top;
+  width: auto;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > p:first-child:has(> img:only-child, > a:only-child > img:only-child) > :is(img, a){
+  margin: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > :is(table, .md-typeset__table):first-child{
+  display: inline-table;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details):first-child, :root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li.knotis-slides__markerless-block > :is(table, .md-typeset__table, .md-typeset__scrollwrap):first-child :is(table, .highlighttable){
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner){
+  --knotis-markerless-block-child-gap: 0.1rem;
+  --knotis-markerless-prose-block-gap: 0.5em;
+  --knotis-markerless-prose-code-gap: var(--knotis-markerless-block-child-gap);
+  --knotis-markerless-prose-table-gap: 1em;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) :is(.heading-flow__content, .knotis-slides__body) li > p:first-child{
+  margin-top: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) :is(.heading-flow__content, .knotis-slides__body) li > :last-child{
+  margin-bottom: 0;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li:has(> p:first-child + :is(ul, ol) > li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details)) > p:first-child{
+  margin-bottom: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li.knotis-slides__markerless-block > :is(ul, ol){
+  margin-top: var(--knotis-markerless-block-child-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li.knotis-slides__markerless-block > :is(ul, ol) > li:first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li.knotis-slides__markerless-block > :is(ul, ol) > li:first-child > :is(p, .highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details):first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li > p + :is(ul, ol) > li:first-child > .highlight:first-child :is(table, .highlighttable){
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid):first-child){
+  margin-top: var(--knotis-markerless-prose-code-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li > p + :is(ul, ol):has(> li:first-child > :is(table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details):first-child){
+  margin-top: var(--knotis-markerless-prose-table-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details):first-child) > li:first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li:has(> p) + li:has(> :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details):first-child){
+  margin-top: var(--knotis-markerless-prose-block-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li > p + :is(ul, ol):has(> li:first-child > :is(.admonition, details):first-child) > li:first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol > li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid):first-child){
+  margin-top: var(--knotis-markerless-prose-code-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol > li > p + :is(ul, ol):has(> li:first-child > :is(table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details):first-child){
+  margin-top: var(--knotis-markerless-prose-table-gap) !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) ol > li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details):first-child) > li:first-child{
+  margin-top: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li > p + :is(ul, ol) > li:first-child > :is(table, .md-typeset__table, .md-typeset__scrollwrap):first-child :is(table){
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}:root:not([data-knotis-nested-numbering-lists="false"]) :is(:is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner) li > p + :is(ul, ol):has(> li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details):first-child) > li:first-child > :is(.highlight, pre, .wl-sec-mermaid, .mermaid, table, .md-typeset__table, .md-typeset__scrollwrap, .admonition, details):first-child{
+  margin-top: 0 !important;
+}.knotis-slides__card .knotis-slides__body > p:has(> img:only-child) + ol, .knotis-slides__card .knotis-slides__body > p:has(> a:only-child > img:only-child) + ol, .knotis-slides__measure .knotis-slides__body > p:has(> img:only-child) + ol, .knotis-slides__measure .knotis-slides__body > p:has(> a:only-child > img:only-child) + ol{
+  margin-left: min(2.4rem, 6vw);
+}.knotis-slides__card .knotis-slides__body li > p:has(> img:only-child) + ol, .knotis-slides__card .knotis-slides__body li > p:has(> a:only-child > img:only-child) + ol, .knotis-slides__measure .knotis-slides__body li > p:has(> img:only-child) + ol, .knotis-slides__measure .knotis-slides__body li > p:has(> a:only-child > img:only-child) + ol{
+  margin-left: min(2.4rem, 6vw);
+}.knotis-slides__card li + li, .knotis-slides__measure li + li{
+  margin-top: 0.22rem;
+}.knotis-slides__card img, .knotis-slides__measure img{
+  border-radius: 0.35rem;
+  box-shadow: none;
+  display: block;
+  margin: 0.8rem auto 0.8rem 0;
+  max-height: min(72vh, 46rem);
+  max-width: min(100%, 86rem);
+  object-fit: contain;
+}.knotis-slides__card p:has(> img:only-child), .knotis-slides__card figure, .knotis-slides__measure p:has(> img:only-child), .knotis-slides__measure figure{
+  text-align: left;
+}.knotis-slides__card table, .knotis-slides__measure table{
+  font-size: 1em;
+  max-width: 100%;
+  min-width: 0;
+  width: auto;
+}.knotis-slides__card table:has(tr > :nth-child(4)), .knotis-slides__measure table:has(tr > :nth-child(4)){
+  min-width: min(32rem, 100%);
+  width: 100%;
+}.knotis-slides__card .md-typeset__table, .knotis-slides__card table, .knotis-slides__card .highlight, .knotis-slides__card pre, .knotis-slides__measure .md-typeset__table, .knotis-slides__measure table, .knotis-slides__measure .highlight, .knotis-slides__measure pre{
+  max-width: 100%;
+  overflow: auto;
+}.knotis-slides__card .highlight pre, .knotis-slides__measure .highlight pre{
+  max-height: 48vh;
+}.knotis-slides__card .admonition, .knotis-slides__card details, .knotis-slides__measure .admonition, .knotis-slides__measure details{
+  box-sizing: border-box;
+  font-size: 1em;
+  margin-inline: 0;
+  max-width: 100%;
+  width: 100%;
+}.knotis-slides__card .admonition-title, .knotis-slides__card details > summary, .knotis-slides__measure .admonition-title, .knotis-slides__measure details > summary{
+  display: block;
+}.knotis-slides__card .admonition-title::before, .knotis-slides__card details > summary::before, .knotis-slides__measure .admonition-title::before, .knotis-slides__measure details > summary::before{
+  flex: 0 0 0.9em;
+  height: 0.9em;
+  left: 0;
+  margin: 0;
+  position: absolute;
+  top: 0.12em;
+  transform: none;
+  width: 0.9em;
+}.knotis-slides__card details > summary, .knotis-slides__measure details > summary{
+  font-size: min(1.08em, 2.2rem);
+  line-height: 1.18;
+  min-height: 0;
+}.knotis-slides__card details > summary + *, .knotis-slides__measure details > summary + *{
+  margin-top: 0.65em;
+}.knotis-slides__card .admonition p, .knotis-slides__card .admonition li, .knotis-slides__card .admonition table, .knotis-slides__card .admonition pre, .knotis-slides__card .admonition code, .knotis-slides__card .admonition .md-typeset__table, .knotis-slides__card .admonition .md-typeset__scrollwrap, .knotis-slides__card .admonition .highlight, .knotis-slides__card details p, .knotis-slides__card details li, .knotis-slides__card details table, .knotis-slides__card details pre, .knotis-slides__card details code, .knotis-slides__card details .md-typeset__table, .knotis-slides__card details .md-typeset__scrollwrap, .knotis-slides__card details .highlight, .knotis-slides__measure .admonition p, .knotis-slides__measure .admonition li, .knotis-slides__measure .admonition table, .knotis-slides__measure .admonition pre, .knotis-slides__measure .admonition code, .knotis-slides__measure .admonition .md-typeset__table, .knotis-slides__measure .admonition .md-typeset__scrollwrap, .knotis-slides__measure .admonition .highlight, .knotis-slides__measure details p, .knotis-slides__measure details li, .knotis-slides__measure details table, .knotis-slides__measure details pre, .knotis-slides__measure details code, .knotis-slides__measure details .md-typeset__table, .knotis-slides__measure details .md-typeset__scrollwrap, .knotis-slides__measure details .highlight{
+  font-size: inherit;
+}.knotis-slides__card .mermaid, .knotis-slides__card .wl-sec-mermaid, .knotis-slides__measure .mermaid, .knotis-slides__measure .wl-sec-mermaid{
+  font-size: 1em;
+  line-height: normal;
+  margin-inline: auto;
+  max-width: 100%;
+  text-align: center;
+  width: 100%;
+}.knotis-slides__card .mermaid svg, .knotis-slides__card .wl-sec-mermaid svg, .knotis-slides__measure .mermaid svg, .knotis-slides__measure .wl-sec-mermaid svg{
+  display: block;
+  height: auto;
+  margin-inline: auto;
+  max-height: min(62vh, 40em);
+  max-width: min(100%, 64em) !important;
+  width: 100%;
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card .mermaid svg, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card .wl-sec-mermaid svg, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure .mermaid svg, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure .wl-sec-mermaid svg{
+  max-height: min(58vh, 36em);
+}  .knotis-slides .mermaid .node rect, .knotis-slides .mermaid .node circle, .knotis-slides .mermaid .node ellipse, .knotis-slides .mermaid .node polygon, .knotis-slides .mermaid .node path{
+  fill: var(--md-mermaid-node-bg-color) !important;
+  stroke: var(--md-mermaid-node-fg-color) !important;
+}.knotis-slides .mermaid .cluster rect{
+  fill: var(--md-mermaid-label-bg-color) !important;
+  stroke: var(--md-mermaid-node-fg-color) !important;
+}.knotis-slides .mermaid .nodeLabel, .knotis-slides .mermaid .cluster-label, .knotis-slides .mermaid .label, .knotis-slides .mermaid text.nodeLabel{
+  color: var(--md-mermaid-label-fg-color) !important;
+  fill: var(--md-mermaid-label-fg-color) !important;
+}.knotis-slides .mermaid .edgeLabel, .knotis-slides .mermaid .edgeLabel p{
+  color: var(--md-mermaid-label-fg-color) !important;
+  background-color: var(--md-mermaid-label-bg-color) !important;
+}.knotis-slides .mermaid .edgeLabel rect, .knotis-slides .mermaid .edgeLabel .label rect{
+  fill: var(--md-mermaid-label-bg-color) !important;
+}.knotis-slides .mermaid .edgePath .path, .knotis-slides .mermaid .edgePath path, .knotis-slides .mermaid .flowchart-link{
+  stroke: var(--md-mermaid-edge-color) !important;
+}.knotis-slides .mermaid marker path, .knotis-slides .mermaid .arrowheadPath, .knotis-slides .mermaid .arrowMarkerPath{
+  fill: var(--md-mermaid-edge-color) !important;
+  stroke: none !important;
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__body{
+  max-height: 100%;
+  max-width: 100%;
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card .knotis-slides__body, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure .knotis-slides__body{
+  transform: scale(var(--knotis-slides-content-scale, 1));
+  transform-origin: top left;
+  width: calc(100% / var(--knotis-slides-content-scale, 1));
+}.knotis-slides[data-knotis-slides-engine="webkit"][data-knotis-fit-mode="fit"] .knotis-slides__card .knotis-slides__body, .knotis-slides[data-knotis-slides-engine="webkit"][data-knotis-fit-mode="fit"] .knotis-slides__measure .knotis-slides__body{
+  max-height: none;
+  max-width: none;
+  transform: none;
+  width: auto;
+}.knotis-slides[data-knotis-slides-engine="webkit"][data-knotis-fit-mode="fit"] .knotis-slides__body-fit{
+  display: block;
+  transform: none;
+  width: auto;
+}.knotis-slides[data-knotis-slides-engine="webkit"] .knotis-slides__preview-body-inner{
+  transform: none;
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card img, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure img{
+  max-height: min(62vh, 28em);
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card .md-typeset__table, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card .md-typeset__scrollwrap, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card table, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card .highlight, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card pre, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure .md-typeset__table, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure .md-typeset__scrollwrap, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure table, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure .highlight, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure pre{
+  max-height: none;
+  overflow: visible;
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card .md-typeset__scrollwrap, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card .md-typeset__table, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure .md-typeset__scrollwrap, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure .md-typeset__table{
+  margin-inline: 0;
+  max-height: none;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-gutter: stable;
+  width: auto;
+}.knotis-slides[data-knotis-fit-mode="fit"] :is(.knotis-slides__card, .knotis-slides__measure) :is(.md-typeset__scrollwrap, .md-typeset__table):has(table tr > :nth-child(4)){
+  width: 100%;
+}  .knotis-slides[data-knotis-fit-mode="fit"] :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) li:has(> p) + li.knotis-slides__markerless-block > :is(.md-typeset__scrollwrap, .md-typeset__table, table):first-child, .knotis-slides[data-knotis-fit-mode="fit"] :is( :is(.knotis-slides__card, .knotis-slides__measure) .knotis-slides__body, .knotis-slides__preview-body-inner ) > ol + ul > li.knotis-slides__markerless-block > :is(.md-typeset__scrollwrap, .md-typeset__table, table):first-child{
+  margin-inline: unset;
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card table, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure table{
+  font-size: min(0.82em, 30px);
+  max-width: 100%;
+  min-width: 0;
+  table-layout: auto;
+  width: auto;
+}.knotis-slides[data-knotis-fit-mode="fit"] :is(.knotis-slides__card, .knotis-slides__measure) table:has(tr > :nth-child(4)){
+  width: 100%;
+}.knotis-slides[data-knotis-fit-mode="fit"] :is(.knotis-slides__card, .knotis-slides__measure) table:has(tr:nth-child(9)){
+  font-size: min(0.74em, 24px);
+}.knotis-slides[data-knotis-fit-mode="fit"] :is(.knotis-slides__card, .knotis-slides__measure) table:has(tr:nth-child(9)) :is(th, td){
+  line-height: 1.2;
+  padding: 0.4em 0.58em;
+}.knotis-slides[data-knotis-fit-mode="fit"] :is(.knotis-slides__card, .knotis-slides__measure) table:has(tr:nth-child(13)){
+  font-size: min(0.68em, 22px);
+}.knotis-slides[data-knotis-fit-mode="fit"] :is(.knotis-slides__card, .knotis-slides__measure) table:has(tr:nth-child(13)) :is(th, td){
+  line-height: 1.22;
+  padding: 0.42em 0.65em;
+}.knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card th, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__card td, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure th, .knotis-slides[data-knotis-fit-mode="fit"] .knotis-slides__measure td{
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-break: normal;
+}.knotis-slides[data-knotis-fit-mode="fit"] :is(.knotis-slides__card, .knotis-slides__measure) table :is( [data-knotis-table-cell="numeric"], [data-knotis-table-cell="compact"] ){
+  white-space: nowrap;
+  width: 1%;
+}.knotis-slides__card .wikilink, .knotis-slides__card .content-tag{
+  cursor: pointer;
+}.knotis-slides__preview{
+  display: none;
+}.knotis-slides--preview .knotis-slides__preview{
+  box-sizing: border-box;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(24rem, 100%), 1fr));
+  overflow: auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+}.knotis-slides__preview-card--title-slide{
+  grid-template-rows: auto minmax(0, 1fr);
+}.knotis-slides__preview-card--title-slide .knotis-slides__preview-crumb, .knotis-slides__preview-card--title-slide .knotis-slides__preview-title{
+  display: none;
+}.knotis-slides__preview-card{
+  background: var(--knotis-slides-panel);
+  border: 1px solid var(--knotis-slides-line);
+  border-radius: 0.9rem;
+  box-shadow: 0 0.8rem 2.2rem color-mix(in srgb, var(--knotis-slides-ink) 8%, transparent);
+  color: var(--knotis-slides-ink);
+  cursor: pointer;
+  display: grid;
+  gap: 0.35rem;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  height: clamp(17rem, 28vw, 22rem);
+  overflow: hidden;
+  padding: 1rem;
+  position: relative;
+  text-align: left;
+}.knotis-slides__preview-card:hover, .knotis-slides__preview-card:focus-visible, .knotis-slides__preview-card--active{
+  border-color: color-mix(in srgb, var(--knotis-slides-accent) 45%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--knotis-slides-accent) 16%, transparent);
+  outline-offset: 2px;
+}.knotis-slides__preview-number{
+  color: var(--knotis-slides-muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+}.knotis-slides__preview-crumb{
+  color: var(--knotis-slides-muted);
+  font-size: 0.68rem;
+  line-height: 1.25;
+}.knotis-slides__preview-title{
+  color: var(--knotis-slides-ink);
+  font-size: 0.92rem;
+  line-height: 1.2;
+}.knotis-slides__preview-body{
+  display: block;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}.knotis-slides__preview-card:not(.knotis-slides__preview-card--title-slide) .knotis-slides__preview-body{
+  container-type: size;
+}.knotis-slides__preview-body-inner{
+  display: block;
+  transform: scale(var(--knotis-slides-preview-scale, 1));
+  transform-origin: top left;
+}.knotis-slides__preview-body-inner--title-slide{
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}.knotis-slides__preview-body-inner--title-slide .knotis-slides__title-slide{
+  min-height: 0;
+}.knotis-slides__preview-body-inner--title-slide .knotis-slides__title-slide-label{
+  font-size: 1.05rem;
+  font-weight: 750;
+  line-height: 1.15;
+  text-align: center;
+}.knotis-slides__preview-body-inner > :first-child{
+  margin-top: 0;
+}.knotis-slides__preview-body-inner > :last-child{
+  margin-bottom: 0;
+}.knotis-slides__preview-body img, .knotis-slides__preview-body svg{
+  height: auto;
+  max-height: 100cqh;
+  max-width: 100%;
+  object-fit: contain;
+}.knotis-slides__preview-body table{
+  font-size: 0.78em;
+  min-width: 0 !important;
+}.knotis-slides__preview-body .md-typeset__table, .knotis-slides__preview-body table, .knotis-slides__preview-body .highlight, .knotis-slides__preview-body pre{
+  max-height: none;
+  max-width: 100%;
+  overflow: visible;
+}.knotis-slides__preview-body .admonition, .knotis-slides__preview-body details{
+  max-width: none;
+  width: auto;
+}.knotis-slides__toc-backdrop{
+  background: color-mix(in srgb, var(--knotis-slides-ink) 12%, transparent);
+  inset: 0;
+  position: fixed;
+  z-index: 1;
+}.knotis-slides__toc-backdrop[hidden], .knotis-slides__toc[hidden]{
+  display: none !important;
+}.knotis-slides__toc{
+  background: var(--knotis-slides-panel);
+  border-left: 1px solid var(--knotis-slides-line);
+  box-shadow: -1rem 0 3rem color-mix(in srgb, var(--knotis-slides-ink) 14%, transparent);
+  box-sizing: border-box;
+  color: var(--knotis-slides-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  inset: 0 0 0 auto;
+  max-width: min(28rem, 86vw);
+  padding: clamp(1rem, 2.4vw, 1.6rem);
+  position: fixed;
+  transform: translateX(100%);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  width: 28rem;
+  z-index: 2;
+}.knotis-slides.knotis-slides--toc-open .knotis-slides__toc{
+  transform: translateX(0);
+}.knotis-slides__toc-heading{
+  color: var(--knotis-slides-muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}.knotis-slides__toc-list{
+  display: grid;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  overflow: auto;
+  padding: 0;
+}.knotis-slides__toc-item{
+  align-items: start;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+  color: var(--knotis-slides-ink);
+  cursor: pointer;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  padding: 0.55rem 0.6rem;
+  text-align: left;
+  width: 100%;
+}.knotis-slides__toc-item:hover, .knotis-slides__toc-item:focus-visible, .knotis-slides__toc-item--active{
+  background: color-mix(in srgb, var(--knotis-slides-accent) 10%, var(--knotis-slides-panel));
+  border-color: color-mix(in srgb, var(--knotis-slides-accent) 24%, transparent);
+  outline: none;
+}.knotis-slides__toc-number{
+  color: var(--knotis-slides-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding-top: 0.1rem;
+}.knotis-slides__toc-text{
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}.knotis-slides__toc-crumb{
+  color: var(--knotis-slides-muted);
+  font-size: 0.68rem;
+  font-weight: 750;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}.knotis-slides__toc-title-button{
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 720;
+  line-height: 1.25;
+  padding: 0;
+  text-align: left;
+}.knotis-slides__toc-title-button:hover, .knotis-slides__toc-title-button:focus-visible{
+  color: var(--knotis-slides-accent);
+  outline: none;
+  text-decoration: underline;
+}@media (max-width: 54rem){
+  .knotis-slides-trigger,
+  .knotis-pane-trigger {
+    min-width: 2.2rem;
+    padding-inline: 0.45rem;
+  }
+
+  .knotis-slides-trigger__label,
+  .knotis-pane-trigger__label {
+    display: none;
+  }
+
+  .knotis-slides__chrome {
+    grid-template-columns: 1fr;
+  }
+
+  .knotis-slides__topline {
+    justify-self: start;
+  }
+
+  .knotis-slides__card {
+    min-height: 0;
+  }
+}  .knotis-slides__card .highlight, .knotis-slides__measure .highlight, .knotis-slides__preview-body-inner .highlight{
+  position: relative;
+}.knotis-slides .highlight > .knotis-slides__code-nav{
+  align-items: center;
+  display: flex;
+  height: 2rem;
+  inset-inline-end: 0.35rem;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0.3rem;
+  z-index: 2;
+}.knotis-slides .knotis-slides__code-copy{
+  align-items: center;
+  background: transparent;
+  border: 0;
+  box-sizing: border-box;
+  color: var(--md-default-fg-color--light, rgba(0, 0, 0, 0.54));
+  cursor: pointer;
+  display: flex;
+  height: 2rem;
+  justify-content: center;
+  padding: 0;
+  width: 2rem;
+}.knotis-slides .knotis-slides__code-copy::after{
+  background-color: currentColor;
+  content: "";
+  display: block;
+  height: 1.1rem;
+  margin: 0;
+  -webkit-mask-image: var(--md-code-copy-icon);
+  mask-image: var(--md-code-copy-icon);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  width: 1.1rem;
+}.knotis-slides .knotis-slides__code-copy:hover, .knotis-slides .knotis-slides__code-copy--done{
+  color: var(--md-accent-fg-color, #009485);
+}.knotis-slides .highlighttable .linenodiv pre > .normal{
+  align-items: center;
+  display: flex;
+  flex: 0 0 1.5em;
+  height: 1.5em;
+  justify-content: flex-end;
+  line-height: 1.5em;
+}.knotis-slides[data-knotis-slides-engine="webkit"] .highlighttable .linenodiv pre > .normal:first-child{
+  transform: none;
+}  .knotis-slides :is(.knotis-slides__card, .knotis-slides__measure, .knotis-slides__preview-body-inner) .highlight{
+  -ms-overflow-style: none;
+  display: block !important;
+  max-width: 100%;
+  overflow-x: auto !important;
+  scrollbar-width: none;
+  width: 100%;
+}  .knotis-slides[data-knotis-slides-engine="webkit"] :is(.knotis-slides__card, .knotis-slides__measure, .knotis-slides__preview-body-inner) ul > li.knotis-slides__markerless-block > .highlight:first-child{
+  display: inline-block !important;
+  vertical-align: top;
+}.knotis-slides :is(.knotis-slides__card, .knotis-slides__measure, .knotis-slides__preview-body-inner) .highlight::-webkit-scrollbar{
+  display: none;
+  height: 0;
+  width: 0;
+}.knotis-slides :is(.knotis-slides__card, .knotis-slides__measure, .knotis-slides__preview-body-inner) .highlighttable{
+  max-width: none;
+  min-width: 100% !important;
+  width: max-content !important;
+}.knotis-slides :is(.knotis-slides__card, .knotis-slides__measure, .knotis-slides__preview-body-inner) :is(.highlight code, pre code){
+  overflow-wrap: normal;
+  white-space: pre;
+  word-break: normal;
+}

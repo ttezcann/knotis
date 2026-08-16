@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "knotis"
+version = "0.1.0"
+description = "Knotis extensions and local-site tooling for Zensical."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "Tolga Tezcan" },
+]
+dependencies = [
+  "zensical==0.0.55",
+]
+
+[project.scripts]
+knotis = "knotis.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+knotis = [
+  "assets/*",
+  "assets/vendor/*",
+  "scaffold/.gitignore",
+  "scaffold/zensical.toml",
+  "scaffold/assets/*",
+  "scaffold/docs/*.md",
+  "scaffold/docs/**/*.md",
+  "scaffold/docs/assets/**",
+  "scaffold/docs/assets/attachments/**/.gitkeep",
+  "scaffold/docs/javascripts/*",
+  "scaffold/overrides/**/*.html",
+]

@@ -467,12 +467,13 @@
   margin-inline: 0;
   max-width: 100%;
   width: 100%;
-}.knotis-slides__card .admonition-title, .knotis-slides__card details > summary, .knotis-slides__measure .admonition-title, .knotis-slides__measure details > summary{
+}.knotis-slides :is(.knotis-slides__card, .knotis-slides__measure, .knotis-slides__preview-body-inner) :is(.admonition-title, details > summary){
   display: block;
-}.knotis-slides__card .admonition-title::before, .knotis-slides__card details > summary::before, .knotis-slides__measure .admonition-title::before, .knotis-slides__measure details > summary::before{
+  padding-left: 1.45em;
+}.knotis-slides :is(.knotis-slides__card, .knotis-slides__measure, .knotis-slides__preview-body-inner) :is(.admonition-title, details > summary)::before{
   flex: 0 0 0.9em;
   height: 0.9em;
-  left: 0;
+  left: 0.2em;
   margin: 0;
   position: absolute;
   top: 0.12em;

@@ -585,6 +585,6 @@ VALID_FIT_MODES = {"fit", "loose", "manual"}
 VALID_SLIDE_FIT_MODES = {"fit", "scroll"}
 
 KNOTIS_FOOTER_ATTRIBUTION_HTML = (
-    'Made with <a href="https://www.knotis-docs.ttezcan.com">Knotis</a>, '
+    'Made with <a href="https://knotis-docs.ttezcan.com/">Knotis</a>, '
     'a wrapper for <a href="https://zensical.org/">Zensical</a>'
 )

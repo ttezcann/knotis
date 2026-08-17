@@ -59,6 +59,7 @@ class PackagingTests(unittest.TestCase):
             "knotis/assets/vendor/mathjax-3.2.2.LICENSE",
             "knotis/assets/vendor/mermaid-10.9.6.min.js",
             "knotis/assets/vendor/mermaid-10.9.6.LICENSE",
+            "knotis/scaffold/.github/workflows/docs.yml",
             "knotis/scaffold/zensical.toml",
             "knotis/scaffold/docs/index.md",
             "knotis/scaffold/docs/assets/attachments/section-1/page-1/.gitkeep",
@@ -106,6 +107,11 @@ class PackagingTests(unittest.TestCase):
             self.assertTrue(attachment_dir.is_dir(), attachment_dir)
             self.assertTrue((attachment_dir / ".gitkeep").is_file(), attachment_dir / ".gitkeep")
         self.assertFalse((site_root / "scripts" / "build_wikilinks.py").exists())
+        workflow = (site_root / ".github" / "workflows" / "docs.yml").read_text(encoding="utf-8")
+        self.assertIn("python -m pip install knotis", workflow)
+        self.assertIn("knotis build", workflow)
+        self.assertNotIn("pip install zensical", workflow)
+        self.assertNotIn("zensical build --clean", workflow)
         config = (site_root / "zensical.toml").read_text(encoding="utf-8")
         self.assertNotIn("knotis.markdown.knotis_slide_markers", config)
 

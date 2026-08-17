@@ -31,6 +31,7 @@ knotis = [
   "assets/*",
   "assets/vendor/*",
   "scaffold/.gitignore",
+  "scaffold/.github/workflows/*.yml",
   "scaffold/zensical.toml",
   "scaffold/assets/*",
   "scaffold/docs/*.md",

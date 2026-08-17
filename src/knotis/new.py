@@ -60,6 +60,10 @@ def run_knotis_new(target: Path, *, run_build: bool = True) -> None:
 
         _copy_file(scaffold_dir / "zensical.toml", target / "zensical.toml")
         _copy_file(scaffold_dir / ".gitignore", target / ".gitignore")
+        _copy_file(
+            scaffold_dir / ".github" / "workflows" / "docs.yml",
+            target / ".github" / "workflows" / "docs.yml",
+        )
         _copy_tree(scaffold_dir / "overrides", target / "overrides")
         _copy_tree(scaffold_dir / "docs", target / "docs")
         _copy_file(

@@ -134,14 +134,12 @@ def clean_managed_docs_assets_for_site_only(docs_assets_dir: Path) -> None:
         path = docs_assets_dir / fname
         if path.is_file():
             path.unlink()
-            print(f"[build_wikilinks] Removed managed {path}", file=sys.stderr)
     vendor_dir = docs_assets_dir / "vendor"
     if vendor_dir.is_dir():
         for fname in VENDOR_ASSET_FILES:
             path = vendor_dir / fname
             if path.is_file():
                 path.unlink()
-                print(f"[build_wikilinks] Removed managed {path}", file=sys.stderr)
         try:
             vendor_dir.rmdir()
         except OSError:
@@ -155,14 +153,12 @@ def clean_managed_site_root_assets_for_fresh_site(site_assets_dir: Path) -> None
         path = site_assets_dir / fname
         if path.is_file():
             path.unlink()
-            print(f"[build_wikilinks] Removed managed {path}", file=sys.stderr)
     vendor_dir = site_assets_dir / "vendor"
     if vendor_dir.is_dir():
         for fname in VENDOR_ASSET_FILES:
             path = vendor_dir / fname
             if path.is_file():
                 path.unlink()
-                print(f"[build_wikilinks] Removed managed {path}", file=sys.stderr)
         try:
             vendor_dir.rmdir()
         except OSError:

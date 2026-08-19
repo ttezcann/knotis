@@ -2788,6 +2788,84 @@ nav = [
         )
         self.assertNotIn(("cat:How to use this site", "page:resources/how-to-use-this-site/search/"), nav_edges)
 
+    def test_nested_moc_nav_uses_intermediate_page_as_graph_parent(self) -> None:
+        _root, docs_dir = self.make_project(
+            """
+[project]
+site_name = "Test"
+nav = [
+  { "Resources" = [
+    { "Guidelines" = "resources/guidelines.md" },
+  ] },
+]
+""".lstrip()
+        )
+        (docs_dir / "resources" / "guidelines").mkdir(parents=True)
+        (docs_dir / "resources" / "guidelines.md").write_text(
+            "\n".join(
+                [
+                    "---",
+                    'title: "Guidelines"',
+                    "moc: true",
+                    "moc_pages:",
+                    "  - guidelines/office-hours.md",
+                    "---",
+                    "",
+                    "# [[Guidelines]]",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        (docs_dir / "resources" / "guidelines" / "office-hours.md").write_text(
+            "\n".join(
+                [
+                    "---",
+                    'title: "Office hours"',
+                    "moc: true",
+                    "moc_pages:",
+                    "  - office-hours-online.md",
+                    "  - office-hours-inperson.md",
+                    "---",
+                    "",
+                    "# [[Office hours]]",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        (docs_dir / "resources" / "guidelines" / "office-hours-online.md").write_text(
+            "# [[Scheduling an online meeting]]\n",
+            encoding="utf-8",
+        )
+        (docs_dir / "resources" / "guidelines" / "office-hours-inperson.md").write_text(
+            "# [[Scheduling an in-person meeting]]\n",
+            encoding="utf-8",
+        )
+
+        MODULE.main(docs_dir=docs_dir)
+
+        graph = json.loads((docs_dir / "assets" / "graph.json").read_text(encoding="utf-8"))
+        nav_edges = {
+            (edge["source"], edge["target"])
+            for edge in graph["edges"]
+            if edge["relation"] == "nav"
+        }
+        self.assertIn(("cat:Resources", "page:resources/guidelines/"), nav_edges)
+        self.assertIn(("page:resources/guidelines/", "page:resources/guidelines/office-hours/"), nav_edges)
+        self.assertIn(
+            ("page:resources/guidelines/office-hours/", "page:resources/guidelines/office-hours-online/"),
+            nav_edges,
+        )
+        self.assertIn(
+            ("page:resources/guidelines/office-hours/", "page:resources/guidelines/office-hours-inperson/"),
+            nav_edges,
+        )
+        self.assertNotIn(
+            ("page:resources/guidelines/", "page:resources/guidelines/office-hours-online/"),
+            nav_edges,
+        )
+
     def test_inline_code_reference_examples_do_not_become_graph_parents(self) -> None:
         _root, docs_dir = self.make_project()
         (docs_dir / "index.md").write_text(

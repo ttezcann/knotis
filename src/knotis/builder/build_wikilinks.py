@@ -249,6 +249,8 @@ def _nav_markdown_files(nav_items: list | None) -> list[Path]:
         for item in items:
             if isinstance(item, str):
                 add(item)
+            elif isinstance(item, list):
+                walk(item)
             elif isinstance(item, dict):
                 for value in item.values():
                     if isinstance(value, str):

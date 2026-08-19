@@ -79,9 +79,8 @@ class KnotisNewTests(unittest.TestCase):
         self.assertIn(f"tags:\n  - {tag}\n", page_md)
         self.assertIn(onboarding.format(section=section, page_num=page_num), page_md)
         self.assertIn("# Heading 1\n- \n## Heading 2\n- \n### Heading 3\n- \n", page_md)
-        attachment_dir = root / "docs" / "assets" / "attachments" / section / f"page-{page_num}"
-        self.assertTrue(attachment_dir.is_dir(), attachment_dir)
-        self.assertTrue((attachment_dir / ".gitkeep").is_file(), attachment_dir / ".gitkeep")
+      self.assertTrue((root / "docs" / "assets").is_dir())
+      self.assertFalse((root / "docs" / "assets" / "attachments").exists())
       index_md = (root / "docs" / "index.md").read_text(encoding="utf-8")
       self.assertIn("icon: lucide/house", index_md)
       self.assertIn("knotis_content:\n  heading_numbering: false\n  heading_guides: false", index_md)

@@ -62,7 +62,6 @@ class PackagingTests(unittest.TestCase):
             "knotis/scaffold/.github/workflows/docs.yml",
             "knotis/scaffold/zensical.toml",
             "knotis/scaffold/docs/index.md",
-            "knotis/scaffold/docs/assets/attachments/section-1/page-1/.gitkeep",
             "knotis/scaffold/docs/javascripts/glossary.js",
             "knotis/scaffold/docs/javascripts/mathjax.js",
             "knotis/scaffold/overrides/main.html",
@@ -100,12 +99,9 @@ class PackagingTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
         self.assertFalse((site_root / "knotis").exists())
         self.assertFalse((site_root / "assets").exists())
+        self.assertTrue((site_root / "docs" / "assets").is_dir())
         self.assertTrue((site_root / "docs" / "stylesheets" / "knotis-theme.css").is_file())
-        for page_num in range(1, 11):
-            section = "section-1" if page_num <= 5 else "section-2"
-            attachment_dir = site_root / "docs" / "assets" / "attachments" / section / f"page-{page_num}"
-            self.assertTrue(attachment_dir.is_dir(), attachment_dir)
-            self.assertTrue((attachment_dir / ".gitkeep").is_file(), attachment_dir / ".gitkeep")
+        self.assertFalse((site_root / "docs" / "assets" / "attachments").exists())
         self.assertFalse((site_root / "scripts" / "build_wikilinks.py").exists())
         workflow = (site_root / ".github" / "workflows" / "docs.yml").read_text(encoding="utf-8")
         self.assertIn("python -m pip install knotis", workflow)
@@ -145,11 +141,8 @@ class PackagingTests(unittest.TestCase):
         config_data = tomllib.loads((site_root / "zensical.toml").read_text(encoding="utf-8"))
         self.assertNotIn("extra_css", config_data["project"])
         self.assertNotIn("extra_javascript", config_data["project"])
-        for page_num in range(1, 11):
-            section = "section-1" if page_num <= 5 else "section-2"
-            attachment_dir = site_root / "docs" / "assets" / "attachments" / section / f"page-{page_num}"
-            self.assertTrue(attachment_dir.is_dir(), attachment_dir)
-            self.assertTrue((attachment_dir / ".gitkeep").is_file(), attachment_dir / ".gitkeep")
+        self.assertTrue((site_root / "docs" / "assets").is_dir())
+        self.assertFalse((site_root / "docs" / "assets" / "attachments").exists())
         html = (site_root / "site" / "index.html").read_text(encoding="utf-8")
         self.assertIn("assets/knotis/knotis-core.js", html)
         self.assertIn("assets/knotis/knotis-search.css", html)

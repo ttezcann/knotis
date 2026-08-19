@@ -11,7 +11,7 @@ SRC_DIR = Path(__file__).resolve().parents[1] / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from knotis import cli, watch  # noqa: E402
+from knotis import build_site, cli, watch  # noqa: E402
 
 
 class KnotisCliWorkflowTests(unittest.TestCase):
@@ -41,6 +41,32 @@ class KnotisCliWorkflowTests(unittest.TestCase):
         normalize_pages.assert_called_once_with(root)
         clean_routes.assert_called_once_with(root)
         clean_search.assert_called_once_with(root / "site", root)
+
+    def test_zensical_build_preserves_generated_runtime_assets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs").mkdir()
+            (root / "site").mkdir()
+            (root / "zensical.toml").write_text("[project]\nsite_name = \"Test\"\n", encoding="utf-8")
+            graph_path = root / ".knotis" / "assets" / "graph.json"
+            graph_path.parent.mkdir(parents=True)
+            graph_path.write_text('{"fresh": true}', encoding="utf-8")
+
+            def fake_run(*_args, **_kwargs):
+                graph_path.write_text('{"stale": true}', encoding="utf-8")
+                return mock.Mock(returncode=0)
+
+            with (
+                mock.patch.object(build_site, "resolve_zensical_command", return_value=["zensical"]),
+                mock.patch.object(build_site.subprocess, "run", side_effect=fake_run),
+                mock.patch.object(build_site, "sync_site_runtime_assets") as sync_assets,
+                mock.patch.object(build_site, "clean_search_index"),
+                mock.patch.object(build_site, "stamp_knotis_asset_cache_busters"),
+            ):
+                self.assertEqual(build_site.run_zensical_build(root), 0)
+
+            self.assertEqual(graph_path.read_text(encoding="utf-8"), '{"fresh": true}')
+            sync_assets.assert_called_once_with(root)
 
     def test_served_runtime_assets_ready_waits_for_javascript(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -213,7 +239,24 @@ class KnotisCliWorkflowTests(unittest.TestCase):
                 encoding="utf-8",
             )
             (docs / "resources" / "how-to-use-this-site" / "search.md").write_text(
-                "# [[Search]]\n",
+                "\n".join(
+                    [
+                        "---",
+                        'title: "Search"',
+                        "moc: true",
+                        "moc_pages:",
+                        "  - search/results.md",
+                        "---",
+                        "",
+                        "# [[Search]]",
+                        "",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            (docs / "resources" / "how-to-use-this-site" / "search").mkdir()
+            (docs / "resources" / "how-to-use-this-site" / "search" / "results.md").write_text(
+                "# [[Search results]]\n",
                 encoding="utf-8",
             )
             (docs / "resources" / "how-to-use-this-site" / "pane.md").write_text(
@@ -240,6 +283,7 @@ class KnotisCliWorkflowTests(unittest.TestCase):
         self.assertIn('{ "How to use this site" = [', updated)
         self.assertIn('"resources/how-to-use-this-site.md"', updated)
         self.assertIn('"resources/how-to-use-this-site/search.md"', updated)
+        self.assertIn('"resources/how-to-use-this-site/search/results.md"', updated)
         self.assertIn('"resources/how-to-use-this-site/pane.md"', updated)
 
     def test_refresh_zensical_build_overlay_skips_moc_nav_when_disabled(self) -> None:

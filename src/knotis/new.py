@@ -66,6 +66,7 @@ def run_knotis_new(target: Path, *, run_build: bool = True) -> None:
         )
         _copy_tree(scaffold_dir / "overrides", target / "overrides")
         _copy_tree(scaffold_dir / "docs", target / "docs")
+        (target / "docs" / "assets").mkdir(parents=True, exist_ok=True)
         _copy_file(
             scaffold_dir / "assets" / "knotis-theme.css",
             target / "docs" / "stylesheets" / "knotis-theme.css",

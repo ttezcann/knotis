@@ -768,6 +768,15 @@ def build_nav_hierarchy(
                 url = knotis_site_io.nav_path_to_url(item)
                 if url and parent_id and parent_id.startswith("page:"):
                     nav_edges.append((parent_id, f"page:{url}"))
+            elif isinstance(item, list):
+                first_url = leaf_url(item[0]) if item else None
+                if first_url in moc_urls:
+                    moc_id = f"page:{first_url}"
+                    if parent_id is not None:
+                        nav_edges.append((parent_id, moc_id))
+                    process(item[1:], moc_id)
+                else:
+                    process(item, parent_id)
             elif isinstance(item, dict):
                 for label, value in item.items():
                     if isinstance(value, str):
@@ -817,6 +826,8 @@ def build_nav_order(nav_items: list | None = None) -> dict[str, int]:
                 if url:
                     nav_order[url] = counter[0]
                     counter[0] += 1
+            elif isinstance(item, list):
+                walk(item)
             elif isinstance(item, dict):
                 for value in item.values():
                     if isinstance(value, str):

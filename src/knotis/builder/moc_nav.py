@@ -16,6 +16,10 @@ def _normalize_nav_path(path: object) -> str:
     return str(path or "").replace("\\", "/").strip().strip("/")
 
 
+def _title_from_path(path: str) -> str:
+    return Path(path).stem.strip("-_ ").replace("-", " ").replace("_", " ").title()
+
+
 def _resolve_moc_child_path(raw_path: object, *, moc_path: str, docs_dir: Path) -> str | None:
     token = _normalize_nav_path(raw_path)
     if not token:
@@ -68,6 +72,7 @@ def load_moc_configs(repo_root: Path, docs_dir: Path | None = None) -> dict[str,
             "collapse": meta.get("moc_collapse") is True,
             "nav": meta.get("moc_nav") is not False,
             "pages": pages,
+            "title": str(meta.get("title") or "").strip() or _title_from_path(moc_path),
         }
     return configs
 
@@ -80,6 +85,27 @@ def nav_visible_moc_configs(moc_configs: dict[str, dict]) -> dict[str, dict]:
     }
 
 
+def _expand_moc_value(path: str, moc_configs: dict[str, dict], seen: set[str]) -> str | list:
+    config = moc_configs.get(path)
+    if config is None or path in seen:
+        return path
+    next_seen = {*seen, path}
+    return [
+        path,
+        *[
+            _expand_moc_item(child_path, moc_configs, next_seen)
+            for child_path in config.get("pages", [])
+        ],
+    ]
+
+
+def _expand_moc_item(path: str, moc_configs: dict[str, dict], seen: set[str]) -> str | dict:
+    config = moc_configs.get(path)
+    if config is None or path in seen:
+        return path
+    return {config.get("title") or _title_from_path(path): _expand_moc_value(path, moc_configs, seen)}
+
+
 def apply_moc_nav_to_items(nav_items: list, moc_configs: dict[str, dict]) -> list:
     if not moc_configs:
         return nav_items
@@ -89,22 +115,14 @@ def apply_moc_nav_to_items(nav_items: list, moc_configs: dict[str, dict]) -> lis
         for item in items:
             if isinstance(item, str):
                 path = _normalize_nav_path(item)
-                config = moc_configs.get(path)
-                if config is None:
-                    transformed.append(item)
-                else:
-                    transformed.append([path, *config.get("pages", [])])
+                transformed.append(_expand_moc_item(path, moc_configs, set()))
                 continue
             if isinstance(item, dict):
                 next_item = {}
                 for label, value in item.items():
                     if isinstance(value, str):
                         path = _normalize_nav_path(value)
-                        config = moc_configs.get(path)
-                        if config is None:
-                            next_item[label] = value
-                        else:
-                            next_item[label] = [path, *config.get("pages", [])]
+                        next_item[label] = _expand_moc_value(path, moc_configs, set())
                     elif isinstance(value, list):
                         next_item[label] = transform(value)
                     else:

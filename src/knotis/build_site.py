@@ -8,7 +8,12 @@ import subprocess
 import tomllib
 from pathlib import Path
 
-from .builder.assets_mirror import site_runtime_assets_dir, sync_site_runtime_assets
+from .builder.assets_mirror import (
+    GENERATED_ASSET_FILES,
+    runtime_asset_output_dir,
+    site_runtime_assets_dir,
+    sync_site_runtime_assets,
+)
 from .builder.zensical_config import resolve_zensical_config_path
 from .zensical_runtime import resolve_zensical_command
 
@@ -208,6 +213,28 @@ def zensical_env(repo_root: Path) -> dict[str, str]:
     return env
 
 
+def _snapshot_generated_runtime_assets(repo_root: Path) -> dict[str, bytes]:
+    source_dir = runtime_asset_output_dir(repo_root, repo_root / "docs")
+    snapshots: dict[str, bytes] = {}
+    for name in GENERATED_ASSET_FILES:
+        path = source_dir / name
+        if path.is_file():
+            snapshots[name] = path.read_bytes()
+    return snapshots
+
+
+def _restore_generated_runtime_assets(repo_root: Path, snapshots: dict[str, bytes]) -> None:
+    if not snapshots:
+        return
+    source_dir = runtime_asset_output_dir(repo_root, repo_root / "docs")
+    source_dir.mkdir(parents=True, exist_ok=True)
+    for name, content in snapshots.items():
+        path = source_dir / name
+        if path.is_file() and path.read_bytes() == content:
+            continue
+        path.write_bytes(content)
+
+
 def refresh_zensical_build_overlay(repo_root: Path) -> bool:
     """Regenerate .zensical.knotis.build.toml from zensical.toml without running Zensical."""
     source = repo_root / "zensical.toml"
@@ -229,6 +256,7 @@ def run_zensical_build(repo_root: Path, extra_args: list[str] | None = None) -> 
     extra_args = list(extra_args or [])
     clean_cache = "--no-clean" not in extra_args
     extra_args = [arg for arg in extra_args if arg != "--no-clean"]
+    generated_asset_snapshots = _snapshot_generated_runtime_assets(repo_root)
 
     args = [*resolve_zensical_command(), "build"]
     if clean_cache and "--clean" not in extra_args and "-c" not in extra_args:
@@ -237,6 +265,7 @@ def run_zensical_build(repo_root: Path, extra_args: list[str] | None = None) -> 
 
     result = subprocess.run(args, env=zensical_env(repo_root))
     if result.returncode == 0:
+        _restore_generated_runtime_assets(repo_root, generated_asset_snapshots)
         sync_site_runtime_assets(repo_root)
         clean_search_index(repo_root / "site", repo_root)
         stamp_knotis_asset_cache_busters(repo_root / "site", site_runtime_assets_dir(repo_root))

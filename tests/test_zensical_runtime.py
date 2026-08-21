@@ -18,8 +18,8 @@ class ZensicalRuntimeTests(unittest.TestCase):
         self.module = zensical_runtime
 
     def test_pinned_version_constant(self) -> None:
-        self.assertEqual(self.module.ZENSICAL_VERSION, "0.0.56")
-        self.assertEqual(self.module.ZENSICAL_REQUIREMENT, "zensical==0.0.56")
+        self.assertEqual(self.module.ZENSICAL_VERSION, "0.0.57")
+        self.assertEqual(self.module.ZENSICAL_REQUIREMENT, "zensical==0.0.57")
 
     def test_read_zensical_version_parses_semver(self) -> None:
         with mock.patch.object(self.module.subprocess, "run") as run:

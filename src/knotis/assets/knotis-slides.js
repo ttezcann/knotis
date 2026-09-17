@@ -73,6 +73,7 @@
   let fitAnimationFrame = 0;
   let slideBodySerial = 0;
   let mermaidConfigured = false;
+  let slidesOpener = null;
   const warnedDenseSlides = new WeakSet();
   const WEBKIT_SLIDES_ENGINE = (() => {
     if (typeof navigator === "undefined") return false;
@@ -2877,6 +2878,7 @@
     if (!slides.length) return;
     currentIndex = Math.max(0, Math.min(index, slides.length - 1));
     currentRevealIndex = Math.max(0, Math.min(revealIndex, revealCount(slides[currentIndex]) - 1));
+    slidesOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     ensureOverlay();
     renderToc();
     overlay.classList.add(ACTIVE_CLASS);
@@ -2896,6 +2898,9 @@
     document.body.removeAttribute("data-knotis-slides-lock");
     await exitFullscreen();
     suppressFullscreenPreview = false;
+    const opener = slidesOpener;
+    slidesOpener = null;
+    if (opener?.isConnected && !opener.hidden) opener.focus();
   }
 
   async function closeSlidesToModule() {
@@ -3024,6 +3029,23 @@
         return;
       }
       if (event.target.closest?.(".wikilink-pane")) return;
+      if (event.key === "Tab") {
+        const focusable = [...overlay.querySelectorAll(
+          "button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])",
+        )].filter((node) => !node.hidden && node.getClientRects().length);
+        if (focusable.length) {
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+        return;
+      }
       if (event.key.toLowerCase() === "t") {
         event.preventDefault();
         toggleToc();

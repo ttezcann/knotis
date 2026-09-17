@@ -105,8 +105,33 @@
     });
   }
 
+  function initGeneratedAccessibility(root = document) {
+    root.querySelectorAll?.('.md-progress[data-md-component="progress"]').forEach((progress) => {
+      if (!progress.hasAttribute("aria-label") && !progress.hasAttribute("aria-labelledby")) {
+        progress.setAttribute("aria-label", "Reading progress");
+      }
+    });
+    root.querySelectorAll?.(".md-overlay[for]").forEach((overlay) => {
+      overlay.removeAttribute("aria-label");
+      overlay.removeAttribute("role");
+    });
+    root.querySelectorAll?.('label.md-header__button[for][aria-label]').forEach((control) => {
+      control.setAttribute("role", "button");
+    });
+    root.querySelectorAll?.('a[id^="__codelineno-"]').forEach((anchor) => {
+      if (!anchor.hasAttribute("href")) {
+        anchor.removeAttribute("aria-label");
+        return;
+      }
+      if (anchor.textContent.trim() || anchor.hasAttribute("aria-label") || anchor.hasAttribute("aria-labelledby")) return;
+      const line = anchor.id.match(/-(\d+)$/)?.[1];
+      if (line) anchor.setAttribute("aria-label", `Code line ${line}`);
+    });
+  }
+
   function initKnotisCorePageEnhancements() {
     initMocNavPersistence(document);
+    initGeneratedAccessibility(document);
   }
 
   if (document.readyState === "loading") {
@@ -131,5 +156,6 @@
     escapeHtml,
     renderKeyChordHtml,
     initMocNavPersistence,
+    initGeneratedAccessibility,
   };
 })();

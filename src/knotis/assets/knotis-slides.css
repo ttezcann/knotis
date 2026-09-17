@@ -854,3 +854,14 @@
   white-space: pre;
   word-break: normal;
 }
+
+@media (max-width: 54rem) {
+  .knotis-pane-trigger,
+  .knotis-slides-trigger {
+    flex: 0 0 2.2rem;
+    max-width: 2.2rem;
+    min-width: 2.2rem;
+    padding-inline: 0.45rem;
+    width: 2.2rem;
+  }
+}

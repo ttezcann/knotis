@@ -603,3 +603,18 @@
 }.md-typeset[data-knotis-heading-numbering="false"] :is(h1, h2, h3, h4, h5, h6)::before{
   content: none;
 }
+/* Keep visible code-line links usable for keyboard and pointer users. */
+.linenos a {
+  box-sizing: border-box;
+  display: inline-flex;
+  min-width: 24px;
+  min-height: 24px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Preserve the highlighted-line background while keeping its common R token
+   colors readable against that light fill. */
+.hll :is(.nf, .s) {
+  color: #5b1f68;
+}

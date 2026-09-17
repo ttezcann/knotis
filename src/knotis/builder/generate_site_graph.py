@@ -103,7 +103,9 @@ def maybe_generate(knotis_config: dict | None) -> None:
     lines = [
         *_front_matter_for_page(page_path),
         "",
+        '<div class="knotis-site-graph-page">',
         '<div id="graph-container" style="width:100%;height:80vh;border:1px solid var(--md-default-fg-color--lightest, rgba(0,0,0,0.12));border-radius:8px;"></div>',
+        "</div>",
         "",
     ]
     site_io.write_if_changed(page_path, "\n".join(lines))

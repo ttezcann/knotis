@@ -63,6 +63,7 @@
   let searchEnabled = false;
   let queryInitialized = false;
   const activeFilters = new Set();
+  let searchOpener = null;
 
   const ICONS = {
     search: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3a6.5 6.5 0 0 1 5.17 10.45l4.44 4.44-1.42 1.42-4.44-4.44A6.5 6.5 0 1 1 9.5 3m0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9z"/></svg>',
@@ -2647,10 +2648,10 @@
     if (!snippet) return "";
     const href = resultUrlWithHighlight(doc, query);
     return `
-      <div class="md-search-result__more-link" tabindex="-1" data-href="${escapeAttr(href)}" data-md-score="${Number(score || 0).toFixed(2)}" role="link">
+      <a class="md-search-result__more-link" href="${escapeAttr(href)}" data-href="${escapeAttr(href)}" data-md-score="${Number(score || 0).toFixed(2)}">
         ${renderBreadcrumb(doc, query, { includeCurrent: true })}
         <div class="md-search-result__teaser">${snippet}</div>
-      </div>
+      </a>
     `;
   }
 
@@ -2910,6 +2911,9 @@
 
   function openSearch(query) {
     if (!searchEnabled) return;
+    if (!document.querySelector(`.${SEARCH_CLASS}.knotis-search--active`)) {
+      searchOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
     const search = ensureSearchComponent();
     const toggle = getToggle();
     const input = search.querySelector(".md-search__input");
@@ -2930,6 +2934,9 @@
     if (search) search.classList.remove("knotis-search--active");
     if (toggle) toggle.checked = false;
     document.body.removeAttribute("data-md-scrolllock");
+    const opener = searchOpener;
+    searchOpener = null;
+    if (opener?.isConnected && !opener.hidden) opener.focus();
   }
 
   // Other Knotis chrome (e.g. the pane, when one of its cards navigates on
@@ -2976,6 +2983,41 @@
     if (handlersAttached) return;
     handlersAttached = true;
 
+    function nestedSearchInteractive(target, container) {
+      const interactive = target.closest?.("a[href], button, .wikilink, .wikilink-card__md-link, [role=\"button\"]");
+      return interactive && container.contains(interactive) && interactive !== container;
+    }
+
+    function runSearchAction(container) {
+      try {
+        handleAction(JSON.parse(container.dataset.knotisSearchAction));
+      } catch (err) {
+        console.error("[knotis-search] Invalid action:", err);
+      }
+    }
+
+    function navigateSearchResult(container) {
+      if (container?.hasAttribute?.("data-knotis-search-action")) {
+        runSearchAction(container);
+        return;
+      }
+      const href = container.dataset.href || container.getAttribute("href") || "";
+      if (!href || href === "#") return;
+      closeSearch();
+      try {
+        const url = new URL(href, location.href);
+        const targetText = url.searchParams.get("knotis-target-text") || "";
+        if (targetText) window.KnotisSectionRender?.setPendingNavigation?.(href, targetText);
+      } catch (err) {
+        console.warn("[DEBUG] recording pending navigation target failed", err);
+      }
+      location.href = href;
+    }
+
+    function firstSearchResult(search) {
+      return search?.querySelector?.(".md-search-result__list .md-search-result__link");
+    }
+
     document.addEventListener("click", (event) => {
       const trigger = event.target.closest?.(".knotis-search-trigger");
       if (trigger) {
@@ -2999,11 +3041,7 @@
       if (actionLink) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        try {
-          handleAction(JSON.parse(actionLink.dataset.knotisSearchAction));
-        } catch (err) {
-          console.error("[knotis-search] Invalid action:", err);
-        }
+        runSearchAction(actionLink);
         return;
       }
 
@@ -3055,27 +3093,8 @@
       return;
     }
 
-    function nestedSearchInteractive(target, container) {
-      const interactive = target.closest?.("a[href], button, .wikilink, .wikilink-card__md-link, [role=\"button\"]");
-      return interactive && container.contains(interactive) && interactive !== container;
-    }
-
-    function navigateSearchResult(container) {
-      const href = container.dataset.href || container.getAttribute("href") || "";
-      if (!href || href === "#") return;
-      closeSearch();
-      try {
-        const url = new URL(href, location.href);
-        const targetText = url.searchParams.get("knotis-target-text") || "";
-        if (targetText) window.KnotisSectionRender?.setPendingNavigation?.(href, targetText);
-      } catch (err) {
-        console.warn("[DEBUG] recording pending navigation target failed", err);
-      }
-      location.href = href;
-    }
-
     const resultLink = event.target.closest?.(".md-search-result__link");
-    if (resultLink && !resultLink.hasAttribute("data-knotis-search-action")) {
+    if (resultLink) {
       if (nestedSearchInteractive(event.target, resultLink)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -3145,6 +3164,14 @@
       if (event.key === "Escape" && activeSearch) {
         event.preventDefault();
         closeSearch();
+      }
+      if (event.key === "Enter" && activeSearch) {
+        const firstResult = firstSearchResult(activeSearch);
+        if (firstResult) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          navigateSearchResult(firstResult);
+        }
       }
       if (event.key === "ArrowRight" && activeSearch) {
         const input = activeSearch.querySelector(".md-search__input");

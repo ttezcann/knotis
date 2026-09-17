@@ -51,6 +51,18 @@
   margin-bottom: 0.6rem;
 }
 
+.md-content__inner.knotis-site-graph-layout > h1,
+.md-content__inner > h1:has(+ .knotis-site-graph-page) {
+  margin-bottom: 0.15rem !important;
+}
+
+.md-content__inner.knotis-site-graph-layout > .graph-search,
+.md-content__inner.knotis-site-graph-layout > .knotis-site-graph-page,
+.md-content__inner > h1 + .knotis-site-graph-page,
+.knotis-site-graph-page > .graph-search {
+  margin-top: 0;
+}
+
 .graph-search__row {
   display: flex;
   align-items: center;
@@ -62,7 +74,7 @@
   width: 100%;
   max-width: 300px;
   padding: 0.38rem 0.85rem;
-  border: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.2));
+  border: 1px solid var(--md-accent-fg-color, var(--knotis-wikilink-color));
   border-radius: 4px;
   font-size: 0.85rem;
   font-family: var(--md-text-font, sans-serif);
@@ -464,12 +476,13 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 0.45rem;
-  width: min(210px, calc(100% - 12px));
+  width: min(260px, calc(100% - 12px));
 }
 
 .graph-controls__buttons {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 0.35rem;
   width: 100%;
 }
@@ -664,7 +677,7 @@
 
 [data-md-color-scheme="slate"] .graph-search__input {
   background: color-mix(in srgb, var(--md-default-fg-color) 6%, var(--md-default-bg-color));
-  border-color: var(--md-default-fg-color--lightest);
+  border-color: var(--knotis-accent-color);
   color: var(--md-default-fg-color);
 }
 
@@ -897,4 +910,132 @@
 .glossary-tag--recurring,
 .glossary-tag--recurring .wikilink {
   color: var(--glossary-recurring-color);
+}
+.graph-text-control {
+  min-height: 30px;
+  width: 30px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  color: var(--md-default-fg-color--light);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.2;
+}
+
+.graph-text-control__icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 auto;
+}
+
+.graph-text-control:hover,
+.graph-text-control:focus-visible {
+  color: var(--knotis-accent-color);
+  outline: none;
+}
+
+.graph-text-control:focus-visible {
+  outline: 2px solid var(--knotis-accent-color);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.graph-text-modal {
+  position: fixed;
+  z-index: 10030;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.58);
+}
+
+.graph-text-modal__panel {
+  box-sizing: border-box;
+  position: relative;
+  width: min(70rem, 100%);
+  max-height: min(92vh, 60rem);
+  overflow: auto;
+  padding: 1.25rem;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+}
+
+.graph-text-modal__panel h2 {
+  margin: 0;
+}
+
+.graph-text-modal__pager button {
+  min-height: 2.25rem;
+  padding: 0.35rem 0.7rem;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--md-default-fg-color--light);
+  cursor: pointer;
+}
+
+.graph-text-modal__pager button:not(:disabled):hover,
+.graph-text-modal__pager button:not(:disabled):focus-visible {
+  color: var(--md-accent-fg-color);
+  border-color: var(--md-accent-fg-color);
+}
+
+.graph-text-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.graph-text-modal__table th,
+.graph-text-modal__table td {
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--md-default-fg-color--lighter, rgba(0, 0, 0, 0.28));
+  text-align: start;
+  vertical-align: top;
+}
+
+.graph-text-modal__table th {
+  background: var(--md-default-fg-color--lightest);
+}
+
+.graph-text-modal__node-action {
+  display: inline;
+  padding: 0;
+  border: 0;
+  color: var(--md-accent-fg-color);
+  background: transparent;
+  font: inherit;
+  text-align: start;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.graph-text-modal__node-action:hover,
+.graph-text-modal__node-action:focus-visible {
+  color: var(--knotis-accent-color);
+}
+
+.graph-text-modal__node-action:focus-visible {
+  outline: 2px solid var(--knotis-accent-color);
+  outline-offset: 2px;
+}
+
+.graph-text-modal__page-status {
+  margin: 0.55rem 0;
+  font-size: 0.85rem;
+}
+
+.graph-text-modal__pager {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.graph-text-modal__pager button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }

@@ -1,8 +1,8 @@
 :root,
 [data-md-color-scheme="default"] {
-  --content-tag-1: #b45309;
-  --content-tag-2: #067647;
-  --content-tag-3: #175cd3;
+  --content-tag-1: #7a3500;
+  --content-tag-2: #05603a;
+  --content-tag-3: #124aa0;
   --content-tag-4: #7a5af8;
   --content-tag-5: #d4448b;
   --knotis-content-tag-text: var(--content-tag-3);
@@ -26,6 +26,9 @@
 }
 
 .content-tag {
+  appearance: none;
+  border: 0;
+  font: inherit;
   color: var(--knotis-content-tag-text, #b54708);
   background-color: var(--knotis-content-tag-background, color-mix(in srgb, var(--knotis-content-tag-text, #b54708) 18%, transparent));
   text-decoration: none;

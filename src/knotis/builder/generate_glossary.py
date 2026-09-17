@@ -49,11 +49,11 @@ def cleanup_generated_pages() -> None:
 
 def _static_wikilink_html(keyword: str, *, bold: bool = False) -> str:
     label = html_escape(keyword)
-    span = (
-        f'<span class="wikilink" data-keyword="{html_escape(keyword.lower())}" '
-        f'role="button" tabindex="0">{label}</span>'
+    button = (
+        f'<button type="button" class="wikilink" data-keyword="{html_escape(keyword.lower())}" '
+        f'aria-haspopup="true">{label}</button>'
     )
-    return f"<strong>{span}</strong>" if bold else span
+    return f"<strong>{button}</strong>" if bold else button
 
 
 def _normalize_default_view(raw_view: object) -> str:

@@ -3,6 +3,17 @@
  * Edit this file for site layout, chrome, and color overrides.
  */
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 [data-md-color-scheme="slate"] {
   --md-default-bg-color: #1E1E2E;
 }
@@ -75,5 +86,24 @@
     opacity: 1;
     color: var(--md-default-fg-color);
     background-color: var(--md-default-fg-color--lightest);
+  }
+}
+
+@media (max-width: 54rem) {
+  .knotis-pane-trigger,
+  .knotis-slides-trigger {
+    flex: 0 0 2.2rem;
+    max-width: 2.2rem;
+    min-width: 2.2rem;
+    padding-inline: 0.45rem;
+    width: 2.2rem;
+  }
+}
+
+@media (max-width: 30rem) {
+  .md-header .knotis-search-trigger {
+    flex: 0 0 2.2rem;
+    min-width: 2.2rem;
+    width: 2.2rem;
   }
 }

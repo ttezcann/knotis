@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-ZENSICAL_VERSION = "0.0.57"
+ZENSICAL_VERSION = "0.0.62"
 ZENSICAL_REQUIREMENT = f"zensical=={ZENSICAL_VERSION}"
 
 

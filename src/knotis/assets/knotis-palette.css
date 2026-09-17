@@ -3,8 +3,8 @@
   --knotis-block-highlight-background: color-mix(in srgb, var(--content-tag-3, #175cd3) 42%, transparent);
   --knotis-block-highlight-mid-background: color-mix(in srgb, var(--content-tag-3, #175cd3) 26%, transparent);
   --knotis-block-highlight-outline: var(--content-tag-3, #175cd3);
-  --knotis-hyperlink-color: #0197a7;
-  --knotis-accent-color: var(--knotis-wikilink-color, #0197a7);
+  --knotis-hyperlink-color: #006b75;
+  --knotis-accent-color: var(--knotis-wikilink-color, #006b75);
   --knotis-accent-fill-color: var(--knotis-accent-color);
   --knotis-accent-on-color: #fff;
   --knotis-accent-bg-subtle: color-mix(in srgb, var(--knotis-accent-color) 12%, var(--md-default-bg-color));
@@ -15,7 +15,7 @@
   --knotis-block-highlight-background: color-mix(in srgb, var(--content-tag-3, #86bbff) 42%, transparent);
   --knotis-block-highlight-mid-background: color-mix(in srgb, var(--content-tag-3, #86bbff) 26%, transparent);
   --knotis-block-highlight-outline: var(--content-tag-3, #86bbff);
-  --knotis-hyperlink-color: #0197a7;
+  --knotis-hyperlink-color: #5bd5df;
   --knotis-accent-color: var(--knotis-wikilink-color, #fda4af);
   --knotis-accent-fill-color: color-mix(in srgb, var(--knotis-accent-color) 40%, #000);
   --knotis-accent-on-color: #fff;

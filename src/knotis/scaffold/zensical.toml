@@ -44,7 +44,7 @@ styled_section_groups = true
 
 ## Wikilinks
 [project.extra.knotis.wikilinks]
-default = "#0197a7"
+default = "#006b75"
 slate = "#fda4af"
 
 ## Pane

@@ -100,7 +100,7 @@
     page_url: "content-tags/",
   };
   const FALLBACK_WIKILINKS_CONFIG = {
-    default: "#0197a7",
+    default: "#006b75",
     slate: "#fda4af",
   };
   const CONTENT_TAGS_NAV_LABEL = "Content tags";
@@ -388,7 +388,7 @@
       if (idx < 0) continue;
       html += escapeHtml(plain.slice(0, idx));
       const labelText = plain.slice(idx, idx + item.label.length);
-      html += `<span class="wikilink wikilink--inline knotis-search-wikilink-match" data-keyword="${escapeHtml(item.keyword)}"${inlineFocusDataAttrs(renderOpts)} role="button" tabindex="0">${escapeHtml(labelText)}</span>`;
+      html += `<button type="button" class="wikilink wikilink--inline knotis-search-wikilink-match" data-keyword="${escapeHtml(item.keyword)}"${inlineFocusDataAttrs(renderOpts)} aria-haspopup="true">${escapeHtml(labelText)}</button>`;
       plain = plain.slice(idx + item.label.length);
       break;
     }
@@ -764,18 +764,17 @@
         const idx = keywordCounters.get(keyword) || 0;
         keywordCounters.set(keyword, idx + 1);
 
-        const span = document.createElement("span");
-        span.className = "wikilink";
-        span.id = `${kwToId(keyword)}-${idx}`;
-        span.dataset.keyword = keyword;
-        span.dataset.occurrenceIndex = String(idx);
-        if (currentPageUrl) span.dataset.focusPageUrl = currentPageUrl;
-        if (mode === "reference") span.dataset.wikilinkMode = "reference";
-        span.textContent = label;
-        span.setAttribute("role", "button");
-        span.setAttribute("tabindex", "0");
-        span.setAttribute("aria-haspopup", "true");
-        frag.appendChild(span);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "wikilink";
+        button.id = `${kwToId(keyword)}-${idx}`;
+        button.dataset.keyword = keyword;
+        button.dataset.occurrenceIndex = String(idx);
+        if (currentPageUrl) button.dataset.focusPageUrl = currentPageUrl;
+        if (mode === "reference") button.dataset.wikilinkMode = "reference";
+        button.textContent = label;
+        button.setAttribute("aria-haspopup", "true");
+        frag.appendChild(button);
       } else if (match[2]) {
         const contentTag = normalizeContentTag(match[2]);
         if (isCssHexColorToken(contentTag)) {
@@ -786,17 +785,16 @@
         const idx = contentTagCounters.get(contentTag) || 0;
         contentTagCounters.set(contentTag, idx + 1);
 
-        const span = document.createElement("span");
-        span.className = "content-tag";
-        span.id = `${contentTagToId(contentTag)}-${idx}`;
-        span.dataset.contentTag = contentTag;
-        span.dataset.occurrenceIndex = String(idx);
-        if (currentPageUrl) span.dataset.focusPageUrl = currentPageUrl;
-        span.textContent = contentTag;
-        span.setAttribute("role", "button");
-        span.setAttribute("tabindex", "0");
-        span.setAttribute("aria-haspopup", "true");
-        frag.appendChild(span);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "content-tag";
+        button.id = `${contentTagToId(contentTag)}-${idx}`;
+        button.dataset.contentTag = contentTag;
+        button.dataset.occurrenceIndex = String(idx);
+        if (currentPageUrl) button.dataset.focusPageUrl = currentPageUrl;
+        button.textContent = contentTag;
+        button.setAttribute("aria-haspopup", "true");
+        frag.appendChild(button);
       }
 
       lastIndex = match.index + match[0].length;
@@ -2475,14 +2473,14 @@
             const currentIndex = renderOpts.focusOccurrenceIndex;
             if (selfNavIndex != null && String(selfNavIndex) !== String(currentIndex ?? "")) {
               const pageUrl = renderOpts.focusPageUrl || "";
-              result += `<span class="wikilink wikilink--inline" data-keyword="${escapeHtml(kwNorm)}" data-occurrence-index="${escapeHtml(String(selfNavIndex))}"${pageUrl ? ` data-focus-page-url="${escapeHtml(pageUrl)}"` : ""}${focusAttrs} role="button" tabindex="0">${escapeHtml(label)}</span>`;
+              result += `<button type="button" class="wikilink wikilink--inline" data-keyword="${escapeHtml(kwNorm)}" data-occurrence-index="${escapeHtml(String(selfNavIndex))}"${pageUrl ? ` data-focus-page-url="${escapeHtml(pageUrl)}"` : ""}${focusAttrs} aria-haspopup="true">${escapeHtml(label)}</button>`;
             } else {
-              result += `<span class="wikilink wikilink--inline knotis-search-wikilink-match" data-keyword="${escapeHtml(kwNorm)}"${focusAttrs} role="button" tabindex="0">${escapeHtml(label)}</span>`;
+              result += `<button type="button" class="wikilink wikilink--inline knotis-search-wikilink-match" data-keyword="${escapeHtml(kwNorm)}"${focusAttrs} aria-haspopup="true">${escapeHtml(label)}</button>`;
             }
           } else if (mode === "reference") {
-            result += `<span class="wikilink wikilink--inline" data-keyword="${escapeHtml(kwNorm)}" data-wikilink-mode="reference"${focusAttrs} role="button" tabindex="0">${partialLabelHtml}</span>`;
+            result += `<button type="button" class="wikilink wikilink--inline" data-keyword="${escapeHtml(kwNorm)}" data-wikilink-mode="reference"${focusAttrs} aria-haspopup="true">${partialLabelHtml}</button>`;
           } else {
-            result += `<span class="wikilink wikilink--inline" data-keyword="${escapeHtml(kwNorm)}"${focusAttrs} role="button" tabindex="0">${partialLabelHtml}</span>`;
+            result += `<button type="button" class="wikilink wikilink--inline" data-keyword="${escapeHtml(kwNorm)}"${focusAttrs} aria-haspopup="true">${partialLabelHtml}</button>`;
           }
         }
       } else if (m[2]) {
@@ -2492,7 +2490,7 @@
         } else if (tagSet.has(tagNorm)) {
           result += `<mark class="content-tag-mark" data-content-tag="${escapeHtml(tagNorm)}">${escapeHtml(tagNorm)}</mark>`;
         } else {
-          result += `<span class="content-tag content-tag--inline" data-content-tag="${escapeHtml(tagNorm)}"${inlineFocusDataAttrs(renderOpts)} role="button" tabindex="0">${escapeHtml(tagNorm)}</span>`;
+          result += `<button type="button" class="content-tag content-tag--inline" data-content-tag="${escapeHtml(tagNorm)}"${inlineFocusDataAttrs(renderOpts)} aria-haspopup="true">${escapeHtml(tagNorm)}</button>`;
         }
       }
       lastIndex = m.index + m[0].length;
@@ -2642,11 +2640,17 @@
 
   function paneLineRenderOpts(renderOpts, lineIndex) {
     if (renderOpts._lockListIndentBase) return renderOpts;
-    const sourceLines = renderOpts.sourceLines;
-    if (!Array.isArray(sourceLines) || !Number.isInteger(lineIndex)) return renderOpts;
+    const sourceLines = Array.isArray(renderOpts.listSourceLines)
+      ? renderOpts.listSourceLines
+      : renderOpts.sourceLines;
+    const sourceLineIndex = Array.isArray(renderOpts.listSourceLines)
+      && Number.isInteger(renderOpts.listBaseLineIndex)
+      ? lineIndex - renderOpts.listBaseLineIndex
+      : lineIndex;
+    if (!Array.isArray(sourceLines) || !Number.isInteger(sourceLineIndex)) return renderOpts;
     return {
       ...renderOpts,
-      listIndentBase: listIndentBaseForListLine(sourceLines, lineIndex, renderOpts),
+      listIndentBase: listIndentBaseForListLine(sourceLines, sourceLineIndex, renderOpts),
     };
   }
 
@@ -3247,7 +3251,14 @@
         );
         const titleHtml = renderInlineMarkdown(highlightKeyword(admonition.title, keyword, renderOpts), pageUrl, renderOpts);
         const bodyBaseIndent = blockListBaseIndent(bodyLines);
-        const bodyRenderOpts = { ...renderOpts, listIndentBase: bodyBaseIndent, prepareContextStart: false };
+        const bodyRenderOpts = {
+          ...renderOpts,
+          baseLineIndex: baseLineIndex + i + 1,
+          listSourceLines: bodyLines,
+          listBaseLineIndex: baseLineIndex + i + 1,
+          listIndentBase: bodyBaseIndent,
+          prepareContextStart: false,
+        };
         const bodyHtml = bodyLines.length
           ? renderStructuredMarkdown(bodyLines, pageUrl, keyword, null, bodyRenderOpts)
           : "";
@@ -3281,7 +3292,14 @@
         const { bodyLines, endIndex } = collectIndentedBlock(lines, i, tab.indent + 4);
         const titleHtml = renderInlineMarkdown(highlightKeyword(tab.title, keyword, renderOpts), pageUrl, renderOpts);
         const bodyBaseIndent = blockListBaseIndent(bodyLines);
-        const bodyRenderOpts = { ...renderOpts, listIndentBase: bodyBaseIndent, prepareContextStart: false };
+        const bodyRenderOpts = {
+          ...renderOpts,
+          baseLineIndex: baseLineIndex + i + 1,
+          listSourceLines: bodyLines,
+          listBaseLineIndex: baseLineIndex + i + 1,
+          listIndentBase: bodyBaseIndent,
+          prepareContextStart: false,
+        };
         const bodyHtml = bodyLines.length
           ? renderStructuredMarkdown(bodyLines, pageUrl, keyword, null, bodyRenderOpts)
           : "";
@@ -6250,13 +6268,20 @@
   }
 
   function paneListDepthForLine(indent, renderOpts = {}, lineIndex = null) {
-    const lines = renderOpts.sourceLines;
-    if (!Array.isArray(lines) || !Number.isInteger(lineIndex) || !lineHasListMarker(lines[lineIndex])) {
+    const lines = Array.isArray(renderOpts.listSourceLines)
+      ? renderOpts.listSourceLines
+      : renderOpts.sourceLines;
+    const sourceLineIndex = Array.isArray(renderOpts.listSourceLines)
+      && Number.isInteger(renderOpts.listBaseLineIndex)
+      && Number.isInteger(lineIndex)
+      ? lineIndex - renderOpts.listBaseLineIndex
+      : lineIndex;
+    if (!Array.isArray(lines) || !Number.isInteger(sourceLineIndex) || !lineHasListMarker(lines[sourceLineIndex])) {
       return paneListDepthFromIndent(indent, renderOpts);
     }
     const baseIndent = paneListIndentBase(renderOpts);
     let depth = 1;
-    let current = lineIndex;
+    let current = sourceLineIndex;
     const seen = new Set([current]);
     while (true) {
       const parent = findPaneListParentLineIndex(lines, current);
@@ -8759,6 +8784,7 @@
 
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Enter" && e.key !== " ") return;
+      if (e.target instanceof HTMLElement && e.target.tagName === "BUTTON") return;
       const inline = e.target.closest(".wikilink--inline");
       if (inline) {
         e.preventDefault();
@@ -8796,6 +8822,7 @@
   
 
   function openLightbox(img) {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const overlay = document.createElement("div");
     overlay.className = "img-lightbox";
     overlay.setAttribute("role", "dialog");
@@ -8827,8 +8854,27 @@
     function closeLightbox() {
       overlay.remove();
       document.removeEventListener("keydown", onKey);
+      if (opener?.isConnected && !opener.hidden) opener.focus();
     }
-    function onKey(e) { if (e.key === "Escape") closeLightbox(); }
+    function onKey(e) {
+      if (e.key === "Escape") {
+        closeLightbox();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusable = [...overlay.querySelectorAll("button, a[href], [tabindex]:not([tabindex='-1'])")]
+        .filter((node) => !node.hidden && node.getClientRects().length);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
 
     
     overlay.addEventListener("pointerdown", (e) => e.stopPropagation());

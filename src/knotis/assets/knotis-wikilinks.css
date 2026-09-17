@@ -1,6 +1,6 @@
 :root,
 [data-md-color-scheme="default"] {
-  --knotis-wikilink-color: #0197a7;
+  --knotis-wikilink-color: #006b75;
   --knotis-wikilink-hover-bg: color-mix(in srgb, var(--knotis-wikilink-color) 12%, transparent);
   --knotis-wikilink-flash-bg: color-mix(in srgb, var(--knotis-wikilink-color) 28%, transparent);
   --knotis-wikilink-text: var(--knotis-wikilink-color);
@@ -22,6 +22,10 @@
 
 
 .wikilink {
+  appearance: none;
+  background: none;
+  border: 0;
+  font: inherit;
   color: var(--knotis-wikilink-text, var(--knotis-wikilink-color));
   text-decoration: none;
   cursor: pointer;
@@ -61,6 +65,11 @@
 
 
 .wikilink--inline {
+  appearance: none;
+  background: none;
+  border: 0;
+  font: inherit;
+  padding: 0;
   color: var(--knotis-wikilink-text, var(--knotis-wikilink-color));
   text-decoration: none;
   cursor: pointer;

@@ -58,7 +58,7 @@ class JsAssetTests(unittest.TestCase):
         dom.window.eval(core);
         const api = dom.window.KnotisCore;
         if (!api) {{ console.error("KnotisCore missing"); process.exit(1); }}
-        for (const name of ["isPlainObject", "deepClone", "deepMerge", "fetchJsonNoStore", "escapeHtml", "renderKeyChordHtml", "initMocNavPersistence"]) {{
+        for (const name of ["isPlainObject", "deepClone", "deepMerge", "fetchJsonNoStore", "escapeHtml", "renderKeyChordHtml", "initMocNavPersistence", "initGeneratedAccessibility"]) {{
           if (typeof api[name] !== "function") {{ console.error("missing export: " + name); process.exit(1); }}
         }}
         const merged = api.deepMerge({{ a: {{ b: 1 }} }}, {{ a: {{ c: 2 }} }});
@@ -140,6 +140,76 @@ class JsAssetTests(unittest.TestCase):
             text = (ASSETS_DIR / name).read_text(encoding="utf-8")
             self.assertIn("window.KnotisCore", text, name)
             self.assertIn("knotis-core.js must load before", text, name)
+
+    def test_accessibility_interaction_guards_are_present(self) -> None:
+        search = (ASSETS_DIR / "knotis-search.js").read_text(encoding="utf-8")
+        graph = (ASSETS_DIR / "knotis-graph.js").read_text(encoding="utf-8")
+        wikilinks = (ASSETS_DIR / "knotis-wikilinks.js").read_text(encoding="utf-8")
+        slides = (ASSETS_DIR / "knotis-slides.js").read_text(encoding="utf-8")
+        theme = (ASSETS_DIR / "knotis-theme.css").read_text(encoding="utf-8")
+
+        graph_css = (ASSETS_DIR / "knotis-graph.css").read_text(encoding="utf-8")
+        self.assertIn('<a class="md-search-result__more-link"', search)
+        self.assertIn("let searchOpener = null", search)
+        self.assertIn("if (opener?.isConnected && !opener.hidden) opener.focus();", search)
+        self.assertIn("const opener = document.activeElement", graph)
+        self.assertIn("if (e.key !== \"Tab\") return;", graph)
+        self.assertIn('control.className = "graph-text-control"', graph)
+        self.assertIn('control.setAttribute("aria-label", "Open accessible graph view")', graph)
+        self.assertNotIn('label.textContent =', graph)
+        self.assertIn('graph-text-control__icon', graph)
+        self.assertIn('buttonRow.appendChild(createGraphTextControl(graphData, mode))', graph)
+        self.assertIn('showButtons: true', graph)
+        self.assertLess(
+            graph.index('zoomInBtn.className = "graph-control-btn graph-control-btn--zoom-in"'),
+            graph.index('zoomOutBtn.className = "graph-control-btn graph-control-btn--zoom-out"'),
+        )
+        self.assertLess(
+            graph.index('zoomOutBtn.className = "graph-control-btn graph-control-btn--zoom-out"'),
+            graph.index('if (graphData) buttonRow.appendChild(createGraphTextControl(graphData, mode))'),
+        )
+        self.assertIn('renderGraph(container, cloneGraph(prepared), "full", null, { preview: true, disableHover: true });', graph)
+        self.assertIn('renderGraph(container, cloneGraph(prepared), "concept", null, { preview: true, disableHover: true });', graph)
+        self.assertIn('overlay.id = "graph-text-modal"', graph)
+        self.assertIn("function graphNodeHref(node)", graph)
+        self.assertIn("function getGraphSourceForNode(graphData, mode, node", graph)
+        self.assertIn("function dispatchGraphEdgePane(edge, graphData, mode", graph)
+        self.assertIn('className = "graph-text-modal__node-action"', graph)
+        self.assertIn('new CustomEvent("wikilink:open-pane"', graph)
+        self.assertIn('new CustomEvent("wikilink:open-edge-pane"', graph)
+        self.assertIn("Open ${relationLabel} relationship between ${source.label} and ${target.label}", graph)
+        self.assertIn("function graphTextDataForVisibleGraph(graphData, mode)", graph)
+        self.assertIn("const { nodes, edges } = graphTextDataForVisibleGraph(graphData, mode);", graph)
+        self.assertIn("graphData?._defaultVisibleNodeIds", graph)
+        self.assertIn("graphData?._defaultVisibleEdgeKeys", graph)
+        self.assertIn("GRAPH_TEXT_PAGE_SIZE = 50", graph)
+        self.assertIn('overlay.setAttribute("aria-modal", "true")', graph)
+        self.assertIn('table.className = "graph-text-modal__table"', graph)
+        self.assertNotIn('caption.textContent = `${title} in this graph`', graph)
+        self.assertIn('closeButton.className = "graph-modal__close"', graph)
+        self.assertIn('closeButton.innerHTML = "&times;"', graph)
+        self.assertIn('closeButton.setAttribute("aria-label", "Close accessible graph view")', graph)
+        self.assertIn('pager.setAttribute("aria-label", `${title} pages`)', graph)
+        self.assertIn("Showing ${title.toLocaleLowerCase()}", graph)
+        self.assertIn(".graph-text-control", graph_css)
+        self.assertIn(".graph-text-modal__node-action", graph_css)
+        self.assertNotIn(".graph-a11y-trigger", graph_css)
+        self.assertIn("const opener = document.activeElement", wikilinks)
+        self.assertIn("if (e.key !== \"Tab\") return;", wikilinks)
+        self.assertIn("let slidesOpener = null", slides)
+        self.assertIn("if (opener?.isConnected && !opener.hidden) opener.focus();", slides)
+        self.assertIn('if (event.key === "Tab")', slides)
+        self.assertIn('"button, a[href], input, select, textarea, [tabindex]:not([tabindex=\'-1\'])"', slides)
+        self.assertIn("@media (prefers-reduced-motion: reduce)", theme)
+
+    def test_generated_inline_controls_use_native_buttons(self) -> None:
+        wikilinks = (ASSETS_DIR / "knotis-wikilinks.js").read_text(encoding="utf-8")
+        glossary = (ASSETS_DIR.parent / "builder" / "generate_glossary.py").read_text(encoding="utf-8")
+        self.assertIn('document.createElement("button")', wikilinks)
+        self.assertIn('<button type="button" class="wikilink', wikilinks)
+        self.assertIn('<button type="button" class="content-tag', wikilinks)
+        self.assertIn('<button type="button" class="wikilink"', glossary)
+        self.assertNotIn('role="button" tabindex="0"', glossary)
 
     def test_site_graph_links_use_graph_meta_page_url(self) -> None:
         for name in ("knotis-wikilinks.js", "knotis-graph.js"):
@@ -1279,6 +1349,63 @@ class JsAssetTests(unittest.TestCase):
         self.assertIn("height: 1.5rem", css)
         self.assertIn("width: 1.5rem", css)
         self.assertIn("background: var(--md-code-bg-color", css)
+
+    def test_pane_admonition_ordered_lists_use_local_depth(self) -> None:
+        node = _node()
+        jsdom = _jsdom_entry()
+        if node is None or jsdom is None:
+            self.skipTest("node/jsdom runtime is unavailable")
+        script = f"""
+        import {{ JSDOM }} from {str(jsdom)!r};
+        import {{ readFileSync }} from "node:fs";
+
+        const dom = new JSDOM("<!DOCTYPE html><html><body data-knotis-offline-preview='true'></body></html>", {{
+          runScripts: "outside-only",
+          url: "https://example.test/assets/knotis-wikilinks.js",
+        }});
+        dom.window.fetch = async () => ({{ ok: false, status: 404, json: async () => ({{}}) }});
+        dom.window.eval(readFileSync({str(ASSETS_DIR / "knotis-core.js")!r}, "utf8"));
+        dom.window.eval(readFileSync({str(ASSETS_DIR / "knotis-wikilinks.js")!r}, "utf8"));
+
+        const lines = [
+          "- Categorical variables take on values that are labels.",
+          "    - Variables are categorical when respondents choose from responses.",
+          "- Values are NOT real numbers.",
+          "    - In the response categories below, no is not triple of yes.",
+          "        - !!! info \"Categorical variable\"",
+          "            - **Do you like coffee?**  ",
+          "                1. Yes  ",
+          "                2. Not much  ",
+          "                3. No  ",
+        ];
+        const holder = dom.window.document.createElement("div");
+        holder.innerHTML = dom.window.KnotisSectionRender.renderLines(lines, "modules/example/", {{
+          sourceLines: lines,
+          baseLineIndex: 0,
+        }});
+        const admonition = holder.querySelector(".admonition");
+        const orderedLists = admonition ? [...admonition.querySelectorAll("ol")] : [];
+        if (orderedLists.length !== 1) {{
+          console.error("callout should contain one local ordered list: " + holder.innerHTML);
+          process.exit(1);
+        }}
+        if (admonition.querySelector(".knotis-nested-list-shell")) {{
+          console.error("callout ordered list should not contain structural shells: " + admonition.innerHTML);
+          process.exit(1);
+        }}
+        const labels = [...orderedLists[0].children].map((item) => item.textContent.trim());
+        if (JSON.stringify(labels) !== JSON.stringify(["Yes", "Not much", "No"])) {{
+          console.error("callout choices should be sibling ordered items: " + JSON.stringify(labels));
+          process.exit(1);
+        }}
+        console.log("ok");
+        """
+        result = subprocess.run(
+            [node, "--input-type=module", "-e", script],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
 
     def test_pane_ordered_lists_under_bullets_use_ordered_counter_depth(self) -> None:
         node = _node()

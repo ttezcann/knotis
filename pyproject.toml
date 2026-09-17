@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "knotis"
-version = "0.1.4"
+version = "0.1.5"
 description = "A teaching-focused static site builder"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,7 +13,7 @@ authors = [
   { name = "Tolga Tezcan" },
 ]
 dependencies = [
-  "zensical==0.0.57",
+  "zensical==0.0.62",
 ]
 
 [project.scripts]

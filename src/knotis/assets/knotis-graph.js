@@ -1244,9 +1244,27 @@
     </svg>`;
   }
 
+  function universalAccessIconSvg() {
+    return `<svg class="graph-text-control__icon" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true" focusable="false"><path d="M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm161.5-86.1c-12.2-5.2-26.3 .4-31.5 12.6s.4 26.3 12.6 31.5l11.9 5.1c17.3 7.4 35.2 12.9 53.6 16.3l0 50.1c0 4.3-.7 8.6-2.1 12.6l-28.7 86.1c-4.2 12.6 2.6 26.2 15.2 30.4s26.2-2.6 30.4-15.2l24.4-73.2c1.3-3.8 4.8-6.4 8.8-6.4s7.6 2.6 8.8 6.4l24.4 73.2c4.2 12.6 17.8 19.4 30.4 15.2s19.4-17.8 15.2-30.4l-28.7-86.1c-1.4-4.1-2.1-8.3-2.1-12.6l0-50.1c18.4-3.5 36.3-8.9 53.6-16.3l11.9-5.1c12.2-5.2 17.8-19.3 12.6-31.5s-19.3-17.8-31.5-12.6L338.7 175c-26.1 11.2-54.2 17-82.7 17s-56.5-5.8-82.7-17l-11.9-5.1zM256 160a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"/></svg>`;
+  }
+
+  function createGraphTextControl(graphData, mode) {
+    const control = document.createElement("button");
+    control.type = "button";
+    control.className = "graph-text-control";
+    control.setAttribute("aria-haspopup", "dialog");
+    control.setAttribute("aria-label", "Open accessible graph view");
+    control.setAttribute("title", "Open accessible graph view");
+    control.appendChild(document.createRange().createContextualFragment(universalAccessIconSvg()));
+    control.addEventListener("click", () => openGraphTextModal(graphData, mode, control));
+    return control;
+  }
+
   function attachGraphControls(container, {
     onZoomIn,
     onZoomOut,
+    graphData,
+    mode,
     showButtons = true,
   }) {
     container.classList.add("graph-controls-host");
@@ -1275,6 +1293,13 @@
       zoomOutBtn.addEventListener("click", onZoomOut);
       buttonRow.appendChild(zoomOutBtn);
 
+      if (graphData) buttonRow.appendChild(createGraphTextControl(graphData, mode));
+
+      controls.appendChild(buttonRow);
+    } else if (graphData) {
+      const buttonRow = document.createElement("div");
+      buttonRow.className = "graph-controls__buttons";
+      buttonRow.appendChild(createGraphTextControl(graphData, mode));
       controls.appendChild(buttonRow);
     }
 
@@ -3055,6 +3080,84 @@
     return "";
   }
 
+  function graphNodeHref(node) {
+    const rawUrl = String(resolveGraphPageUrl(node) || "").trim();
+    if (!rawUrl) return "";
+    if (/^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(rawUrl)) return rawUrl;
+    return `${getSiteRootPath()}${rawUrl.replace(/^\/+/, "")}`;
+  }
+
+  function getGraphSourceForNode(graphData, mode, node, currentPageUrl = "") {
+    if (mode === "concept") {
+      return {
+        type: "concept",
+        keyword: graphData?._conceptKeyword || node?.label || "",
+      };
+    }
+    if (mode === "page") {
+      return {
+        type: "page",
+        pageUrl: graphData?._currentPageUrl || currentPageUrl || "",
+      };
+    }
+    return {
+      type: "site",
+      keyword: node?.type === "keyword" ? (node.label || "") : "",
+    };
+  }
+
+  function canOpenGraphEdgePane(edge, sourceNode, targetNode) {
+    if (!edge || !sourceNode || !targetNode) return false;
+    const sourceId = edgeSourceId(edge);
+    const targetId = edgeTargetId(edge);
+    return !sourceId.startsWith("cat:")
+      && !targetId.startsWith("cat:")
+      && !(Array.isArray(edge.pages) && edge.pages.includes("__nav__"));
+  }
+
+  function dispatchGraphEdgePane(edge, graphData, mode, currentPageUrl = "", closeModal = null) {
+    const sourceId = edgeSourceId(edge);
+    const targetId = edgeTargetId(edge);
+    const nodeById = new Map((graphData?.nodes || []).map((node) => [node.id, node]));
+    const sourceNode = nodeById.get(sourceId);
+    const targetNode = nodeById.get(targetId);
+    if (!canOpenGraphEdgePane(edge, sourceNode, targetNode)) return false;
+
+    const edgePages = Array.isArray(edge.pages)
+      ? edge.pages.filter((pageUrl) => pageUrl && pageUrl !== "__nav__")
+      : [];
+    const isPageGraph = mode === "page";
+    const scopedEdgePages = scopeEdgeClickPages(edgePages, {
+      relation: edge.relation || null,
+      sourceId,
+      targetId,
+      currentPageUrl,
+      graphData,
+      preferCurrentPageScope: isPageGraph,
+    });
+    closeModal?.();
+    document.dispatchEvent(
+      new CustomEvent("wikilink:open-edge-pane", {
+        detail: {
+          sourceId,
+          sourceLabel: sourceNode.label,
+          sourceType: sourceNode.type,
+          sourceUrl: sourceNode.url || null,
+          targetId,
+          targetLabel: targetNode.label,
+          targetType: targetNode.type,
+          relation: edge.relation || null,
+          pages: scopedEdgePages,
+          preferCurrentPageScope: isPageGraph,
+          contextScope: isPageGraph
+            ? "current_page_first"
+            : (graphData?._resolvedConfig?.pane?.context_scope || "all_pages"),
+        },
+      })
+    );
+    return true;
+  }
+
   function collectPageModulePathHighlight(
     hoveredPageId,
     pageUrl,
@@ -3868,6 +3971,244 @@
   }
 
   
+
+  const GRAPH_TEXT_PAGE_SIZE = 50;
+
+  function appendGraphNodeValue(cell, node, { onPageActivate = null, onKeywordActivate = null } = {}) {
+    const label = String(node?.label || node?.id || "Unnamed node");
+    if (node?.type === "keyword" && onKeywordActivate) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "graph-text-modal__node-action";
+      button.setAttribute("aria-label", `Open ${label} concept pane`);
+      button.textContent = label;
+      button.addEventListener("click", () => onKeywordActivate(node));
+      cell.appendChild(button);
+    } else if (node?.type === "page" && graphNodeHref(node)) {
+      const link = document.createElement("a");
+      link.className = "graph-text-modal__node-action";
+      link.href = graphNodeHref(node);
+      link.textContent = label;
+      if (onPageActivate) link.addEventListener("click", onPageActivate);
+      cell.appendChild(link);
+    } else {
+      cell.textContent = label;
+    }
+  }
+
+  function graphTextDataForVisibleGraph(graphData, mode) {
+    const sourceNodes = Array.isArray(graphData?.nodes) ? graphData.nodes : [];
+    const sourceEdges = Array.isArray(graphData?.edges) ? graphData.edges : [];
+    const hasScopedVisibleState = mode === "page" || graphData?._teachingPathMode === true;
+    const visibleNodeIds = hasScopedVisibleState && Array.isArray(graphData?._defaultVisibleNodeIds)
+      ? new Set(graphData._defaultVisibleNodeIds)
+      : null;
+    const visibleEdgeKeys = hasScopedVisibleState && Array.isArray(graphData?._defaultVisibleEdgeKeys)
+      ? new Set(graphData._defaultVisibleEdgeKeys)
+      : null;
+    const nodes = visibleNodeIds
+      ? sourceNodes.filter((node) => visibleNodeIds.has(node.id))
+      : sourceNodes;
+    const nodeIds = new Set(nodes.map((node) => node.id));
+    const edges = sourceEdges.filter((edge) => {
+      const sourceId = edgeSourceId(edge);
+      const targetId = edgeTargetId(edge);
+      if (!nodeIds.has(sourceId) || !nodeIds.has(targetId)) return false;
+      return !visibleEdgeKeys || visibleEdgeKeys.has(graphEdgeKey(edge));
+    });
+    return { nodes, edges };
+  }
+
+  function createGraphTextTable(title, columns, rows, renderRow) {
+    const section = document.createElement("section");
+    section.className = "graph-text-modal__section";
+    const heading = document.createElement("h3");
+    heading.textContent = title;
+    section.appendChild(heading);
+
+    const table = document.createElement("table");
+    table.className = "graph-text-modal__table";
+    const head = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    columns.forEach((column) => {
+      const header = document.createElement("th");
+      header.scope = "col";
+      header.textContent = column;
+      headerRow.appendChild(header);
+    });
+    head.appendChild(headerRow);
+    table.appendChild(head);
+    const body = document.createElement("tbody");
+    table.appendChild(body);
+    section.appendChild(table);
+
+    const status = document.createElement("p");
+    status.className = "graph-text-modal__page-status";
+    status.setAttribute("aria-live", "polite");
+    section.appendChild(status);
+    const pager = document.createElement("nav");
+    pager.className = "graph-text-modal__pager";
+    pager.setAttribute("aria-label", `${title} pages`);
+    const previous = document.createElement("button");
+    previous.type = "button";
+    previous.textContent = "Previous";
+    const next = document.createElement("button");
+    next.type = "button";
+    next.textContent = "Next";
+    pager.append(previous, next);
+    section.appendChild(pager);
+
+    let page = 0;
+    const pageCount = Math.max(1, Math.ceil(rows.length / GRAPH_TEXT_PAGE_SIZE));
+    const update = () => {
+      const start = page * GRAPH_TEXT_PAGE_SIZE;
+      const visibleRows = rows.slice(start, start + GRAPH_TEXT_PAGE_SIZE);
+      body.replaceChildren();
+      visibleRows.forEach((row) => body.appendChild(renderRow(row)));
+      const first = rows.length ? start + 1 : 0;
+      const last = Math.min(start + GRAPH_TEXT_PAGE_SIZE, rows.length);
+      status.textContent = rows.length
+        ? `Showing ${title.toLocaleLowerCase()} ${first}–${last} of ${rows.length}. Page ${page + 1} of ${pageCount}.`
+        : `No ${title.toLocaleLowerCase()} are present in this graph.`;
+      previous.disabled = page === 0;
+      next.disabled = page >= pageCount - 1;
+    };
+    previous.addEventListener("click", () => { if (page > 0) { page -= 1; update(); } });
+    next.addEventListener("click", () => { if (page < pageCount - 1) { page += 1; update(); } });
+    update();
+    return section;
+  }
+
+  function openGraphTextModal(graphData, mode = "page", opener = null) {
+    if (document.getElementById("graph-text-modal")) return;
+    const focusReturn = opener || (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    const { nodes, edges } = graphTextDataForVisibleGraph(graphData, mode);
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const relationships = edges.filter((edge) => nodeById.has(edgeSourceId(edge)) && nodeById.has(edgeTargetId(edge)));
+    const overlay = document.createElement("div");
+    overlay.id = "graph-text-modal";
+    overlay.className = "graph-text-modal";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    const titleId = "graph-text-modal-title";
+    overlay.setAttribute("aria-labelledby", titleId);
+
+    const panel = document.createElement("div");
+    panel.className = "graph-text-modal__panel";
+    const heading = document.createElement("h2");
+    heading.id = titleId;
+    heading.textContent = "Accessible graph view";
+    panel.appendChild(heading);
+    const description = document.createElement("p");
+    description.textContent = `Accessible view of the ${getGraphModalTitle(graphData, mode).toLocaleLowerCase()}.`;
+    panel.appendChild(description);
+
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "graph-modal__close";
+    closeButton.innerHTML = "&times;";
+    closeButton.setAttribute("aria-label", "Close accessible graph view");
+    panel.appendChild(closeButton);
+
+    const close = () => {
+      overlay.remove();
+      document.removeEventListener("keydown", onKey);
+      if (focusReturn?.isConnected && !focusReturn.hidden) focusReturn.focus();
+    };
+    const closeAccessibleGraphAndContainingModal = () => {
+      close();
+      document.dispatchEvent(new CustomEvent("knotis:close-graph-modal"));
+    };
+    const activateKeyword = (node) => {
+      const graphSource = getGraphSourceForNode(graphData, mode, node, graphData?._currentPageUrl || "");
+      closeAccessibleGraphAndContainingModal();
+      document.dispatchEvent(
+        new CustomEvent("wikilink:open-pane", {
+          detail: {
+            keyword: node.label,
+            graphSource,
+            contextScope: graphData?._resolvedConfig?.pane?.context_scope || "all_pages",
+          },
+        })
+      );
+    };
+    const nodeActionOptions = {
+      onPageActivate: closeAccessibleGraphAndContainingModal,
+      onKeywordActivate: activateKeyword,
+    };
+
+    const sortedNodes = [...nodes].sort((a, b) => String(a.label || a.id).localeCompare(String(b.label || b.id)));
+    panel.appendChild(createGraphTextTable("Nodes", ["Node", "Type"], sortedNodes, (node) => {
+      const row = document.createElement("tr");
+      const label = document.createElement("td");
+      appendGraphNodeValue(label, node, nodeActionOptions);
+      const type = document.createElement("td");
+      type.textContent = String(node.type || "node");
+      row.append(label, type);
+      return row;
+    }));
+    panel.appendChild(createGraphTextTable("Relationships", ["From", "Relationship", "To"], relationships, (edge) => {
+      const row = document.createElement("tr");
+      const source = nodeById.get(edgeSourceId(edge));
+      const target = nodeById.get(edgeTargetId(edge));
+      const sourceCell = document.createElement("td");
+      const targetCell = document.createElement("td");
+      if (source) appendGraphNodeValue(sourceCell, source, nodeActionOptions);
+      if (target) appendGraphNodeValue(targetCell, target, nodeActionOptions);
+      const relation = document.createElement("td");
+      const relationLabel = String(edge.relation || "related to");
+      if (canOpenGraphEdgePane(edge, source, target)) {
+        const relationButton = document.createElement("button");
+        relationButton.type = "button";
+        relationButton.className = "graph-text-modal__node-action";
+        relationButton.setAttribute(
+          "aria-label",
+          `Open ${relationLabel} relationship between ${source.label} and ${target.label}`
+        );
+        relationButton.textContent = relationLabel;
+        relationButton.addEventListener("click", () => {
+          dispatchGraphEdgePane(
+            edge,
+            graphData,
+            mode,
+            graphData?._currentPageUrl || "",
+            closeAccessibleGraphAndContainingModal
+          );
+        });
+        relation.appendChild(relationButton);
+      } else {
+        relation.textContent = relationLabel;
+      }
+      row.append(sourceCell, relation, targetCell);
+      return row;
+    }));
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    const onKey = (event) => {
+      if (event.key === "Escape") {
+        close();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = [...overlay.querySelectorAll("button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])")]
+        .filter((node) => !node.disabled && !node.hidden && node.getClientRects().length);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    closeButton.addEventListener("click", close);
+    overlay.addEventListener("click", (event) => { if (event.target === overlay) close(); });
+    document.addEventListener("keydown", onKey);
+    closeButton.focus();
+  }
 
   function renderGraph(container, graphData, mode, highlightKw = null, options = {}) {
     const { nodes, edges } = graphData;
@@ -4960,41 +5301,8 @@
       const dx = event.clientX - x;
       const dy = event.clientY - y;
       if (dx * dx + dy * dy < 25) {  
-        const sourceId = edgeSourceId(d);
-        const targetId = edgeTargetId(d);
-        const sourceNode = nodeById.get(sourceId);
-        const targetNode = nodeById.get(targetId);
-        if (!sourceNode || !targetNode) return;
         dismissIncomingHighlight();
-        closeContainingGraphModal();
-        const edgePages = Array.isArray(d.pages)
-          ? d.pages.filter((pageUrl) => pageUrl && pageUrl !== "__nav__")
-          : [];
-        const scopedEdgePages = scopeEdgeClickPages(edgePages, {
-          relation: d.relation || null,
-          sourceId,
-          targetId,
-          currentPageUrl,
-          graphData,
-          preferCurrentPageScope: isPageGraph,
-        });
-        document.dispatchEvent(
-          new CustomEvent("wikilink:open-edge-pane", {
-            detail: {
-              sourceId,
-              sourceLabel: sourceNode.label,
-              sourceType:  sourceNode.type,
-              sourceUrl:   sourceNode.url || null,
-              targetId,
-              targetLabel: targetNode.label,
-              targetType:  targetNode.type,
-              relation:    d.relation || null,
-              pages:       scopedEdgePages,
-              preferCurrentPageScope: isPageGraph,
-              contextScope: isPageGraph ? "current_page_first" : graphConfig.pane.context_scope,
-            },
-          })
-        );
+        dispatchGraphEdgePane(d, graphData, mode, currentPageUrl, closeContainingGraphModal);
       }
     }, true);  
 
@@ -6086,25 +6394,6 @@
       }
     }
 
-    function graphSourceForNode(d) {
-      if (mode === "concept") {
-        return {
-          type: "concept",
-          keyword: graphData._conceptKeyword || d.label || "",
-        };
-      }
-      if (mode === "page") {
-        return {
-          type: "page",
-          pageUrl: graphData._currentPageUrl || currentPageUrl || "",
-        };
-      }
-      return {
-        type: "site",
-        keyword: d.type === "keyword" ? (d.label || "") : "",
-      };
-    }
-
     function clearHighlight() {
       hoverHaloIds = new Set();
       node.select("circle.graph-node__circle")
@@ -6253,7 +6542,7 @@
           closeContainingGraphModal();
           location.href = "/" + d.url;
         } else if (d.type === "keyword") {
-          const graphSource = graphSourceForNode(d);
+          const graphSource = getGraphSourceForNode(graphData, mode, d, currentPageUrl);
           closeContainingGraphModal();
           document.dispatchEvent(
             new CustomEvent("wikilink:open-pane", {
@@ -6706,6 +6995,10 @@
   async function initFullGraph(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
+    if (containerId === "graph-container") {
+      container.closest(".md-content__inner")?.classList.add("knotis-site-graph-layout");
+      container.closest(".knotis-site-graph-page")?.classList.add("knotis-site-graph-page--active");
+    }
     container.style.height = "92vh";
     container.style.minHeight = "940px";
     container.textContent = "Loading graph…";
@@ -6788,14 +7081,13 @@
           highlightPageId,
         });
         const { setSearchHighlight } = graphApi;
-        if (filtered._resolvedConfig.ui.show_zoom_controls) {
-          attachGraphControls(container, {
-            onZoomIn: graphApi.zoomIn,
-            onZoomOut: graphApi.zoomOut,
-          });
-        } else {
-          container.querySelector(".graph-controls")?.remove();
-        }
+        attachGraphControls(container, {
+          onZoomIn: graphApi.zoomIn,
+          onZoomOut: graphApi.zoomOut,
+          graphData: filtered,
+          mode: "full",
+          showButtons: true,
+        });
 
         const pinnedChip = document.getElementById("graph-pinned-chip");
         graphApi.setUiStateListener((state) => {
@@ -6896,11 +7188,10 @@
 
   function openGraphModal(graphData, mode = "page", options = {}) {
     if (document.getElementById("graph-modal")) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const resolvedTitle = getGraphModalTitle(graphData, mode, options.title || "");
     const showFreezeHint = graphData._resolvedConfig?.hover?.freeze_enabled !== false;
-    const showModalControls = graphData._resolvedConfig?.ui?.show_zoom_controls !== false;
-
     const overlay = document.createElement("div");
     overlay.id        = "graph-modal";
     overlay.className = "graph-modal";
@@ -6975,12 +7266,13 @@
 
     const modalApi = renderGraph(graphDiv, cloneGraph(graphData), mode, options.highlightKw || null);
 
-    if (showModalControls) {
-      attachGraphControls(graphDiv, {
-        onZoomIn: modalApi.zoomIn,
-        onZoomOut: modalApi.zoomOut,
-      });
-    }
+    attachGraphControls(graphDiv, {
+      onZoomIn: modalApi.zoomIn,
+      onZoomOut: modalApi.zoomOut,
+      graphData,
+      mode,
+      showButtons: true,
+    });
     modalApi.setUiStateListener((state) => {
       if (statusChip) {
         const shouldShow = Boolean(state.shiftFreezeActive && state.activeLabel);
@@ -6995,8 +7287,27 @@
       overlay.remove();
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("knotis:close-graph-modal", close);
+      if (opener?.isConnected && !opener.hidden) opener.focus();
     }
-    function onKey(e) { if (e.key === "Escape") close(); }
+    function onKey(e) {
+      if (e.key === "Escape") {
+        close();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusable = [...overlay.querySelectorAll("button, a[href], input, select, textarea, [tabindex]:not([tabindex='-1'])")]
+        .filter((node) => !node.hidden && node.getClientRects().length);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!overlay.contains(document.activeElement) || (e.shiftKey && document.activeElement === first)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
     function isSameTabActionClick(event, link) {
       if (event.defaultPrevented || event.button !== 0) return false;
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
@@ -7274,15 +7585,7 @@
       await waitForContainerLayout(container);
       if (!document.body.contains(container)) return;
 
-      const graphApi = renderGraph(container, cloneGraph(filtered), "page", null, { disableHover: true });
-      if (filtered._resolvedConfig.ui.show_zoom_controls) {
-        attachGraphControls(container, {
-          onZoomIn: graphApi.zoomIn,
-          onZoomOut: graphApi.zoomOut,
-        });
-      } else {
-        container.querySelector(".graph-controls")?.remove();
-      }
+      renderGraph(container, cloneGraph(filtered), "page", null, { disableHover: true });
       
       container.querySelector(".page-graph-zoom")?.remove();
       const siteGraphAvailable = graphEnabled(graph, "full");
@@ -7397,7 +7700,6 @@
       actionLabel: siteGraphAvailable ? "See it in site graph" : "",
     };
     
-    container.querySelector(".page-graph-zoom")?.remove();
     enablePageGraphPreviewOpen(container, prepared, "concept", modalOptions);
     return { prepared };
   }

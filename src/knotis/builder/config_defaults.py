@@ -530,7 +530,7 @@ KNOTIS_DEFAULT_CONFIG = {
         "colors": {},
     },
     "wikilinks": {
-        "default": "#0197a7",
+        "default": "#006b75",
         "slate": "#fda4af",
     },
     "search": {
@@ -586,5 +586,5 @@ VALID_SLIDE_FIT_MODES = {"fit", "scroll"}
 
 KNOTIS_FOOTER_ATTRIBUTION_HTML = (
     'Made with <a href="https://knotis-docs.ttezcan.com/">Knotis</a>, '
-    'a wrapper for <a href="https://zensical.org/">Zensical</a>'
+    'an extension for <a href="https://zensical.org/">Zensical</a>'
 )

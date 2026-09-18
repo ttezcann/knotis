@@ -1735,6 +1735,16 @@ class JsAssetTests(unittest.TestCase):
         self.assertIn("line-height: var(--knotis-list-bullet-line-height)", css)
         self.assertNotIn("list-style-position: inside !important", css)
 
+    def test_code_line_number_links_do_not_change_line_height(self) -> None:
+        css = (ASSETS_DIR / "knotis-content.css").read_text(encoding="utf-8")
+        line_number_rule = css.split(".linenos a {", 1)[1].split("}", 1)[0]
+
+        self.assertIn("display: inline-block", line_number_rule)
+        self.assertIn("min-width: 24px", line_number_rule)
+        self.assertIn("text-align: right", line_number_rule)
+        self.assertNotIn("min-height", line_number_rule)
+        self.assertNotIn("inline-flex", line_number_rule)
+
     def test_content_tag_css_owns_content_tag_tokens_and_rules(self) -> None:
         palette_css = (ASSETS_DIR / "knotis-palette.css").read_text(encoding="utf-8")
         content_tags_css = (ASSETS_DIR / "knotis-content-tags.css").read_text(encoding="utf-8")

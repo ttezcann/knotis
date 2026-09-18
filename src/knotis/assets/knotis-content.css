@@ -603,14 +603,12 @@
 }.md-typeset[data-knotis-heading-numbering="false"] :is(h1, h2, h3, h4, h5, h6)::before{
   content: none;
 }
-/* Keep visible code-line links usable for keyboard and pointer users. */
+/* Keep visible code-line links usable without changing the code row height. */
 .linenos a {
   box-sizing: border-box;
-  display: inline-flex;
+  display: inline-block;
   min-width: 24px;
-  min-height: 24px;
-  align-items: center;
-  justify-content: flex-end;
+  text-align: right;
 }
 
 /* Preserve the highlighted-line background while keeping its common R token

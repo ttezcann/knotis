@@ -196,10 +196,14 @@ class JsAssetTests(unittest.TestCase):
         self.assertNotIn(".graph-a11y-trigger", graph_css)
         self.assertIn("const opener = document.activeElement", wikilinks)
         self.assertIn("if (e.key !== \"Tab\") return;", wikilinks)
+        self.assertIn("let paneOpener = null", wikilinks)
+        self.assertIn("function rememberPaneOpener(opts = {})", wikilinks)
+        self.assertIn("if (focusNeedsRestoration && opener?.isConnected && !opener.hidden)", wikilinks)
         self.assertIn("let slidesOpener = null", slides)
         self.assertIn("if (opener?.isConnected && !opener.hidden) opener.focus();", slides)
         self.assertIn('if (event.key === "Tab")', slides)
         self.assertIn('"button, a[href], input, select, textarea, [tabindex]:not([tabindex=\'-1\'])"', slides)
+        self.assertIn("if (!focusable.includes(document.activeElement))", slides)
         self.assertIn("@media (prefers-reduced-motion: reduce)", theme)
 
     def test_generated_inline_controls_use_native_buttons(self) -> None:
@@ -1071,7 +1075,9 @@ class JsAssetTests(unittest.TestCase):
         paneOpenDom.window.eval(readFileSync({str(ASSETS_DIR / "knotis-wikilinks.js")!r}, "utf8"));
         paneOpenDom.window.document.dispatchEvent(new paneOpenDom.window.Event("DOMContentLoaded", {{ bubbles: true }}));
         await new Promise((resolve) => setTimeout(resolve, 20));
-        paneOpenDom.window.document.getElementById("pane-test-wikilink").click();
+        const paneActivator = paneOpenDom.window.document.getElementById("pane-test-wikilink");
+        paneActivator.focus();
+        paneActivator.click();
         await new Promise((resolve) => setTimeout(resolve, 80));
         const openedPane = paneOpenDom.window.document.getElementById("wikilink-pane");
         if (!openedPane || !openedPane.classList.contains("wikilink-pane--open")) {{
@@ -1098,6 +1104,13 @@ class JsAssetTests(unittest.TestCase):
           .filter((text) => text === "Wikilinks Feature");
         if (moduleTitles.length !== 1 || cardTitles.length !== 0) {{
           console.error("page title should appear only as module header, got module=" + moduleTitles.length + " card=" + cardTitles.length + ": " + openedPane.innerHTML);
+          process.exit(1);
+        }}
+        const paneClose = openedPane.querySelector(".wikilink-pane__close");
+        paneClose.focus();
+        paneClose.click();
+        if (paneOpenDom.window.document.activeElement !== paneActivator) {{
+          console.error("closing the pane did not restore focus to its opener");
           process.exit(1);
         }}
         paneOpenDom.window.close();

@@ -157,6 +157,7 @@
   let paneHistoryState = { entries: [], index: -1 };
   let paneHistoryLoaded = false;
   let paneTrigger = null;
+  let paneOpener = null;
   let paneHeaderObserver = null;
   let paneHeaderObserverScheduled = false;
   const PANE_TRIGGER_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-panel-right-open" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/><path d="m10 15-3-3 3-3"/></svg>';
@@ -7644,6 +7645,7 @@
   }
 
   async function openEdgePane(detail, opts = {}) {
+    rememberPaneOpener(opts);
     const token = ++paneOpenToken;
     const [data, references, navOrder, paneConfig, graphData] = await Promise.all([
       getWikilinkData(),
@@ -7867,7 +7869,7 @@
 
   function closePaneForModuleNavigation() {
     try { sessionStorage.removeItem(PENDING_PANE_RESTORE_KEY); } catch (err) { console.warn("[DEBUG] clearing pending pane restore key failed", err); }
-    closePane();
+    closePane({ restoreFocus: false });
     closeGraphModal();
     
     
@@ -7910,9 +7912,35 @@
   
   let paneOpenToken = 0;
 
-  function closePane() {
+  function rememberPaneOpener(opts = {}) {
+    if (opts.skipFocus) return;
+    const candidate = document.activeElement;
+    const pane = document.getElementById("wikilink-pane");
+    if (
+      candidate instanceof HTMLElement &&
+      candidate !== document.body &&
+      candidate !== document.documentElement &&
+      !pane?.contains(candidate)
+    ) {
+      paneOpener = candidate;
+    }
+  }
+
+  function restorePaneFocus(pane) {
+    const opener = paneOpener;
+    paneOpener = null;
+    const active = document.activeElement;
+    const focusNeedsRestoration = !active ||
+      active === document.body ||
+      active === document.documentElement ||
+      pane?.contains(active);
+    if (focusNeedsRestoration && opener?.isConnected && !opener.hidden) opener.focus();
+  }
+
+  function closePane({ restoreFocus = true } = {}) {
     paneOpenToken += 1;
     const pane = document.getElementById("wikilink-pane");
+    const wasOpen = pane?.classList.contains("wikilink-pane--open");
     if (pane) {
       pane.classList.remove("wikilink-pane--open");
       pane.setAttribute("aria-hidden", "true");
@@ -7926,6 +7954,8 @@
       console.warn("[DEBUG] clearing pane URL param failed", err);
     }
     syncPaneTriggerState();
+    if (wasOpen && restoreFocus) restorePaneFocus(pane);
+    else if (wasOpen) paneOpener = null;
   }
 
   function openGraphReturn(source) {
@@ -8067,6 +8097,7 @@
   }
 
   async function openPlaceholderPane() {
+    rememberPaneOpener();
     const paneConfig = await getResolvedPaneConfig();
     const pane = getOrCreatePane();
     applyPaneWidth(pane, paneConfig);
@@ -8178,6 +8209,7 @@
   }
 
   async function openPane(keyword, opts = {}) {
+    rememberPaneOpener(opts);
     const token = ++paneOpenToken;
     keyword = keyword.toLowerCase();
     const [data, references, navOrder, paneConfig, graphData] = await Promise.all([
@@ -8232,6 +8264,7 @@
   }
 
   async function openContentTagPane(contentTag, opts = {}) {
+    rememberPaneOpener(opts);
     const token = ++paneOpenToken;
     contentTag = normalizeContentTag(contentTag);
     const [data, navOrder, paneConfig] = await Promise.all([getContentTagData(), getNavOrder(), getResolvedPaneConfig()]);
@@ -8269,6 +8302,7 @@
   }
 
   async function openReferencePane(keyword, opts = {}) {
+    rememberPaneOpener(opts);
     const token = ++paneOpenToken;
     keyword = String(keyword || "").toLowerCase();
     const [data, navOrder, paneConfig, graphData] = await Promise.all([getReferenceData(), getNavOrder(), getResolvedPaneConfig(), getGraphData()]);

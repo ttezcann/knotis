@@ -149,7 +149,7 @@ class KnotisNewTests(unittest.TestCase):
       self.assertNotIn("path", knotis["content_tags"])
       self.assertNotIn("order", knotis["content_tags"])
       self.assertNotIn("colors", knotis["content_tags"])
-      self.assertEqual(knotis["wikilinks"]["default"], "#0197a7")
+      self.assertEqual(knotis["wikilinks"]["default"], "#006b75")
       self.assertEqual(knotis["wikilinks"]["slate"], "#fda4af")
       self.assertNotIn("extra_css", config["project"])
       self.assertNotIn("extra_javascript", config["project"])

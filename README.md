@@ -16,7 +16,7 @@ It helps instructors publish course notes in which readers can follow a lesson s
 
 Instructors maintain Markdown files. Knotis indexes wikilinks such as `[[concept]]`, outlining structure and content tags, then generates the Pane, Site graph, Page graph, Concept graph, Glossary and Search features, with optional Slide mode, alongside the rendered pages.
 
-[Documentation](https://knotis-docs.ttezcan.com/) | [Source code](https://github.com/ttezcann/knotis) | [PyPI](https://pypi.org/project/knotis/) | [Issues](https://github.com/ttezcann/knotis/issues)
+[Documentation](https://knotis-docs.ttezcan.com/) | [Source code](https://github.com/ttezcann/knotis) | [PyPI](https://pypi.org/project/knotis/) | [Knotis VS Code extension](https://marketplace.visualstudio.com/items?itemName=ttezcann.knotis-preview)
 
 ## Documentation and Sample Site
 

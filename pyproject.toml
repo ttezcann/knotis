@@ -13,7 +13,7 @@ authors = [
   { name = "Tolga Tezcan" },
 ]
 dependencies = [
-  "zensical==0.0.62",
+  "zensical==0.0.65",
 ]
 
 [project.scripts]

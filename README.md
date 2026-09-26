@@ -6,17 +6,52 @@
     <img src="https://raw.githubusercontent.com/ttezcann/knotis-docs/main/docs/assets/attachments/0-logo/knotis-lockup.png" alt="Knotis logo" width="260">
   </picture>
 </p>
+<p align="center">
+  <strong>
+    Connected instructional materials from Markdown
+  </strong>
+</p>
 
+<p align="center">
+  <a href="https://pypi.org/project/knotis/"><img
+    src="https://img.shields.io/pypi/v/knotis"
+    alt="PyPI"
+  /></a>
+  <a href="https://www.python.org/"><img
+    src="https://img.shields.io/badge/Python-%E2%89%A53.11-3776AB"
+    alt="Python 3.11 or later"
+  /></a>
+  <a href="LICENSE.txt"><img
+    src="https://img.shields.io/badge/License-MIT-blue.svg"
+    alt="MIT License"
+  /></a>
+  <a href="https://doi.org/10.5281/zenodo.22983153"><img
+    src="https://zenodo.org/badge/DOI/10.5281/zenodo.22983153.svg"
+    alt="DOI 10.5281/zenodo.22983153"
+  /></a>
+</p>
 
-**Connected instructional materials from Markdown.**
+<p align="center">
+  <a href="https://knotis-docs.ttezcan.com/"><img
+    src="https://img.shields.io/badge/Documentation-Read-4F46E5"
+    alt="Knotis documentation"
+  /></a>
+  <a href="https://ssric-reg.ttezcan.com/"><img
+    src="https://img.shields.io/badge/Demo-View%20site-teal"
+    alt="View the demonstration site"
+  /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=ttezcann.knotis-preview"><img
+    src="https://img.shields.io/badge/VS%20Code-Install%20extension-007ACC"
+    alt="Install the Knotis VS Code extension"
+  /></a>
+</p>
+
 
 Knotis is a teaching-focused extension to [Zensical](https://zensical.org/), distributed as a Python package with a command-line interface.
 
 It helps instructors publish course notes in which readers can follow a lesson sequence, revisit concepts across pages, inspect their relationships and retrieve particular kinds of teaching content.
 
-Instructors maintain Markdown files. Knotis indexes wikilinks such as `[[concept]]`, outlining structure and content tags, then generates the Pane, Site graph, Page graph, Concept graph, Glossary and Search features, with optional Slide mode, alongside the rendered pages.
-
-[Documentation](https://knotis-docs.ttezcan.com/) | [Source code](https://github.com/ttezcann/knotis) | [PyPI](https://pypi.org/project/knotis/) | [Knotis VS Code extension](https://marketplace.visualstudio.com/items?itemName=ttezcann.knotis-preview)
+Instructors maintain Markdown files. Knotis indexes wikilinks such as `[[concept]]`, outline structure and content tags, then uses them to power contextual panes, Site graph, Page graph, Concept graph, Glossary and Search features, with optional Slide mode, alongside the rendered pages.
 
 ## Documentation and Sample Site
 
@@ -25,18 +60,19 @@ Instructors maintain Markdown files. Knotis indexes wikilinks such as `[[concept
 
 ## Features
 
-- **Outlining:** headings and nested lists organize explanations, code, tables, images and media.
-- **Wikilinks:** `[[concept]]` markers connect occurrences across pages; aliases change the displayed wording without creating a separate concept.
-- **Panes:** inspect occurrences with surrounding teaching material, follow related concepts and return through pane history.
-- **Graphs:** explore site, page and concept views derived from authored structure and navigation.
-- **Content tags:** collect material such as `#code`, `#output` and `#interpretation` across the site.
-- **Glossary:** a site-wide list of every concept, generated from the wikilinks.
-- **Slide mode:** present lesson content without maintaining a separate slide deck.
-- **Search:** find concepts and sections, narrow searches with content tags.
-- **Read aloud:** a built-in text-to-speech control for pages.
-- **Supporting media tools:** browser-based read-aloud, image viewing, GIF/MP4 playback controls and caption support.
+- **[Outlining](https://knotis-docs.ttezcan.com/features/outlining-feature/):** headings and nested lists organize explanations, code, tables, images and media.
+- **[Wikilinks](https://knotis-docs.ttezcan.com/features/wikilinks-feature/):** `[[concept]]` markers connect occurrences across pages; aliases change the displayed wording without creating a separate concept.
+- **[Panes](https://knotis-docs.ttezcan.com/features/pane-feature/):** inspect occurrences with surrounding teaching material, follow related concepts and return through pane history.
+- **[Graphs](https://knotis-docs.ttezcan.com/features/graphs-feature/):** explore site, page and concept views derived from authored structure and navigation.
+- **[Content tags](https://knotis-docs.ttezcan.com/features/content-tags-feature/):** collect material such as `#code`, `#output` and `#interpretation` across the site.
+- **[Glossary](https://knotis-docs.ttezcan.com/features/glossary-feature/):** a site-wide index of concepts generated from wikilinks.
+- **[Slide mode](https://knotis-docs.ttezcan.com/features/slide-mode-feature/):** present lesson content without maintaining a separate slide deck.
+- **[Search](https://knotis-docs.ttezcan.com/features/search-feature/):** find concepts and sections, narrow searches with content tags.
+- **[Read aloud](https://knotis-docs.ttezcan.com/features/read-aloud-feature/):** a built-in text-to-speech control for pages.
+- **[Supporting media tools](https://knotis-docs.ttezcan.com/features/video-controls-feature/):** image viewing, GIF/MP4 playback controls and caption support.
 
 An optional [Knotis VS Code extension](https://github.com/ttezcann/knotis-vscode) supports authoring and previewing.
+
 
 ## Requirements
 
@@ -58,22 +94,13 @@ source .venv/bin/activate
 pip install knotis
 ```
 
-### Windows PowerShell
+### Windows
 
-```powershell
-python3 -m venv .venv
+```console
+python -m venv .venv
 .venv\Scripts\activate
 pip install knotis
 ```
-
-## Upgrade
-```bash
-pip install --upgrade knotis
-```
-
-Review the [GitHub Releases page](https://github.com/ttezcann/knotis/releases) before upgrading.
-
-It lists new features, renamed settings, removed settings, and any steps needed after an update.
 
 ## Quick Start
 
@@ -98,6 +125,103 @@ knotis build
 
 Run build and serve commands from the site directory containing `zensical.toml`. The finished website is written to `site/`.
 
+## Screenshots
+
+### Pane
+
+Clicking a wikilink opens a pane with the concept's surrounding teaching material, relationships and path through the course.
+
+[Read the Pane feature guide](https://knotis-docs.ttezcan.com/features/pane-feature/).
+
+<p align="center">
+  <a href="https://github.com/ttezcann/knotis-docs/blob/main/docs/assets/attachments/getting-started/what-is-knotis/pane.png">
+    <img src="https://raw.githubusercontent.com/ttezcann/knotis-docs/main/docs/assets/attachments/getting-started/what-is-knotis/pane.png" alt="A Knotis concept pane for Binary, showing its concept graph, teaching path and contextual occurrences across course pages" width="600">
+  </a>
+</p>
+
+### Graphs
+
+Knotis builds three graphs: (1) Site graph, (2) Page graph, and (3) Concept graph.
+
+[Read the graphs feature guide](https://knotis-docs.ttezcan.com/features/graphs-feature/).
+
+#### Site Graph
+
+The site graph shows the whole course at a glance.
+
+<p align="center">
+  <a href="https://github.com/ttezcann/knotis-docs/blob/main/docs/assets/attachments/getting-started/what-is-knotis/site-graph.png">
+    <img src="https://raw.githubusercontent.com/ttezcann/knotis-docs/main/docs/assets/attachments/getting-started/what-is-knotis/site-graph.png" alt="Full-site concept map showing modules, resources, and linked concepts as connected nodes." width="600">
+  </a>
+</p>
+
+#### Page Graph
+
+The page graph shows the concepts on the page and how they relate to each other.
+
+<p align="center">
+  <a href="https://github.com/ttezcann/knotis-docs/blob/main/docs/assets/attachments/getting-started/what-is-knotis/page-graph.png">
+    <img src="https://raw.githubusercontent.com/ttezcann/knotis-docs/main/docs/assets/attachments/getting-started/what-is-knotis/page-graph.png" alt="Concept map for a single page, showing the page connected to its major concepts and related sub-concepts." width="600">
+  </a>
+</p>
+
+#### Concept Graph
+
+The concept graph centers on one concept.
+
+<p align="center">
+  <a href="https://github.com/ttezcann/knotis-docs/blob/main/docs/assets/attachments/getting-started/what-is-knotis/concept-graph.png">
+    <img src="https://raw.githubusercontent.com/ttezcann/knotis-docs/main/docs/assets/attachments/getting-started/what-is-knotis/concept-graph.png" alt="Concept graph centered on one concept and connected to course pages and related concepts." width="600">
+  </a>
+</p>
+
+### Content Tags
+
+Clicking a content tag chip on the home page opens the pane.
+
+[Read the content tags feature guide](https://knotis-docs.ttezcan.com/features/content-tags-feature/).
+
+<p align="center">
+  <a href="https://github.com/ttezcann/knotis-docs/blob/main/docs/assets/attachments/getting-started/what-is-knotis/content-tags.png">
+    <img src="https://raw.githubusercontent.com/ttezcann/knotis-docs/main/docs/assets/attachments/getting-started/what-is-knotis/content-tags.png" alt="The #code content tag is selected in the navigation bar, opening a pane that lists sections across the site tagged #code." width="600">
+  </a>
+</p>
+
+### Glossary
+
+The Glossary is an auto-generated page that lists wikilink concepts found across the site.
+
+[Read the glossary feature guide](https://knotis-docs.ttezcan.com/features/glossary-feature/).
+
+<p align="center">
+  <a href="https://github.com/ttezcann/knotis-docs/blob/main/docs/assets/attachments/getting-started/what-is-knotis/glossary.png">
+    <img src="https://raw.githubusercontent.com/ttezcann/knotis-docs/main/docs/assets/attachments/getting-started/what-is-knotis/glossary.png" alt="Glossary organized by page, listing linked concepts introduced in each course module, with options to switch to alphabetical or importance views." width="600">
+  </a>
+</p>
+
+### Slide Mode
+
+Slide mode turns a page into a full-screen slideshow without a separate deck.
+
+[Read the slide mode feature guide](https://knotis-docs.ttezcan.com/features/slide-mode-feature/).
+
+<p align="center">
+  <a href="https://github.com/ttezcann/knotis-docs/blob/main/docs/assets/attachments/getting-started/what-is-knotis/slides.png">
+    <img src="https://raw.githubusercontent.com/ttezcann/knotis-docs/main/docs/assets/attachments/getting-started/what-is-knotis/slides.png" alt="Slide mode displays lesson content as presentation slides, with multiple slides visible in the overview and a Slideshow control at the top." width="600">
+  </a>
+</p>
+
+### Concept-aware Search
+
+Search finds concepts, pages, and teaching content across the entire site or specific sections.
+
+[Read the search feature guide](https://knotis-docs.ttezcan.com/features/search-feature/).
+
+<p align="center">
+  <a href="https://github.com/ttezcann/knotis-docs/blob/main/docs/assets/attachments/getting-started/what-is-knotis/search-dummy-variable.png">
+    <img src="https://raw.githubusercontent.com/ttezcann/knotis-docs/main/docs/assets/attachments/getting-started/what-is-knotis/search-dummy-variable.png" alt="Knotis search results for dummy variable, showing matched teaching context and related concepts" width="600">
+  </a>
+</p>
 
 ## Configuration and Site Files
 
@@ -114,7 +238,24 @@ For newly scaffolded sites, the main files and directories are:
 | `.knotis/assets/` | Generated runtime and index staging files. |
 | `site/` | Generated website, including `assets/knotis/`. |
 
+## Upgrade
+
+```bash
+pip install --upgrade knotis
+```
+
+Review the [GitHub Releases page](https://github.com/ttezcann/knotis/releases) before upgrading.
+
+It lists new features, renamed settings, removed settings, and any steps needed after an update.
+
+## Support
+
+For usage questions and bug reports, open a [GitHub issue](https://github.com/ttezcann/knotis/issues).
+
+## Citation
+
+If you use Knotis in research or teaching, cite the archived software using [DOI 10.5281/zenodo.22983153](https://doi.org/10.5281/zenodo.22983153).
 
 ## License
-Knotis is released under the [MIT License](LICENSE.txt).
 
+Knotis is released under the [MIT License](LICENSE.txt).

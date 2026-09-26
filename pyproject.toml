@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "knotis"
-version = "0.1.8"
-description = "A teaching-focused static site builder"
+version = "0.1.9"
+description = "A teaching-focused extension to Zensical, distributed as a Python package with a command-line interface."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"

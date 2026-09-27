@@ -33,11 +33,11 @@
 
 <p align="center">
   <a href="https://knotis-docs.ttezcan.com/"><img
-    src="https://img.shields.io/badge/Documentation-Read-4F46E5"
+    src="https://img.shields.io/badge/Documentation-Read-brightgreen"
     alt="Knotis documentation"
   /></a>
   <a href="https://ssric-reg.ttezcan.com/"><img
-    src="https://img.shields.io/badge/Demo-View%20site-teal"
+    src="https://img.shields.io/badge/Demo-View%20site-brightgreen"
     alt="View the demonstration site"
   /></a>
   <a href="https://marketplace.visualstudio.com/items?itemName=ttezcann.knotis-preview"><img
@@ -53,26 +53,74 @@ It helps instructors publish course notes in which readers can follow a lesson s
 
 Instructors maintain Markdown files. Knotis indexes wikilinks such as `[[concept]]`, outline structure and content tags, then uses them to power contextual panes, Site graph, Page graph, Concept graph, Glossary and Search features, with optional Slide mode, alongside the rendered pages.
 
-## Documentation and Sample Site
+## Documentation and Demonstration Site
 
 - [Knotis documentation](https://knotis-docs.ttezcan.com/): a functioning Knotis site with installation, authoring, feature and publishing guides.
 - [Regression Modeling in Social Sciences](https://ssric-reg.ttezcan.com/): data analysis teaching materials.
 
+
 ## Features
 
-- **[Outlining](https://knotis-docs.ttezcan.com/features/outlining-feature/):** headings and nested lists organize explanations, code, tables, images and media.
-- **[Wikilinks](https://knotis-docs.ttezcan.com/features/wikilinks-feature/):** `[[concept]]` markers connect occurrences across pages; aliases change the displayed wording without creating a separate concept.
-- **[Panes](https://knotis-docs.ttezcan.com/features/pane-feature/):** inspect occurrences with surrounding teaching material, follow related concepts and return through pane history.
-- **[Graphs](https://knotis-docs.ttezcan.com/features/graphs-feature/):** explore site, page and concept views derived from authored structure and navigation.
-- **[Content tags](https://knotis-docs.ttezcan.com/features/content-tags-feature/):** collect material such as `#code`, `#output` and `#interpretation` across the site.
-- **[Glossary](https://knotis-docs.ttezcan.com/features/glossary-feature/):** a site-wide index of concepts generated from wikilinks.
-- **[Slide mode](https://knotis-docs.ttezcan.com/features/slide-mode-feature/):** present lesson content without maintaining a separate slide deck.
-- **[Search](https://knotis-docs.ttezcan.com/features/search-feature/):** find concepts and sections, narrow searches with content tags.
-- **[Read aloud](https://knotis-docs.ttezcan.com/features/read-aloud-feature/):** a built-in text-to-speech control for pages.
-- **[Supporting media tools](https://knotis-docs.ttezcan.com/features/video-controls-feature/):** image viewing, GIF/MP4 playback controls and caption support.
+<table>
+  <tr>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/outlining-feature/">Outlining</a></strong><br>
+      Headings and nested lists organize explanations, code, tables, images and media.
+    </td>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/wikilinks-feature/">Wikilinks</a></strong><br>
+      <code>[[Concept]]</code> markers connect occurrences across pages.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/pane-feature/">Pane</a></strong><br>
+      Inspect occurrences with surrounding teaching material, follow related concepts and return through pane history.
+    </td>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/graphs-feature/">Graphs</a></strong><br>
+      Explore site, page and concept views derived from authored structure and navigation.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/content-tags-feature/">Content tags</a></strong><br>
+      Collect material such as <code>#code</code>, <code>#formula</code> and <code>#discussion</code> across the site.
+    </td>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/glossary-feature/">Glossary</a></strong><br>
+      A site-wide index of concepts generated from wikilinks.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/slide-mode-feature/">Slide mode</a></strong><br>
+      Present lesson content without maintaining a separate slide deck.
+    </td>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/search-feature/">Search</a></strong><br>
+      Find concepts and sections, narrow searches with content tags.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/read-aloud-feature/">Read aloud</a></strong><br>
+      A built-in text-to-speech control for pages.
+    </td>
+    <td width="50%">
+      <strong><a href="https://knotis-docs.ttezcan.com/features/video-controls-feature/">Supporting media tools</a></strong><br>
+      Image viewing, GIF/MP4 playback controls and caption support.
+    </td>
+  </tr>
+</table>
 
-An optional [Knotis VS Code extension](https://github.com/ttezcann/knotis-vscode) supports authoring and previewing.
-
+<p>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vscode/vscode-original.svg"
+       alt=""
+       width="18">
+  An optional <a href="https://github.com/ttezcann/knotis-vscode">Knotis VS Code extension</a>
+  supports authoring and previewing.
+</p>
 
 ## Requirements
 

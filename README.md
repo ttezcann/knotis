@@ -8,12 +8,6 @@
   <strong>Connected instructional materials from Markdown</strong>
 </p>
 <p align="center">
-  <strong>
-    Connected instructional materials from Markdown
-  </strong>
-</p>
-
-<p align="center">
   <a href="https://pypi.org/project/knotis/"><img
     src="https://img.shields.io/pypi/v/knotis"
     alt="PyPI"

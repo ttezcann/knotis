@@ -474,6 +474,13 @@ def _normalize_pane_config(raw_config: dict | None, path: str = "knotis.pane") -
             normalized_value = _normalize_int(value, sub_path, minimum=1)
             if normalized_value is not None:
                 normalized[key] = normalized_value
+        elif key == "graph_path_size":
+            normalized_value = _normalize_int(value, sub_path, minimum=1)
+            if normalized_value is not None and normalized_value > 4:
+                _warn_knotis_config(f"{sub_path} must be <= 4; got {value!r}")
+                normalized_value = None
+            if normalized_value is not None:
+                normalized[key] = normalized_value
         else:
             _warn_knotis_config(f"Unknown config key '{sub_path}' will be ignored")
     return normalized
@@ -487,7 +494,7 @@ def _finalize_pane_runtime_config(knotis_config: dict) -> None:
     if not isinstance(path_author, dict):
         path_author = {}
     defaults_pane = knotis_config.setdefault("defaults", {}).setdefault("pane", {})
-    for key in ("order", "width", "initial_lines", "initial_list_items", "chunk_lines"):
+    for key in ("order", "width", "initial_lines", "initial_list_items", "chunk_lines", "graph_path_size"):
         if key in author:
             defaults_pane[key] = deepcopy(author[key])
     knotis_config["path"] = {
@@ -536,6 +543,44 @@ def _normalize_readaloud_config(raw_config: dict | None, path: str = "knotis.rea
             normalized_value = _normalize_bool(value, sub_path)
             if normalized_value is not None:
                 normalized[key] = normalized_value
+        else:
+            _warn_knotis_config(f"Unknown config key '{sub_path}' will be ignored")
+    return normalized
+
+
+def _normalize_sticky_headers_config(raw_config: dict | None, path: str) -> dict:
+    if raw_config is None:
+        return {}
+    if not isinstance(raw_config, dict):
+        _warn_knotis_config(f"{path} must be a mapping; got {raw_config!r}")
+        return {}
+
+    normalized: dict = {}
+    for key, value in raw_config.items():
+        sub_path = f"{path}.{key}"
+        if key == "enabled":
+            normalized_value = _normalize_bool(value, sub_path)
+            if normalized_value is not None:
+                normalized[key] = normalized_value
+        elif key in {"include_paths", "exclude_paths"}:
+            normalized[key] = knotis_site_io.normalize_page_path_list(value, config_key=sub_path)
+        else:
+            _warn_knotis_config(f"Unknown config key '{sub_path}' will be ignored")
+    return normalized
+
+
+def _normalize_table_config(raw_config: dict | None, path: str = "knotis.table") -> dict:
+    if raw_config is None:
+        return {}
+    if not isinstance(raw_config, dict):
+        _warn_knotis_config(f"{path} must be a mapping; got {raw_config!r}")
+        return {}
+
+    normalized: dict = {}
+    for key, value in raw_config.items():
+        sub_path = f"{path}.{key}"
+        if key == "sticky_headers":
+            normalized[key] = _normalize_sticky_headers_config(value, sub_path)
         else:
             _warn_knotis_config(f"Unknown config key '{sub_path}' will be ignored")
     return normalized
@@ -1148,6 +1193,12 @@ def _normalize_knotis_config(raw_config: dict | None) -> dict:
             _normalize_slides_config(raw_config.get("slides")),
         )
 
+    if "table" in raw_config:
+        normalized["table"] = _deep_merge_dicts(
+            normalized["table"],
+            _normalize_table_config(raw_config.get("table")),
+        )
+
     if "readaloud" in raw_config:
         normalized["readaloud"] = _deep_merge_dicts(
             normalized["readaloud"],
@@ -1190,6 +1241,7 @@ def _normalize_knotis_config(raw_config: dict | None) -> dict:
             "wikilinks",
             "search",
             "slides",
+            "table",
             "readaloud",
             "content",
             "defaults",
@@ -1220,22 +1272,44 @@ def _finalize_content_tag_colors(
     )
 
 
-def _finalize_slides_page_scope(slides_cfg: dict, md_files: list[Path]) -> None:
-    include_paths = slides_cfg.get("include_paths", [])
-    exclude_paths = slides_cfg.get("exclude_paths", [])
+def _resolve_page_scope_urls(cfg: dict, md_files: list[Path], config_key: str) -> tuple[list[str], list[str]]:
     include_resolved = knotis_site_io.resolve_page_path_set(
-        include_paths,
+        cfg.get("include_paths", []),
         md_files,
-        config_key="knotis.slides.include_paths",
+        config_key=f"{config_key}.include_paths",
     )
     exclude_resolved = knotis_site_io.resolve_page_path_set(
-        exclude_paths,
+        cfg.get("exclude_paths", []),
         md_files,
-        config_key="knotis.slides.exclude_paths",
+        config_key=f"{config_key}.exclude_paths",
     )
     included_paths = include_resolved - exclude_resolved
-    slides_cfg["include_urls"] = sorted(knotis_site_io.page_url_from_path(md_path) for md_path in md_files if md_path.relative_to(knotis_site_io.DOCS_DIR).as_posix() in included_paths)
-    slides_cfg["exclude_urls"] = sorted(knotis_site_io.page_url_from_path(md_path) for md_path in md_files if md_path.relative_to(knotis_site_io.DOCS_DIR).as_posix() in exclude_resolved)
+
+    def urls(paths: set[str]) -> list[str]:
+        return sorted(
+            knotis_site_io.page_url_from_path(md_path)
+            for md_path in md_files
+            if md_path.relative_to(knotis_site_io.DOCS_DIR).as_posix() in paths
+        )
+
+    return urls(included_paths), urls(exclude_resolved)
+
+
+def _finalize_slides_page_scope(slides_cfg: dict, md_files: list[Path]) -> None:
+    slides_cfg["include_urls"], slides_cfg["exclude_urls"] = _resolve_page_scope_urls(
+        slides_cfg, md_files, "knotis.slides"
+    )
+
+
+def _finalize_sticky_headers_page_scope(sticky_cfg: dict, md_files: list[Path]) -> None:
+    # Unlike slides, an empty include_paths permits every page; the flag keeps that
+    # distinct from include paths that matched nothing.
+    include_urls, exclude_urls = _resolve_page_scope_urls(
+        sticky_cfg, md_files, "knotis.table.sticky_headers"
+    )
+    sticky_cfg["include_all"] = not sticky_cfg.get("include_paths")
+    sticky_cfg["include_urls"] = [] if sticky_cfg["include_all"] else include_urls
+    sticky_cfg["exclude_urls"] = exclude_urls
 
 
 def _build_graph_meta(knotis_config: dict | None, md_files: list[Path] | None = None) -> dict:
@@ -1252,6 +1326,8 @@ def _build_graph_meta(knotis_config: dict | None, md_files: list[Path] | None = 
     site_graph_cfg["page_url"] = knotis_site_io.nav_path_to_url(site_graph_path) or ""
     slides_cfg = deepcopy(knotis_config.get("slides", {}))
     _finalize_slides_page_scope(slides_cfg, md_files or [])
+    table_cfg = deepcopy(knotis_config.get("table", {}))
+    _finalize_sticky_headers_page_scope(table_cfg.setdefault("sticky_headers", {}), md_files or [])
     return {
         "knotis": {
             "defaults": deepcopy(knotis_config.get("defaults", {})),
@@ -1259,6 +1335,7 @@ def _build_graph_meta(knotis_config: dict | None, md_files: list[Path] | None = 
             "concept_graph": deepcopy(knotis_config.get("concept_graph", {})),
             "site_graph": site_graph_cfg,
             "slides": slides_cfg,
+            "table": table_cfg,
             "readaloud": deepcopy(knotis_config.get("readaloud", {})),
             "content": deepcopy(knotis_config.get("content", {})),
             "content_tags": content_tags_cfg,

@@ -36,6 +36,7 @@ KNOTIS_STAMPED_ASSETS = (
     "knotis-readaloud.css",
     "knotis-media.js",
     "knotis-media.css",
+    "knotis-sticky-table-headers.js",
     "knotis-theme.css",
 )
 GENERATED_PAGE_FILENAMES = ("site-graph.md", "graph.md", "glossary.md", "content-tags.md")

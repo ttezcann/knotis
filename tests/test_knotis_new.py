@@ -138,12 +138,18 @@ class KnotisNewTests(unittest.TestCase):
       knotis = config["project"]["extra"]["knotis"]
       self.assertTrue(knotis["search"]["enabled"])
       self.assertEqual(knotis["pane"]["width"], 750)
+      self.assertEqual(knotis["pane"]["graph_path_size"], 3)
       self.assertTrue(knotis["pane"]["path"]["enabled"])
       self.assertEqual(knotis["site_graph"]["graph"]["exclude_paths"], [])
       self.assertEqual(knotis["page_graph"]["graph"]["exclude_paths"], [])
       self.assertEqual(knotis["concept_graph"]["graph"]["exclude_paths"], [])
       self.assertTrue(knotis["slides"]["enabled"])
       self.assertEqual(knotis["slides"]["fit_min_font_px"], 26)
+      self.assertEqual(
+        knotis["table"]["sticky_headers"],
+        {"enabled": False, "include_paths": [], "exclude_paths": []},
+      )
+      self.assertEqual(set(knotis["table"]), {"sticky_headers"})
       self.assertEqual(knotis["glossary"]["page_view_label"], "Pages")
       self.assertTrue(knotis["content_tags"]["enabled"])
       self.assertNotIn("path", knotis["content_tags"])
@@ -156,6 +162,30 @@ class KnotisNewTests(unittest.TestCase):
 
       text = (root / "zensical.toml").read_text(encoding="utf-8")
       self.assertIn('site_url = "http://localhost:8000/"', text)
+      table_block = (
+        "## Table\n"
+        "[project.extra.knotis.table.sticky_headers]\n"
+        "enabled = false\n"
+        "include_paths = []\n"
+        "exclude_paths = []\n"
+        "\n"
+        "## Wikilinks\n"
+      )
+      self.assertIn(table_block, text)
+      self.assertLess(text.index("## Content\n"), text.index(table_block))
+      pane_block = (
+        "## Pane\n"
+        "[project.extra.knotis.pane]\n"
+        "width = 750\n"
+        "initial_lines = 12\n"
+        "initial_list_items = 20\n"
+        "chunk_lines = 4\n"
+        "order = []\n"
+        "graph_path_size = 3\n"
+        "\n"
+        "### Pane path\n"
+      )
+      self.assertIn(pane_block, text)
       self.assertNotIn('"Graph"', text)
       self.assertIn('{ "Explore" = [', text)
       self.assertNotIn("plugins = [", text)
@@ -169,13 +199,12 @@ class KnotisNewTests(unittest.TestCase):
       self.assertIn("### Site graph", text)
       self.assertNotIn("[project.validation]", text)
       self.assertNotIn("knotis.markdown.knotis_slide_markers", text)
-      self.assertNotIn("ssric-reg", text)
       self.assertNotIn("resources/how-to-use", text)
       self.assertNotIn('include_paths = ["modules"]', text)
       self.assertNotIn("[project.theme.icon.tag]", text)
       self.assertNotIn("[project.extra.tags]", text)
 
-  def test_resolve_knotis_root_from_ssric_scripts(self) -> None:
+  def test_resolve_knotis_root_from_site_scripts(self) -> None:
     self.skipTest("legacy symlink root resolution is not used by packaged Knotis")
 
 

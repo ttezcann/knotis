@@ -338,7 +338,7 @@ def main(docs_dir: Path | None = None, skip_site_mirror: bool = False) -> None:
     mirror_runtime_assets(runtime_assets_dir, ASSETS_DIR, site_asset_output_dir)
     mirror_vendor_assets(runtime_assets_dir, ASSETS_DIR, site_asset_output_dir)
 
-    from .generate_icon_map import write_icon_map
+    from .generate_icon_map import custom_icon_dirs_from_config, write_icon_map
 
     if not legacy_asset_layout:
         _ensure_site_theme_css(DOCS_DIR / "stylesheets" / "knotis-theme.css")
@@ -357,7 +357,13 @@ def main(docs_dir: Path | None = None, skip_site_mirror: bool = False) -> None:
     md_files = sorted(
         p for p in DOCS_DIR.rglob("*.md") if not _is_scan_skipped_md_file(p)
     )
-    write_icon_map(md_files, ASSETS_DIR, runtime_assets_dir, site_asset_output_dir)
+    write_icon_map(
+        md_files,
+        ASSETS_DIR,
+        runtime_assets_dir,
+        site_asset_output_dir,
+        custom_icon_dirs=custom_icon_dirs_from_config(knotis_site_io.read_zensical_toml(), REPO_ROOT),
+    )
     print(f"[build_wikilinks] Scanning {len(md_files)} Markdown files…", file=sys.stderr)
 
     all_occurrences: list[dict] = []

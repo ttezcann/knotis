@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+import tomllib
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -18,8 +19,17 @@ class ZensicalRuntimeTests(unittest.TestCase):
         self.module = zensical_runtime
 
     def test_pinned_version_constant(self) -> None:
-        self.assertEqual(self.module.ZENSICAL_VERSION, "0.0.62")
-        self.assertEqual(self.module.ZENSICAL_REQUIREMENT, "zensical==0.0.62")
+        self.assertEqual(self.module.ZENSICAL_VERSION, "0.0.72")
+        self.assertEqual(self.module.ZENSICAL_REQUIREMENT, "zensical==0.0.72")
+
+    def test_runtime_pin_matches_package_dependency(self) -> None:
+        # ensure_zensical() pip-installs the runtime pin, so drift from the
+        # pyproject dependency silently swaps the user's Zensical version.
+        pyproject = Path(__file__).resolve().parents[1] / "pyproject.toml"
+        with pyproject.open("rb") as handle:
+            dependencies = tomllib.load(handle)["project"]["dependencies"]
+        zensical_deps = [dep for dep in dependencies if dep.startswith("zensical")]
+        self.assertEqual(zensical_deps, [self.module.ZENSICAL_REQUIREMENT])
 
     def test_read_zensical_version_parses_semver(self) -> None:
         with mock.patch.object(self.module.subprocess, "run") as run:

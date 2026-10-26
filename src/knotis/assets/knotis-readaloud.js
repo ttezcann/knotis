@@ -219,7 +219,7 @@
     if (el.querySelector("pre, table, figure, .mermaid, .highlighttable, .md-button")) {
       var clone = el.cloneNode(true);
       clone.querySelectorAll(
-        "pre, table, figure, button, .md-button, .highlighttable, .highlight, .mermaid, img, svg"
+        "pre, table, figure, button:not(.wikilink), .md-button, .highlighttable, .highlight, .mermaid, img, svg"
       ).forEach(function (n) { n.remove(); });
       if ((clone.textContent || "").replace(/\s+/g, " ").trim().length < 12) return true;
     }
@@ -228,7 +228,7 @@
       if (el.querySelector("img, svg, .twemoji")) {
         var prose = el.cloneNode(true);
         prose.querySelectorAll(
-          "img, svg, pre, table, figure, button, .md-button, .twemoji, .keys, a[download], .highlighttable, .highlight"
+          "img, svg, pre, table, figure, button:not(.wikilink), .md-button, .twemoji, .keys, a[download], .highlighttable, .highlight"
         ).forEach(function (n) { n.remove(); });
         if ((prose.textContent || "").replace(/\s+/g, " ").trim().length < 12) return true;
       }
@@ -286,9 +286,10 @@
 
   function extractVisibleText(el) {
     var clone = el.cloneNode(true);
+    // Wikilinks render as buttons but are lesson text; other buttons are controls.
     clone.querySelectorAll(
       "script, style, noscript, nav, aside, pre, table, figure, img, svg, math, mjx-container, " +
-      "button, .md-search, .knotis-search, .md-nav, .md-header, .md-sidebar, .md-footer, .md-tabs, " +
+      "button:not(.wikilink), .md-search, .knotis-search, .md-nav, .md-header, .md-sidebar, .md-footer, .md-tabs, " +
       ".md-content__button, .md-button, .mermaid, .highlighttable, .highlight, .twemoji, .keys, " +
       "[aria-hidden='true'], [data-knotis-slide-marker]"
     ).forEach(function (n) { n.remove(); });
@@ -298,6 +299,10 @@
       .replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, "$1")
       .replace(/\s+/g, " ")
       .trim();
+  }
+
+  if (window.__KNOTIS_READALOUD_TEST__) {
+    window.__KnotisReadaloudTest = { extractContentBlocks: extractContentBlocks };
   }
 
   

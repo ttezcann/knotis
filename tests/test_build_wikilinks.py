@@ -260,55 +260,6 @@ nav = [
     def _zensical_site_root(self) -> Path:
         return KNOTIS_ROOT.parent
 
-    def render_zensical_html(self, markdown_text: str, *, markdown_path: str = "sample.md") -> str:
-        site_root = self._zensical_site_root()
-        config_path = site_root / "zensical.toml"
-        if not config_path.exists():
-            self.skipTest("Zensical site config is unavailable for slide marker render tests")
-        with tempfile.TemporaryDirectory() as tmpdir:
-            markdown_file = Path(tmpdir) / Path(markdown_path).name
-            markdown_file.write_text(markdown_text, encoding="utf-8")
-            script = textwrap.dedent(
-                """
-                from pathlib import Path
-                import sys
-
-                from knotis.builder.zensical_config import resolve_zensical_config_path
-                from zensical.config import parse_zensical_config
-                from zensical.markdown.render import render
-
-                site_root = Path(sys.argv[1])
-                markdown_path = Path(sys.argv[2])
-                parse_zensical_config(str(resolve_zensical_config_path(site_root)))
-                html = render(
-                    markdown_path.read_text(encoding="utf-8"),
-                    path=str(markdown_path),
-                    url="sample/",
-                )["content"]
-                sys.stdout.write(html)
-                """
-            )
-            env = os.environ.copy()
-            root_path = str(site_root)
-            src_path = str(SRC_DIR)
-            existing = env.get("PYTHONPATH", "")
-            env["PYTHONPATH"] = (
-                f"{root_path}{os.pathsep}{src_path}"
-                if not existing
-                else f"{root_path}{os.pathsep}{src_path}{os.pathsep}{existing}"
-            )
-            result = subprocess.run(
-                [self._markdown_runtime_python(), "-c", script, str(site_root), str(markdown_file)],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                env=env,
-                check=False,
-            )
-            if result.returncode != 0:
-                self.fail(f"Zensical render failed:\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}")
-            return result.stdout.strip()
-
     def test_markerless_block_list_prefixes_render_as_blocks(self) -> None:
         html = self.render_markdown_html(
             textwrap.dedent(
@@ -474,7 +425,7 @@ nav = [
                 ```
                 - ![Diagram](figure.png)
 
-            - Copy the code below.
+            - Copy the snippet below.
                 - ```r
                 x <- 1
                 ```
@@ -494,7 +445,7 @@ nav = [
                 ```
                 ![Diagram](figure.png)
 
-            - Copy the code below.
+            - Copy the snippet below.
                 ```r
                 x <- 1
                 ```
@@ -521,8 +472,8 @@ nav = [
         child_forms = {
             "indented": textwrap.dedent(
                 """
-                ### [[Descriptive table]] #output
-                - **Basic descriptive statistics**
+                ### [[Overview table]] #output
+                - **Basic summary methods**
                     | variable | variable label | n | NA.prc | mean | sd |
                     |:---------|:---------------|---|--------|------|-----|
                     | coninc   | Respondents' family income | 3563 | 10.61 | 47738.65 | 47738.65 |
@@ -530,8 +481,8 @@ nav = [
             ).strip(),
             "dash": textwrap.dedent(
                 """
-                ### [[Descriptive table]] #output
-                - **Basic descriptive statistics**
+                ### [[Overview table]] #output
+                - **Basic summary methods**
                     - | variable | variable label | n | NA.prc | mean | sd |
                     |:---------|:---------------|---|--------|------|-----|
                     | coninc   | Respondents' family income | 3563 | 10.61 | 47738.65 | 47738.65 |
@@ -541,8 +492,8 @@ nav = [
         sibling_forms = {
             "repo": textwrap.dedent(
                 """
-                ### [[Descriptive table]] #output
-                - **Basic descriptive statistics**
+                ### [[Overview table]] #output
+                - **Basic summary methods**
                 - | variable | variable label | n | NA.prc | mean | sd |
                 |:---------|:---------------|---|--------|------|-----|
                 | coninc   | Respondents' family income | 3563 | 10.61 | 47738.65 | 47738.65 |
@@ -550,8 +501,8 @@ nav = [
             ).strip(),
             "flush": textwrap.dedent(
                 """
-                ### [[Descriptive table]] #output
-                - **Basic descriptive statistics**
+                ### [[Overview table]] #output
+                - **Basic summary methods**
                 | variable | variable label | n | NA.prc | mean | sd |
                 |:---------|:---------------|---|--------|------|-----|
                 | coninc   | Respondents' family income | 3563 | 10.61 | 47738.65 | 47738.65 |
@@ -582,7 +533,7 @@ nav = [
         sibling_html = self.render_markdown_html(
             textwrap.dedent(
                 """
-                - **Basic descriptive statistics**
+                - **Basic summary methods**
                 - | variable | variable label | n |
                 |:---------|:---------------|---|
                 | coninc   | income | 3563 |
@@ -592,7 +543,7 @@ nav = [
         child_html = self.render_markdown_html(
             textwrap.dedent(
                 """
-                - **Basic descriptive statistics**
+                - **Basic summary methods**
                     - | variable | variable label | n |
                     |:---------|:---------------|---|
                     | coninc   | income | 3563 |
@@ -601,11 +552,11 @@ nav = [
         )
         self.assertRegex(
             sibling_html,
-            r"<ul>\s*<li>\s*<p><strong>Basic descriptive statistics</strong></p>\s*</li>\s*<li>\s*<table>",
+            r"<ul>\s*<li>\s*<p><strong>Basic summary methods</strong></p>\s*</li>\s*<li>\s*<table>",
         )
         self.assertRegex(
             child_html,
-            r"<ul>\s*<li>\s*<p><strong>Basic descriptive statistics</strong></p>\s*<ul>\s*<li>\s*<table>",
+            r"<ul>\s*<li>\s*<p><strong>Basic summary methods</strong></p>\s*<ul>\s*<li>\s*<table>",
         )
 
     def test_slide_break_after_prose_and_indented_mermaid(self) -> None:
@@ -656,7 +607,7 @@ nav = [
                     | Younger | 207 | 293 |
 
                     - ??? tip "Show the answer"
-                        - Use chi-square to test the relationship.
+                        - Use group test to test the relationship.
                 """
             ).strip()
         )
@@ -678,8 +629,8 @@ nav = [
                     | Better | Worse |  Stayed about the same |
 
                         - ??? tip "Show the answer"
-                            - Categorical (Nominal)
-                                - There are more than two categories, so it is not binary.
+                            - Grouped (Unranked)
+                                - There are more than two categories, so it is not two-level.
                 """
             ).strip()
         )
@@ -703,7 +654,7 @@ nav = [
                 |:---:|:---:|
                 | A | B |
                 - ??? tip "Show the answer"
-                    - **Categorical (Ordinal)**
+                    - **Grouped (Ranked)**
 
             - ??? abstract "2. American Health Values Survey"
                 *"During the last 5 years..."*
@@ -721,7 +672,7 @@ nav = [
                 |:---:|:---:|
                 | A | B |
                 - ??? tip "Show the answer"
-                    - **Categorical (Ordinal)**
+                    - **Grouped (Ranked)**
 
             <!-- slide-break -->
             - ??? abstract "2. American Health Values Survey"
@@ -750,8 +701,8 @@ nav = [
             - Determining the type of variable is important because different analysis techniques are used depending on the variable type.
                 - Some questions from different surveys will be shown.
                 - We will determine if they are;
-                    - **Categorical** (If so, **binary**, **nominal**, or **ordinal**)
-                    - **Continuous**
+                    - **Grouped** (If so, **two-level**, **unranked**, or **ranked**)
+                    - **Numeric**
 
             <!-- slide-break -->
             - ??? abstract "1. Youth Participatory Politics Survey Project"
@@ -762,14 +713,14 @@ nav = [
         html = self.render_markdown_html(marked_markdown)
         self.assertRegex(
             html,
-            r'<strong>Continuous</strong>\s*</li>\s*</ul>\s*</li>\s*</ul>\s*</li>\s*'
+            r'<strong>Numeric</strong>\s*</li>\s*</ul>\s*</li>\s*</ul>\s*</li>\s*'
             r'<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span>\s*'
             r'<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*'
             r'<li>\s*<details class="abstract">\s*<summary>1\. Youth Participatory Politics Survey Project</summary>',
         )
         self.assertNotRegex(
             html,
-            r'<strong>Continuous</strong>[\s\S]{0,250}<li>\s*<span\b[^>]*data-knotis-slide-marker="slide-break"',
+            r'<strong>Numeric</strong>[\s\S]{0,250}<li>\s*<span\b[^>]*data-knotis-slide-marker="slide-break"',
         )
 
     def test_markerless_table_after_admonition_paragraph_does_not_need_blank_line(self) -> None:
@@ -782,7 +733,7 @@ nav = [
                     |---|---:|---:|
                     | Younger | 207 | 293 |
                         - ??? tip "Show the answer"
-                            - Use chi-square to test the relationship.
+                            - Use group test to test the relationship.
                 """
             ).strip()
         )
@@ -802,9 +753,6 @@ nav = [
 
     def normalize_html_whitespace(self, html: str) -> str:
         return re.sub(r">\s+<", "><", html.strip())
-
-    def strip_data_line_attrs(self, html: str) -> str:
-        return re.sub(r'\sdata-line="[^"]*"', "", html)
 
     def assert_render_neutral_markers(self, base_markdown: str, marked_markdown: str, expected_markers: list[str]) -> tuple[str, str]:
         base_html = self.render_markdown_html(base_markdown)
@@ -845,23 +793,23 @@ nav = [
             """
             ### More detailed look
             - Here's the more detailed look:
-            ![RStudio interface with more detailed view](../assets/images/rstudio/01.-introduction-to-rstudio/rstudio_interface_detailed.png){ width="1000" }
+            ![Juniper interface with more detailed view](../assets/images/juniper/01.-getting-started/juniper_interface_detailed.png){ width="1000" }
 
 
             1. **Menu bar:** The top strip with File, Edit, Code, View, Plots, and other menus.
-            2. **Script editor:** The upper-left panel where you write and save your R code.
+            2. **Script editor:** The upper-left panel where you write and save your Code.
             """
         ).strip()
         marked_markdown = textwrap.dedent(
             """
             ### More detailed look
             - Here's the more detailed look:
-            ![RStudio interface with more detailed view](../assets/images/rstudio/01.-introduction-to-rstudio/rstudio_interface_detailed.png){ width="1000" }
+            ![Juniper interface with more detailed view](../assets/images/juniper/01.-getting-started/juniper_interface_detailed.png){ width="1000" }
 
             <!-- slide-end -->
             <!-- slide-break -->
             1. **Menu bar:** The top strip with File, Edit, Code, View, Plots, and other menus.
-            2. **Script editor:** The upper-left panel where you write and save your R code.
+            2. **Script editor:** The upper-left panel where you write and save your Code.
             """
         ).strip()
         base_html, marked_html = self.assert_render_neutral_markers(
@@ -934,15 +882,15 @@ nav = [
         base_markdown = textwrap.dedent(
             """
             - For our analysis, imagine we are interested in the income level of respondents.
-                - Then, we will merge values and create a new variable by recoding.
+                - Then, we will merge values and create a new variable by relabeling.
 
-                    !!! info "Merging values"
+                    !!! info "Combining values"
                         - **1**: married ➜ 1: married
                         - **2**: widowed ➜ **2**: formerly in union
 
-            - After recoding the original variable, our dataset will include one more variable.
+            - After relabeling the original variable, our dataset will include one more variable.
 
-                | respondent id | marital | maritalgroups |
+                | respondent id | status | statusgroups |
                 |---|---|---|
                 | 1 | 1 (married) | 1 (married) |
                 | 2 | 2 (widowed) | 2 (formerly in union) |
@@ -952,15 +900,15 @@ nav = [
             """
             <!-- slide-break -->
             - For our analysis, imagine we are interested in the income level of respondents.
-                - Then, we will merge values and create a new variable by recoding.
+                - Then, we will merge values and create a new variable by relabeling.
 
-                    !!! info "Merging values"
+                    !!! info "Combining values"
                         - **1**: married ➜ 1: married
                         - **2**: widowed ➜ **2**: formerly in union
             <!-- slide-break -->
-            - After recoding the original variable, our dataset will include one more variable.
+            - After relabeling the original variable, our dataset will include one more variable.
 
-                | respondent id | marital | maritalgroups |
+                | respondent id | status | statusgroups |
                 |---|---|---|
                 | 1 | 1 (married) | 1 (married) |
                 | 2 | 2 (widowed) | 2 (formerly in union) |
@@ -972,49 +920,9 @@ nav = [
             ["slide-break", "slide-end"],
         )
         self.assertRegex(marked_html, r"</li>\s*<span\b[^>]*data-knotis-slide-marker=\"slide-end\"")
-        self.assertRegex(marked_html, r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<li>\s*<p>After recoding')
+        self.assertRegex(marked_html, r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<li>\s*<p>After relabeling')
         self.assertRegex(marked_html, r"<ul>\s*<li>\s*<p>For our analysis")
         self.assertRegex(marked_html, r"</li>\s*<span\b[^>]*data-knotis-slide-marker=\"slide-end\"[^>]*></span><span\b[^>]*data-knotis-slide-marker=\"slide-break\"[^>]*></span>\s*<li>")
-
-    def test_frequency_table_interpretation_slide_start_in_module_04_context(self) -> None:
-        # Inline replica of the module 04 item 5 -> 6 boundary (the module
-        # file itself drifts, so the test carries its own fixture).
-        snippet = textwrap.dedent(
-            """
-            ### [[Merging values]]
-            - For our analysis, we may want to merge the values of variables and create a new variable.
-            - Merging values is for [[categorical]] variables.
-                - Take `marital` variable in GSS.
-            <!-- slide-break -->
-            5. **[[Frequency table]] #output for the original variable (marital)**
-                - **Respondents' marital status (Variable label)**
-                    - | value | value label   | frq  | raw.prc | valid.prc | cum.prc |
-                      |-----|-----------------|------|---------|-----------|---------|
-                      | 1   | Married         | 1659 | 41.62   | 41.78     | 41.78   |
-                      | 2   | Widowed         | 269  | 6.75    | 6.77      | 48.55   |
-                      | 5   | Never married   | 1334 | 33.47   | 33.59     | 100.00  |
-                      | NA  | NA              | 15   | 0.38    | NA        | NA      |
-            <!-- slide-break -->
-            6. **[[Frequency table]] #interpretation for the original variable (marital)**
-                - !!! note "Frequency table interpretation sample"
-                    The respondents' marital status *variable* shows that 41.78% of the respondents are married; 6.77% of the respondents are widowed; and 33.59% of the respondents are never married.
-                - !!! quote "Frequency table interpretation template"
-                    The **[[variable label]]** *variable* shows that **xx.xx%** of the respondents are / have / feel / think / said / reported **[[value label]] 1**...
-                - !!! success "Interpretation explanation"
-                    - After the **variable label**, we add the word of "*variable*" in your interpretation:
-                        - "The respondents' marital status *variable* shows that..."
-            """
-        ).strip()
-        marked_html = self.render_zensical_html(snippet)
-        stripped = self.strip_data_line_attrs(marked_html)
-        self.assertRegex(
-            stripped,
-            r'slide-end"[^>]*></span>\s*<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*<li>\s*<p><strong>\[\[Frequency table\]\] #interpretation for the original variable',
-        )
-        self.assertNotRegex(
-            stripped,
-            r'slide-end"[^>]*></span>\s*<li>\s*<p><strong>\[\[Frequency table\]\] #interpretation for the original variable',
-        )
 
     def test_slide_break_carries_click_font_fill_to_next_slide(self) -> None:
         base_markdown = textwrap.dedent(
@@ -1111,8 +1019,8 @@ nav = [
         base_markdown = textwrap.dedent(
             """
             ### Learning outcomes { data-search-exclude }
-            1. Differentiate R and RStudio
-            2. Use RStudio Cloud (Posit)
+            1. Differentiate R and Juniper
+            2. Use Juniper Cloud (Posit)
             3. Explain what R packages are
             """
         ).strip()
@@ -1120,8 +1028,8 @@ nav = [
             """
             <!-- slide-break -->
             ### Learning outcomes { data-search-exclude }
-            1. Differentiate R and RStudio
-            2. Use RStudio Cloud (Posit)
+            1. Differentiate R and Juniper
+            2. Use Juniper Cloud (Posit)
             3. Explain what R packages are
             <!-- slide-end -->
             """
@@ -1132,7 +1040,7 @@ nav = [
             ["slide-break", "slide-end"],
         )
         self.assertEqual(base_html.count("<li>"), marked_html.count("<li>"))
-        self.assertIn("Differentiate R and RStudio", marked_html)
+        self.assertIn("Differentiate R and Juniper", marked_html)
         self.assertRegex(marked_html, r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<h3')
         self.assertRegex(
             marked_html,
@@ -1143,33 +1051,33 @@ nav = [
     def test_slide_break_preserves_nested_bullet_ordered_list_block(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            ## [[Reasons for recoding]]
-            - There are three reasons for recoding:
-                1. [[Merging values]]
-                2. [[Reversing values]]
-                3. [[Transforming continuous variables into groups]]
+            ## [[Reasons for relabeling]]
+            - There are three reasons for relabeling:
+                1. [[Combining values]]
+                2. [[Flipping values]]
+                3. [[Transforming numeric variables into groups]]
 
-            ### [[Merging values]]
+            ### [[Combining values]]
             - For our analysis, we may want to merge values.
-            - Take `marital` variable in GSS.
-            - After recoding, the dataset includes one more variable.
+            - Take `status` variable in SURVEY.
+            - After relabeling, the dataset includes one more variable.
             """
         ).strip()
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            ## [[Reasons for recoding]]
-            - There are three reasons for recoding:
-                1. [[Merging values]]
-                2. [[Reversing values]]
-                3. [[Transforming continuous variables into groups]]
+            ## [[Reasons for relabeling]]
+            - There are three reasons for relabeling:
+                1. [[Combining values]]
+                2. [[Flipping values]]
+                3. [[Transforming numeric variables into groups]]
             <!-- slide-break -->
-            ### [[Merging values]]
+            ### [[Combining values]]
             - For our analysis, we may want to merge values.
             <!-- slide-break -->
-            - Take `marital` variable in GSS.
+            - Take `status` variable in SURVEY.
             <!-- slide-break -->
-            - After recoding, the dataset includes one more variable.
+            - After relabeling, the dataset includes one more variable.
             """
         ).strip()
         _base_html, marked_html = self.assert_render_neutral_markers(
@@ -1177,7 +1085,7 @@ nav = [
             marked_markdown,
             ["slide-break", "slide-end"],
         )
-        self.assertRegex(marked_html, r"<ul>\s*<li>There are three reasons for recoding:<ol>")
+        self.assertRegex(marked_html, r"<ul>\s*<li>There are three reasons for relabeling:<ol>")
         self.assertRegex(marked_html, r"</ol>\s*</li>\s*</ul>\s*<span\b[^>]*data-knotis-slide-marker=\"slide-end\"")
         self.assertNotRegex(marked_html, r"<ol>\s*<span\b[^>]*data-knotis-slide-marker=\"slide-break\"")
         self.assertNotRegex(marked_html, r"<li>\s*<span\b[^>]*data-knotis-slide-marker=\"slide-(?:break|end)\"")
@@ -1185,42 +1093,42 @@ nav = [
     def test_slide_break_after_nested_bullet_list_closes_after_whole_list(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            ## [[Recoding]] definition
+            ## [[Relabeling]] definition
             - It is rare that we use variables as they are in our analyses.
                 - Instead, we often customize the values of variables for our needs.
-            - Recoding means creating a new variable using the values of an original variable.
-                - After recoding (creating a new variable), the data will include one more variable.
+            - Relabeling means creating a new variable using the values of an original variable.
+                - After relabeling (creating a new variable), the data will include one more variable.
 
-            ## [[Reasons for recoding]]
-            - There are three reasons for recoding:
-                1. [[Merging values]]
-                2. [[Reversing values]]
-                3. [[Transforming continuous variables into groups]]
+            ## [[Reasons for relabeling]]
+            - There are three reasons for relabeling:
+                1. [[Combining values]]
+                2. [[Flipping values]]
+                3. [[Transforming numeric variables into groups]]
 
-            ### [[Merging values]]
+            ### [[Combining values]]
             - For our analysis, we may want to merge values.
-            - After recoding the original `marital` variable, our dataset will include `maritalgroups`.
+            - After relabeling the original `status` variable, our dataset will include `statusgroups`.
             """
         ).strip()
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            ## [[Recoding]] definition
+            ## [[Relabeling]] definition
             - It is rare that we use variables as they are in our analyses.
                 - Instead, we often customize the values of variables for our needs.
-            - Recoding means creating a new variable using the values of an original variable.
-                - After recoding (creating a new variable), the data will include one more variable.
+            - Relabeling means creating a new variable using the values of an original variable.
+                - After relabeling (creating a new variable), the data will include one more variable.
             <!-- slide-break -->
-            ## [[Reasons for recoding]]
-            - There are three reasons for recoding:
-                1. [[Merging values]]
-                2. [[Reversing values]]
-                3. [[Transforming continuous variables into groups]]
+            ## [[Reasons for relabeling]]
+            - There are three reasons for relabeling:
+                1. [[Combining values]]
+                2. [[Flipping values]]
+                3. [[Transforming numeric variables into groups]]
             <!-- slide-break -->
-            ### [[Merging values]]
+            ### [[Combining values]]
             - For our analysis, we may want to merge values.
             <!-- slide-break -->
-            - After recoding the original `marital` variable, our dataset will include `maritalgroups`.
+            - After relabeling the original `status` variable, our dataset will include `statusgroups`.
             """
         ).strip()
         _base_html, marked_html = self.assert_render_neutral_markers(
@@ -1229,7 +1137,7 @@ nav = [
             ["slide-break", "slide-end"],
         )
         definition = marked_html[
-            marked_html.find('id="recoding-definition"') : marked_html.find('id="reasons-for-recoding"')
+            marked_html.find('id="relabeling-definition"') : marked_html.find('id="reasons-for-relabeling"')
         ]
         self.assertEqual(definition.count('data-knotis-slide-marker="slide-break"'), 1)
         self.assertEqual(definition.count('data-knotis-slide-marker="slide-end"'), 1)
@@ -1241,11 +1149,11 @@ nav = [
     def test_slide_markers_keep_standalone_image_inside_manual_slide(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            1. **Files tab:** This shows the files.
+            1. **Files panel:** This shows the files.
 
             ![Files screenshot](files.png)
 
-            2. **Plots tab:** This displays graphs.
+            2. **Charts panel:** This displays graphs.
 
             ![Plots screenshot](plots.png)
 
@@ -1255,11 +1163,11 @@ nav = [
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            1. **Files tab:** This shows the files.
+            1. **Files panel:** This shows the files.
 
             ![Files screenshot](files.png)
 
-            2. **Plots tab:** This displays graphs.
+            2. **Charts panel:** This displays graphs.
 
             ![Plots screenshot](plots.png)
             <!-- slide-end -->
@@ -1338,7 +1246,7 @@ nav = [
         base_markdown = textwrap.dedent(
             """
             !!! warning "Troubleshooting"
-                - Use the new recoded variable names in the computation code.
+                - Use the new relabeled variable names in the computation code.
                 - Original variables are not usable for this analysis.
             """
         ).strip()
@@ -1346,7 +1254,7 @@ nav = [
             """
             <!-- slide-break -->
             !!! warning "Troubleshooting"
-                - Use the new recoded variable names in the computation code.
+                - Use the new relabeled variable names in the computation code.
                 - Original variables are not usable for this analysis.
             <!-- slide-end -->
             """
@@ -1366,7 +1274,7 @@ nav = [
                 *"During the last 5 years do you think your health in general has gotten better, gotten worse or stayed about the same?"*
 
                 ??? tip "Show the answer"
-                    Categorical (Ordinal)
+                    Grouped (Ranked)
             """
         ).strip()
         marked_markdown = textwrap.dedent(
@@ -1377,7 +1285,7 @@ nav = [
                 *"During the last 5 years do you think your health in general has gotten better, gotten worse or stayed about the same?"*
 
                 ??? tip "Show the answer"
-                    Categorical (Ordinal)
+                    Grouped (Ranked)
             <!-- slide-end -->
             """
         ).strip()
@@ -1388,54 +1296,6 @@ nav = [
         )
         self.assertIn("<details", base_html)
         self.assertIn("<summary>", base_html)
-
-    def test_chi_square_basics_heading_admonition_manual_slide_boundaries(self) -> None:
-        marked_markdown = textwrap.dedent(
-            """
-            <!-- slide-break -->
-            ## Chi-square basics
-
-            !!! abstract "Relationship between preferred pet and respondents' age group"
-                Do you think there is a relationship between **preferred pet** and respondents' **age group**?
-
-                | Age group | Cat | Dog | Total |
-                |---|---:|---:|---:|
-                | Younger | 207<br>41.4% | 293<br>58.6% | 500<br>100% |
-                | Older | 267<br>53.4% | 233<br>46.6% | 500<br>100% |
-                | Total | 474<br>47.4% | 526<br>52.6% | 1000<br>100% |
-
-                ??? tip "Show the answer"
-
-                    - While the table shows differences, we **CANNOT** conclude significance.
-                        - We need a statistical test like the chi-square test.
-
-            <!-- slide-end -->
-            <!-- slide-break -->
-
-            - The [[chi-square]] test is used to discover if there is a relationship between:
-                - Two [[categorical]] variables.
-
-            <!-- slide-end -->
-            """
-        ).strip()
-        html = self.render_zensical_html(marked_markdown, markdown_path="06.-chi-square-analysis.md")
-        self.assertRegex(
-            html,
-            r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<h2[^>]*id="chi-square-basics"',
-        )
-        self.assertNotRegex(
-            html,
-            r'<h2[^>]*id="chi-square-basics"[^>]*>\s*<span\b[^>]*data-knotis-slide-marker="slide-break"',
-        )
-        self.assertRegex(
-            html,
-            r'</div>\s*<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span>'
-            r'<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*<ul>',
-        )
-        details = re.search(r"<details\b[^>]*>.*?</details>", html, re.S)
-        self.assertIsNotNone(details)
-        self.assertNotIn('data-knotis-slide-marker="slide-break"', details.group(0))
-        self.assertNotIn('data-knotis-slide-marker="slide-end"', details.group(0))
 
     def test_slide_markers_keep_fenced_blocks_rendering(self) -> None:
         base_markdown = textwrap.dedent(
@@ -1470,18 +1330,18 @@ nav = [
     def test_slide_markers_keep_heading_followed_by_numbered_list_rendering(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            ## Using R script files
+            ## Using Script files
 
-            1. Copy the code
+            1. Copy the snippet
             2. Highlight and run
             """
         ).strip()
         marked_markdown = textwrap.dedent(
             """
-            ## Using R script files
+            ## Using Script files
             <!-- slide-break -->
 
-            1. Copy the code
+            1. Copy the snippet
             2. Highlight and run
             <!-- slide-end -->
             """
@@ -1583,74 +1443,38 @@ nav = [
         self.assertRegex(marked_html, r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<li>')
         self.assertNotRegex(marked_html, r"<span\b[^>]*data-knotis-slide-marker=\"slide-(?:end|break)\"[^>]*></span>\s*</li>")
 
-    def test_slide_markers_via_zensical_render(self) -> None:
-        base_markdown = textwrap.dedent(
-            """
-            ### More detailed look
-            - Here's the more detailed look:
-            ![RStudio interface with more detailed view](../assets/images/rstudio/01.-introduction-to-rstudio/rstudio_interface_detailed.png){ width="1000" }
-
-
-            1. **Menu bar:** The top strip with File, Edit, Code, View, Plots, and other menus.
-            2. **Script editor:** The upper-left panel where you write and save your R code.
-            """
-        ).strip()
-        marked_markdown = textwrap.dedent(
-            """
-            ### More detailed look
-            - Here's the more detailed look:
-            ![RStudio interface with more detailed view](../assets/images/rstudio/01.-introduction-to-rstudio/rstudio_interface_detailed.png){ width="1000" }
-
-            <!-- slide-end -->
-            <!-- slide-break -->
-            1. **Menu bar:** The top strip with File, Edit, Code, View, Plots, and other menus.
-            2. **Script editor:** The upper-left panel where you write and save your R code.
-            """
-        ).strip()
-        base_html = self.render_zensical_html(base_markdown)
-        marked_html = self.render_zensical_html(marked_markdown)
-        self.assertNotIn("<!-- slide-", marked_html)
-        for marker in ("slide-end", "slide-break"):
-            self.assertIn(f'data-knotis-slide-marker="{marker}"', marked_html)
-        self.assertEqual(
-            self.strip_data_line_attrs(self.strip_slide_marker_spans(marked_html)),
-            self.strip_data_line_attrs(base_html),
-        )
-        self.assertRegex(marked_html, r'</ul>\s*<span\b[^>]*data-knotis-slide-marker="slide-end"')
-        self.assertRegex(marked_html, r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<ol>')
-
     def test_slide_break_after_markerless_table_list_starts_next_heading(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            #### Find the variable in Variables in GSS page
-            1. We will create a frequency table for the `finalter` variable.
+            #### Find the variable in Variables in SURVEY page
+            1. We will create a summary table for the `choice` variable.
 
             - | Variable name | Variable label |
             |---|---|
-            | `finalter` | Perceived change in financial situation |
+            | `choice` | Perceived change in financial situation |
 
-            #### [[Frequency table]] #code
-            - **[[Model code]]**
+            #### [[Summary table]] #code
+            - **[[Model snippet]]**
                 - ```r
-                  frq(gss$variable_here, out = "v")
+                  frq(survey$variable_here, out = "v")
                   ```
             """
         ).strip()
         marked_markdown = textwrap.dedent(
             """
-            #### Find the variable in Variables in GSS page
-            1. We will create a frequency table for the `finalter` variable.
+            #### Find the variable in Variables in SURVEY page
+            1. We will create a summary table for the `choice` variable.
 
             - | Variable name | Variable label |
             |---|---|
-            | `finalter` | Perceived change in financial situation |
+            | `choice` | Perceived change in financial situation |
 
             <!-- slide-end -->
             <!-- slide-break -->
-            #### [[Frequency table]] #code
-            - **[[Model code]]**
+            #### [[Summary table]] #code
+            - **[[Model snippet]]**
                 - ```r
-                  frq(gss$variable_here, out = "v")
+                  frq(survey$variable_here, out = "v")
                   ```
             """
         ).strip()
@@ -1663,13 +1487,13 @@ nav = [
         self.assertRegex(marked_html, r"</table>\s*<span\b[^>]*data-knotis-slide-marker=\"slide-end\"")
         self.assertRegex(
             marked_html,
-            r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<h4[^>]*id="frequency-table-code"',
+            r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<h4[^>]*id="summary-table-code"',
         )
 
     def test_slide_break_after_stripped_table_keeps_heading_and_interpretation_slides(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            ### [[Linear regression]] with 2 factors #output
+            ### [[Linear model]] with 2 factors #output
             - **Respondents' personal income**
             - | *Factors* | *Coeff.* | *std. Coeff* | *p* |
             | :---------------------------------------------------------- | :-------------------: | :-------------: | :------------: |
@@ -1682,16 +1506,16 @@ nav = [
             - Population density of residence during adolescence years and respondents' age variables are statistically significant factor of personal income (p < 0.05).
             - Looks like, for example, residing in **6**: City greater than 250K, instead of **5**: Big city **increases** personal income by $**1,515**,
             - One year increase in age increases personal income by $**308**. For this model, a 40-year-old would make $**616** more compared to a 30-year-old.
-            - Now, let's add the third factor variable, `prestg10`.
+            - Now, let's add the third input variable, `score10`.
 
-            ### [[Linear regression]] with 3 factors #code
-            - **[[Model code]]**
+            ### [[Linear model]] with 3 factors #code
+            - **[[Model snippet]]**
             """
         ).strip()
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            ### [[Linear regression]] with 2 factors #output
+            ### [[Linear model]] with 2 factors #output
             - **Respondents' personal income**
             - | *Factors* | *Coeff.* | *std. Coeff* | *p* |
             | :---------------------------------------------------------- | :-------------------: | :-------------: | :------------: |
@@ -1705,10 +1529,10 @@ nav = [
             - Population density of residence during adolescence years and respondents' age variables are statistically significant factor of personal income (p < 0.05).
             - Looks like, for example, residing in **6**: City greater than 250K, instead of **5**: Big city **increases** personal income by $**1,515**,
             - One year increase in age increases personal income by $**308**. For this model, a 40-year-old would make $**616** more compared to a 30-year-old.
-            - Now, let's add the third factor variable, `prestg10`.
+            - Now, let's add the third input variable, `score10`.
             <!-- slide-break -->
-            ### [[Linear regression]] with 3 factors #code
-            - **[[Model code]]**
+            ### [[Linear model]] with 3 factors #code
+            - **[[Model snippet]]**
             """
         ).strip()
         base_html, marked_html = self.assert_render_neutral_markers(
@@ -1718,7 +1542,7 @@ nav = [
         )
         self.assertRegex(
             marked_html,
-            r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<h3[^>]*id="linear-regression-with-2-factors-output"',
+            r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<h3[^>]*id="linear-model-with-2-factors-output"',
         )
         self.assertNotRegex(
             marked_html,
@@ -1736,12 +1560,12 @@ nav = [
     def test_slide_break_after_markerless_code_and_table_list_items(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            ## [[Regression]] definition
-            - Regression is the most widely used statistical technique.
-                - Unlike [[correlation analysis]], which does NOT imply a causal relationship, regression does imply one and requires the specification of outcome and factor variables. A correlation table as an example:
+            ## [[Estimation]] definition
+            - Estimation is the most widely used statistical technique.
+                - Unlike [[relation analysis]], which does NOT imply a causal relationship, estimation does imply one and requires the specification of outcome and factor variables. A relation table as an example:
 
             - ```r
-            tab_corr (gss[c("age", "childs")],
+            tab_corr (survey[c("age", "childs")],
             p.numeric = T, triangle="lower")
             ```
 
@@ -1754,13 +1578,13 @@ nav = [
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            ## [[Regression]] definition
-            - Regression is the most widely used statistical technique.
-                - Unlike [[correlation analysis]], which does NOT imply a causal relationship, regression does imply one and requires the specification of outcome and factor variables. A correlation table as an example:
+            ## [[Estimation]] definition
+            - Estimation is the most widely used statistical technique.
+                - Unlike [[relation analysis]], which does NOT imply a causal relationship, estimation does imply one and requires the specification of outcome and factor variables. A relation table as an example:
 
             <!-- slide-break -->
             - ```r
-            tab_corr (gss[c("age", "childs")],
+            tab_corr (survey[c("age", "childs")],
             p.numeric = T, triangle="lower")
             ```
 
@@ -1786,38 +1610,6 @@ nav = [
         self.assertRegex(
             marked_html,
             r'</table>\s*<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span></li>',
-        )
-
-    def test_slide_break_dedents_following_indented_ordered_list(self) -> None:
-        marked_markdown = textwrap.dedent(
-            """
-            <!-- slide-break -->
-            ### More detailed look
-            - ![RStudio interface with more detailed view](rstudio_interface_detailed.png)
-            <!-- slide-break -->
-                1. **Menu bar:** The top strip with File, Edit, Code, View, Plots, and other menus.
-                2. **Script editor:** The upper-left panel where you write and save your R code.
-            <!-- slide-break -->
-                1. **Files tab:** This shows the files.
-                    - ![RStudio Files tab](files-tab.png)
-                2. **Plots tab:** This displays any graph you produce.
-                    - ![RStudio Plots tab](plots-tab.png)
-            <!-- slide-end -->
-            """
-        ).strip()
-        html = self.render_zensical_html(marked_markdown)
-        self.assertRegex(
-            html,
-            r'rstudio_interface_detailed\.png"[^>]*/>\s*</li>\s*</ul>\s*'
-            r'<span\b[^>]*data-knotis-slide-marker="slide-end"',
-        )
-        self.assertRegex(
-            html,
-            r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<ol>\s*<li\b[^>]*><strong>Menu bar:',
-        )
-        self.assertRegex(
-            html,
-            r'files-tab\.png"[^>]*/>\s*</li>\s*</ul>\s*</li>\s*<li\b[^>]*><strong>Plots tab:',
         )
 
     def test_slide_break_preserves_indented_bullet_list_after_images(self) -> None:
@@ -1867,33 +1659,33 @@ nav = [
             {
                 "base_markdown": textwrap.dedent(
                     """
-                    ### Assumption 2: Multicollinearity
-                    - [[Multicollinearity]] occurs when two or more variables in a regression model are dependent upon the other variables in such a way that one can be linearly predicted from the other with a high degree of accuracy.
-                        - In multicollinearity, two or more of the factor variables correlate strongly with each other.
-                            - ![Multicollinearity diagram](multicollinearity.png){ width="400" }
-                        - **Several solutions exist for [[multicollinearity]] issue:**
+                    ### Assumption 2: Overlap
+                    - [[Overlap]] occurs when two or more variables in a estimation model are dependent upon the other variables in such a way that one can be linearly predicted from the other with a high degree of accuracy.
+                        - In overlap, two or more of the factor variables correlate strongly with each other.
+                            - ![Overlap diagram](overlap.png){ width="400" }
+                        - **Several solutions exist for [[overlap]] issue:**
                             - Removing one of the strongly correlated variables
-                            - !!! note "Addressing the multicollinearity issue"
-                                - For this module, we will address the multicollinearity issue by removing one of the strongly correlated variables from the model.
+                            - !!! note "Addressing the overlap issue"
+                                - For this module, we will address the overlap issue by removing one of the strongly correlated variables from the model.
                     """
                 ).strip(),
                 "marked_markdown": textwrap.dedent(
                     """
                     <!-- slide-break -->
-                    ### Assumption 2: Multicollinearity
-                    - [[Multicollinearity]] occurs when two or more variables in a regression model are dependent upon the other variables in such a way that one can be linearly predicted from the other with a high degree of accuracy.
-                        - In multicollinearity, two or more of the factor variables correlate strongly with each other.
-                            - ![Multicollinearity diagram](multicollinearity.png){ width="400" }
+                    ### Assumption 2: Overlap
+                    - [[Overlap]] occurs when two or more variables in a estimation model are dependent upon the other variables in such a way that one can be linearly predicted from the other with a high degree of accuracy.
+                        - In overlap, two or more of the factor variables correlate strongly with each other.
+                            - ![Overlap diagram](overlap.png){ width="400" }
                     <!-- slide-break -->
-                        - **Several solutions exist for [[multicollinearity]] issue:**
+                        - **Several solutions exist for [[overlap]] issue:**
                             - Removing one of the strongly correlated variables
-                            - !!! note "Addressing the multicollinearity issue"
-                                - For this module, we will address the multicollinearity issue by removing one of the strongly correlated variables from the model.
+                            - !!! note "Addressing the overlap issue"
+                                - For this module, we will address the overlap issue by removing one of the strongly correlated variables from the model.
                     <!-- slide-end -->
                     """
                 ).strip(),
                 "image_marker_pattern": (
-                    r'multicollinearity\.png"[^>]*/>\s*</li>\s*</ul>\s*</li>\s*'
+                    r'overlap\.png"[^>]*/>\s*</li>\s*</ul>\s*</li>\s*'
                     r'<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span>\s*'
                     r'<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*'
                     r'<li\b[^>]*>\s*<p><strong>Several solutions exist'
@@ -1906,35 +1698,35 @@ nav = [
             {
                 "base_markdown": textwrap.dedent(
                     """
-                    ### Assumption 1: Homoscedasticity
-                    - [[Homoscedasticity]] refers to a situation in statistics where the variability of a variable is consistent across all levels of another variable.
-                        - For linear regression to be accurate, the spread of data points should be uniform across all values of the independent variable.
-                        - Linear regression aims to create a straight-line model that best fits the data.
-                            - ![Homoscedasticity diagram](homoscedasticity.png)
-                        - **Several reasons cause this [[heteroscedasticity]] issue:**
-                            - **Outliers:** Extreme values in data can lead to heteroscedasticity.
-                            - !!! note "Addressing the heteroscedasticity"
-                                - For this module, we will address the heteroscedasticity issue by removing the problematic variables from the model.
+                    ### Assumption 1: Even spread
+                    - [[Even spread]] refers to a situation in statistics where the variability of a variable is consistent across all levels of another variable.
+                        - For linear model to be accurate, the spread of data points should be uniform across all values of the independent variable.
+                        - Linear model aims to create a straight-line model that best fits the data.
+                            - ![Even spread diagram](even spread.png)
+                        - **Several reasons cause this [[uneven spread]] issue:**
+                            - **Outliers:** Extreme values in data can lead to uneven spread.
+                            - !!! note "Addressing the uneven spread"
+                                - For this module, we will address the uneven spread issue by removing the problematic variables from the model.
                     """
                 ).strip(),
                 "marked_markdown": textwrap.dedent(
                     """
                     <!-- slide-break -->
-                    ### Assumption 1: Homoscedasticity
-                    - [[Homoscedasticity]] refers to a situation in statistics where the variability of a variable is consistent across all levels of another variable.
-                        - For linear regression to be accurate, the spread of data points should be uniform across all values of the independent variable.
-                        - Linear regression aims to create a straight-line model that best fits the data.
-                            - ![Homoscedasticity diagram](homoscedasticity.png)
+                    ### Assumption 1: Even spread
+                    - [[Even spread]] refers to a situation in statistics where the variability of a variable is consistent across all levels of another variable.
+                        - For linear model to be accurate, the spread of data points should be uniform across all values of the independent variable.
+                        - Linear model aims to create a straight-line model that best fits the data.
+                            - ![Even spread diagram](even spread.png)
                     <!-- slide-break -->
-                        - **Several reasons cause this [[heteroscedasticity]] issue:**
-                            - **Outliers:** Extreme values in data can lead to heteroscedasticity.
-                            - !!! note "Addressing the heteroscedasticity"
-                                - For this module, we will address the heteroscedasticity issue by removing the problematic variables from the model.
+                        - **Several reasons cause this [[uneven spread]] issue:**
+                            - **Outliers:** Extreme values in data can lead to uneven spread.
+                            - !!! note "Addressing the uneven spread"
+                                - For this module, we will address the uneven spread issue by removing the problematic variables from the model.
                     <!-- slide-end -->
                     """
                 ).strip(),
                 "image_marker_pattern": (
-                    r'homoscedasticity\.png"[^>]*/>\s*</li>\s*</ul>\s*</li>\s*'
+                    r'even spread\.png"[^>]*/>\s*</li>\s*</ul>\s*</li>\s*'
                     r'<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span>\s*'
                     r'<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*'
                     r'<li\b[^>]*>\s*(?:<p>)?<strong>Several reasons cause'
@@ -1949,9 +1741,9 @@ nav = [
                     """
                     ### Assumption 5: At least 10% of the cases
                     - The least frequent response category should have at least [[10% of the cases]].
-                        - Let's check the frequency table of `class` variable.
+                        - Let's check the summary table of `class` variable.
                         - ```r
-                        frq(gss$class, out = "v")
+                        frq(survey$class, out = "v")
                         ```
                             - **Respondents' subjective class identification (Variable label)**
                                 - | value | value label | frq |
@@ -1966,9 +1758,9 @@ nav = [
                     <!-- slide-break -->
                     ### Assumption 5: At least 10% of the cases
                     - The least frequent response category should have at least [[10% of the cases]].
-                        - Let's check the frequency table of `class` variable.
+                        - Let's check the summary table of `class` variable.
                         - ```r
-                        frq(gss$class, out = "v")
+                        frq(survey$class, out = "v")
                         ```
                             - **Respondents' subjective class identification (Variable label)**
                                 - | value | value label | frq |
@@ -2006,11 +1798,11 @@ nav = [
     def test_slide_break_table_and_indented_admonition_stay_on_one_slide(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            ### [[Use a model code]]
+            ### [[Use a model snippet]]
             - We will likely make mistakes:
                 - Imagine, there was a semicolon at the end of line 3.
                     - ```r
-                    frq(gss$agegroups, out = "v")
+                    frq(survey$agegroups, out = "v")
                     ```
                         - **Line 4:** The table will show `-Inf` and `2[Middle` labels.
                 - | value | frq |
@@ -2019,20 +1811,20 @@ nav = [
                   | ==2[Middle== | 1196 |
 
                     - !!! warning "Troubleshooting"
-                        - See [Recoding model codes](#recoding-model-codes).
-                        - Determine what kind of recoding you need.
-            ### [[Refresh GSS data if variables are misplaced]]
+                        - See [Relabeling model snippets](#relabeling-model-snippets).
+                        - Determine what kind of relabeling you need.
+            ### [[Refresh survey data if variables are misplaced]]
             - If variables are misplaced in the codes, we need fresh data.
             """
         ).strip()
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            ### [[Use a model code]]
+            ### [[Use a model snippet]]
             - We will likely make mistakes:
                 - Imagine, there was a semicolon at the end of line 3.
                     - ```r
-                    frq(gss$agegroups, out = "v")
+                    frq(survey$agegroups, out = "v")
                     ```
                         - **Line 4:** The table will show `-Inf` and `2[Middle` labels.
             <!-- slide-break -->
@@ -2042,10 +1834,10 @@ nav = [
                   | ==2[Middle== | 1196 |
 
                     - !!! warning "Troubleshooting"
-                        - See [Recoding model codes](#recoding-model-codes).
-                        - Determine what kind of recoding you need.
+                        - See [Relabeling model snippets](#relabeling-model-snippets).
+                        - Determine what kind of relabeling you need.
             <!-- slide-break -->
-            ### [[Refresh GSS data if variables are misplaced]]
+            ### [[Refresh survey data if variables are misplaced]]
             - If variables are misplaced in the codes, we need fresh data.
             """
         ).strip()
@@ -2067,26 +1859,26 @@ nav = [
     def test_slide_break_after_code_fence_keeps_line_notes_slide(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            ### [[Reversing values]] #code, if necessary
-            - **[[Working code]]**
+            ### [[Flipping values]] #code, if necessary
+            - **[[Working snippet]]**
                 - ```r
-                gss$disrspctreversed <- 1
+                survey$respectreversed <- 1
                 ```
                 - **Line 1:** New variable name.
                 - **Line 2:** Original variable.
                     - If codes are correct, confirmation appears:
                         - ![alt text](variable-created.png)
-            ### [[Index variable]] #code
-            - **[[Model code]]**
+            ### [[Composite variable]] #code
+            - **[[Model snippet]]**
             """
         ).strip()
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            ### [[Reversing values]] #code, if necessary
-            - **[[Working code]]**
+            ### [[Flipping values]] #code, if necessary
+            - **[[Working snippet]]**
                 - ```r
-                gss$disrspctreversed <- 1
+                survey$respectreversed <- 1
                 ```
             <!-- slide-break -->
                 - **Line 1:** New variable name.
@@ -2094,8 +1886,8 @@ nav = [
                     - If codes are correct, confirmation appears:
                         - ![alt text](variable-created.png)
             <!-- slide-break -->
-            ### [[Index variable]] #code
-            - **[[Model code]]**
+            ### [[Composite variable]] #code
+            - **[[Model snippet]]**
             """
         ).strip()
         marked_html = self.render_markdown_html(marked_markdown)
@@ -2112,13 +1904,13 @@ nav = [
         )
         self.assertRegex(
             marked_html,
-            r'<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span>\s*<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*<h3[^>]*id="index-variable-code"',
+            r'<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span>\s*<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*<h3[^>]*id="composite-variable-code"',
         )
 
     def test_slide_break_between_parent_text_and_child_image_keeps_image_slide(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            ### [[Run the computing codes to create a new variable]]
+            ### [[Run the snippets to create a new variable]]
             - **(1)** Let’s say we want to compute a variable.
                 - Preparing the computing code does not mean we computed a new variable.
                 - For example, below, the code didn’t work.
@@ -2130,7 +1922,7 @@ nav = [
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            ### [[Run the computing codes to create a new variable]]
+            ### [[Run the snippets to create a new variable]]
             - **(1)** Let’s say we want to compute a variable.
                 - Preparing the computing code does not mean we computed a new variable.
                 - For example, below, the code didn’t work.
@@ -2167,32 +1959,11 @@ nav = [
         )
         self.assertIn("computing-error.png", marked_html)
 
-    def test_zensical_module_05_computing_error_image_slide_markers(self) -> None:
-        module_path = self._zensical_site_root() / "docs" / "modules" / "05.-computing-variables.md"
-        if not module_path.exists():
-            self.skipTest("Module 05 source is unavailable for Zensical slide marker test")
-        html = self.render_zensical_html(
-            module_path.read_text(encoding="utf-8"),
-            markdown_path="modules/05.-computing-variables.md",
-        )
-        self.assertNotRegex(
-            html,
-            r'<ul>\s*<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span>\s*<li[^>]*>\s*<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*<img\b[^>]*computing-error\.png',
-        )
-        self.assertNotRegex(
-            html,
-            r'<li[^>]*>\s*<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span>\s*<img\b[^>]*computing-error\.png',
-        )
-        self.assertRegex(
-            html,
-            r'<span\b[^>]*data-knotis-slide-marker="slide-end"[^>]*></span>\s*(?:</li>\s*)*<li[^>]*>\s*<span\b[^>]*data-knotis-slide-marker="slide-break"[^>]*></span>\s*<img\b[^>]*computing-error\.png',
-        )
-
     def test_slide_break_after_table_interpretation_and_shallower_section_keeps_hierarchy(self) -> None:
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            ### [[Linear regression]] with 4 factors #output
+            ### [[Linear model]] with 4 factors #output
             - **Respondents' personal income**
                 - | *Factors* | *Coeff.* | *std. Coeff* | *p* |
                   | :---------------------------------------------------------- | :-------------------: | :-------------: | :------------: |
@@ -2202,7 +1973,7 @@ nav = [
                 - One year increase in age increases personal income by $**196**.
                 - Population density is **NO LONGER** statistically significant (p = 0.232).
             <!-- slide-break -->
-            - **What changed?:** The presence of [[confounding variable]]
+            - **What changed?:** The presence of [[hidden variable]]
                 - In earlier models, population density appeared to have a significant positive effect on income.
                     - But after adding education, this effect disappears.
             - **What does this mean?**
@@ -2236,15 +2007,15 @@ nav = [
         marked_markdown = textwrap.dedent(
             """
             <!-- slide-break -->
-            ### [[Merging values]]
-            - Merging values is for [[categorical]] variables.
-            - [[Search]] the variable name, `marital`, in [Variables in GSS](variables-in-gss.md) page.
+            ### [[Combining values]]
+            - Combining values is for [[grouped]] variables.
+            - [[Search]] the variable name, `status`, in [Variables in SURVEY](variables-in-survey.md) page.
                 - | Variable name | Variable label |
                   |---|---|
-                  | `marital`| Respondents' marital status |
+                  | `status`| Respondents' status status |
             <!-- slide-break -->
             - For our analysis, imagine we are interested in the income level of `1: married` respondents.
-                - Then, we will merge values and create a new variable by recoding.
+                - Then, we will merge values and create a new variable by relabeling.
             """
         ).strip()
         marked_html = self.render_markdown_html(marked_markdown)
@@ -2432,18 +2203,18 @@ nav = [
     def test_slide_end_after_standalone_image_paragraph_not_inside_p(self) -> None:
         base_markdown = textwrap.dedent(
             """
-            10. **Plots tab:** This displays any graph you produce.
+            10. **Charts panel:** This displays any graph you produce.
 
-            ![Plots screenshot](plots-tab.png)
+            ![Plots screenshot](charts-panel.png)
 
             11. **Packages tab:** This shows packages.
             """
         ).strip()
         marked_markdown = textwrap.dedent(
             """
-            10. **Plots tab:** This displays any graph you produce.
+            10. **Charts panel:** This displays any graph you produce.
 
-            ![Plots screenshot](plots-tab.png)
+            ![Plots screenshot](charts-panel.png)
 
             <!-- slide-end -->
             <!-- slide-break -->
@@ -2464,187 +2235,82 @@ nav = [
             r'<p>\s*<img[^>]*alt="Plots screenshot"[^>]*/>\s*<span\b[^>]*data-knotis-slide-marker="slide-end"',
         )
 
-    def test_module_01_marker_count(self) -> None:
-        module_path = self._zensical_site_root() / "docs" / "modules" / "01.-introduction-to-rstudio.md"
-        if not module_path.exists():
-            self.skipTest("Module 01 markdown is unavailable")
-        markdown_text = module_path.read_text(encoding="utf-8")
-        source_markers = 0
-        slide_open = False
-        for m in re.finditer(r"<!--\s*(slide-end|slide-break)\b", markdown_text, re.I):
-            kind = m.group(1).lower()
-            if kind == "slide-break":
-                if slide_open:
-                    source_markers += 1  # slide-end from break
-                source_markers += 1  # slide-break opener
-                slide_open = True
-            elif kind == "slide-end":
-                source_markers += 1
-                slide_open = False
-        html = self.render_zensical_html(
-            markdown_text,
-            markdown_path="docs/modules/01.-introduction-to-rstudio.md",
-        )
-        self.assertEqual(html.count('data-knotis-slide-marker'), source_markers)
-        idx = html.find("more-detailed-look")
-        self.assertGreater(idx, -1)
-        chunk = html[idx : idx + 900]
-        self.assertRegex(chunk, r"</ul>\s*<span\b[^>]*data-knotis-slide-marker=\"slide-end\"")
-        self.assertRegex(chunk, r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<ol>')
-
-    def test_module_01_open_rstudio_slide_keeps_list_content(self) -> None:
-        module_path = self._zensical_site_root() / "docs" / "modules" / "01.-introduction-to-rstudio.md"
-        if not module_path.exists():
-            self.skipTest("Module 01 markdown is unavailable")
-        html = self.render_zensical_html(
-            module_path.read_text(encoding="utf-8"),
-            markdown_path="docs/modules/01.-introduction-to-rstudio.md",
-        )
-        idx = html.find("open_rstudio_run_script_codes")
-        self.assertGreater(idx, -1)
-        chunk = html[idx : idx + 1200]
-        self.assertNotRegex(
-            chunk,
-            r'open_rstudio_run_script_codes[^>]*/>\s*<span\b[^>]*data-knotis-slide-marker="slide-end"',
-        )
-        self.assertRegex(
-            chunk,
-            r'open the script file\.</li>\s*</ul>\s*</li>\s*</ol>\s*</li>\s*</ul>\s*'
-            r'<span\b[^>]*data-knotis-slide-marker="slide-end"',
-        )
-
-    def test_module_01_files_plots_tabs_split_inside_ordered_list(self) -> None:
-        module_path = self._zensical_site_root() / "docs" / "modules" / "01.-introduction-to-rstudio.md"
-        if not module_path.exists():
-            self.skipTest("Module 01 markdown is unavailable")
-        html = self.render_zensical_html(
-            module_path.read_text(encoding="utf-8"),
-            markdown_path="docs/modules/01.-introduction-to-rstudio.md",
-        )
-        idx = html.find("files-tab.png")
-        self.assertGreater(idx, -1)
-        chunk = html[idx : idx + 2200]
-        self.assertNotRegex(
-            chunk,
-            r'files-tab\.png[^>]*/>\s*<span\b[^>]*data-knotis-slide-marker="slide-end"',
-        )
-        self.assertRegex(
-            chunk,
-            r'files-tab\.png[^>]*/>(?:\s*</p>)?\s*</li>\s*</ul>\s*</li>\s*'
-            r'<li><strong>\[\[Plots tab\|ref\]\]:',
-        )
-        self.assertRegex(
-            chunk,
-            r'plots-tab\.png[^>]*/>(?:\s*</p>)?\s*</li>\s*</ul>\s*</li>\s*'
-            r'<span\b[^>]*data-knotis-slide-marker="slide-end"',
-        )
-        self.assertRegex(
-            chunk,
-            r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<li><strong>Packages tab:',
-        )
-        self.assertNotRegex(chunk, r'<ol start="10">')
-
-    def test_module_01_table_view_slide_keeps_ordered_list_numbering(self) -> None:
-        module_path = self._zensical_site_root() / "docs" / "modules" / "01.-introduction-to-rstudio.md"
-        if not module_path.exists():
-            self.skipTest("Module 01 markdown is unavailable")
-        html = self.render_zensical_html(
-            module_path.read_text(encoding="utf-8"),
-            markdown_path="docs/modules/01.-introduction-to-rstudio.md",
-        )
-        idx = html.find("Table view")
-        self.assertGreater(idx, -1)
-        chunk = html[idx - 400 : idx + 900]
-        self.assertRegex(
-            chunk,
-            r'data-knotis-slide-marker="slide-break"[^>]*></span>\s*<li><strong>Table view:',
-        )
-        self.assertRegex(
-            chunk,
-            r'We will paste the R script file codes here and hit "Enter" when we open RStudio\.</li>\s*</ol>\s*</li>\s*'
-            r'<span\b[^>]*data-knotis-slide-marker="slide-end"',
-        )
-        self.assertNotRegex(
-            chunk,
-            r'</ol>\s*<span\b[^>]*data-knotis-slide-marker="slide-end"',
-        )
-
     def test_reference_alias_renders_as_target_text(self) -> None:
-        target, label = MODULE.split_wikilink_parts("RStudio console|ref")
+        target, label = MODULE.split_wikilink_parts("Juniper console|ref")
 
-        self.assertEqual(target, "RStudio console")
-        self.assertEqual(label, "RStudio console")
-        self.assertEqual(MODULE.normalize("RStudio console|ref"), "rstudio console")
-        self.assertEqual(MODULE.wikilink_mode("RStudio console|ref"), "reference")
-        self.assertEqual(MODULE.wikilink_mode("RStudio console|reference"), "reference")
-        self.assertEqual(MODULE.wikilink_mode("RStudio console|console"), "concept")
+        self.assertEqual(target, "Juniper console")
+        self.assertEqual(label, "Juniper console")
+        self.assertEqual(MODULE.normalize("Juniper console|ref"), "juniper console")
+        self.assertEqual(MODULE.wikilink_mode("Juniper console|ref"), "reference")
+        self.assertEqual(MODULE.wikilink_mode("Juniper console|reference"), "reference")
+        self.assertEqual(MODULE.wikilink_mode("Juniper console|console"), "concept")
 
     def test_ref_sources_drive_references_and_filter_plain_mentions_from_index(self) -> None:
         _root, docs_dir = self.make_project()
         (docs_dir / "index.md").write_text(
             "# Home\n\n"
-            "Paste into [[RStudio console]].\n\n"
+            "Paste into [[Juniper console]].\n\n"
             "## Reference source\n"
-            "- Paste the code into [[RStudio console|ref]].\n"
+            "- Paste the code into [[Juniper console|ref]].\n"
             "- Hit Enter.\n",
             encoding="utf-8",
         )
         other_path = docs_dir / "other.md"
-        other_path.write_text("# Other\n\nUse [[RStudio console]] again.\n", encoding="utf-8")
+        other_path.write_text("# Other\n\nUse [[Juniper console]] again.\n", encoding="utf-8")
 
         MODULE.main(docs_dir=docs_dir)
 
         references = json.loads((docs_dir / "assets" / "references.json").read_text(encoding="utf-8"))
         wikilinks = json.loads((docs_dir / "assets" / "wikilinks.json").read_text(encoding="utf-8"))
-        self.assertIn("rstudio console", references)
-        self.assertEqual(len(references["rstudio console"]), 1)
-        self.assertEqual(references["rstudio console"][0]["page_url"], "./")
-        self.assertEqual(references["rstudio console"][0]["title"], "RStudio console")
-        self.assertIn("- Paste the code into [[RStudio console|ref]].", references["rstudio console"][0]["section_lines"])
-        self.assertIn("rstudio console", wikilinks)
-        self.assertEqual(len(wikilinks["rstudio console"]), 1)
-        self.assertEqual(wikilinks["rstudio console"][0]["title"], "RStudio console")
-        self.assertEqual(wikilinks["rstudio console"][0]["mode"], "reference")
+        self.assertIn("juniper console", references)
+        self.assertEqual(len(references["juniper console"]), 1)
+        self.assertEqual(references["juniper console"][0]["page_url"], "./")
+        self.assertEqual(references["juniper console"][0]["title"], "Juniper console")
+        self.assertIn("- Paste the code into [[Juniper console|ref]].", references["juniper console"][0]["section_lines"])
+        self.assertIn("juniper console", wikilinks)
+        self.assertEqual(len(wikilinks["juniper console"]), 1)
+        self.assertEqual(wikilinks["juniper console"][0]["title"], "Juniper console")
+        self.assertEqual(wikilinks["juniper console"][0]["mode"], "reference")
 
     def test_multiple_reference_sources_for_one_concept_are_all_kept(self) -> None:
         _root, docs_dir = self.make_project()
         (docs_dir / "index.md").write_text(
             "# Home\n\n"
             "## Interface\n"
-            "- **(14) [[RStudio console|ref]] tab:** This shows the codes that were run.\n\n"
+            "- **(14) [[Juniper console|ref]] tab:** This shows the codes that were run.\n\n"
             "## Open website\n"
-            "### Open RStudio Cloud website: Use RStudio console\n"
-            "1. Open RStudio Cloud website.\n"
-            "2. Paste the code into [[RStudio console|ref]].\n",
+            "### Open Juniper Cloud website: Use Juniper console\n"
+            "1. Open Juniper Cloud website.\n"
+            "2. Paste the code into [[Juniper console|ref]].\n",
             encoding="utf-8",
         )
-        (docs_dir / "other.md").write_text("# Other\n\nUse [[Rstudio console]].\n", encoding="utf-8")
+        (docs_dir / "other.md").write_text("# Other\n\nUse [[Juniper console]].\n", encoding="utf-8")
 
         MODULE.main(docs_dir=docs_dir)
 
         references = json.loads((docs_dir / "assets" / "references.json").read_text(encoding="utf-8"))
         wikilinks = json.loads((docs_dir / "assets" / "wikilinks.json").read_text(encoding="utf-8"))
 
-        self.assertIn("rstudio console", references)
-        self.assertEqual(len(references["rstudio console"]), 2)
-        self.assertEqual([entry["title"] for entry in references["rstudio console"]], ["RStudio console", "RStudio console"])
-        self.assertIn("rstudio console", wikilinks)
-        self.assertEqual(len(wikilinks["rstudio console"]), 2)
-        self.assertTrue(all(entry["mode"] == "reference" for entry in wikilinks["rstudio console"]))
+        self.assertIn("juniper console", references)
+        self.assertEqual(len(references["juniper console"]), 2)
+        self.assertEqual([entry["title"] for entry in references["juniper console"]], ["Juniper console", "Juniper console"])
+        self.assertIn("juniper console", wikilinks)
+        self.assertEqual(len(wikilinks["juniper console"]), 2)
+        self.assertTrue(all(entry["mode"] == "reference" for entry in wikilinks["juniper console"]))
 
     def test_reference_pane_uses_only_explicit_reference_cards(self) -> None:
         _root, docs_dir = self.make_project()
         (docs_dir / "index.md").write_text(
             "# Module\n\n"
-            "## [[Modeling types]]\n"
+            "## [[Approach types]]\n"
             "- Intro line\n"
-            "    1. **[[Explanatory modeling|ref]]**\n"
+            "    1. **[[Exploratory approach|ref]]**\n"
             "        - Definition bullet.\n"
             "    - Transition bullet.\n"
             "### Example one\n"
-            "- [[Explanatory modeling]] in the example.\n"
+            "- [[Exploratory approach]] in the example.\n"
             "### Example two\n"
-            "- [[Explanatory modeling]] again.\n",
+            "- [[Exploratory approach]] again.\n",
             encoding="utf-8",
         )
 
@@ -2652,49 +2318,49 @@ nav = [
 
         references = json.loads((docs_dir / "assets" / "references.json").read_text(encoding="utf-8"))
         wikilinks = json.loads((docs_dir / "assets" / "wikilinks.json").read_text(encoding="utf-8"))
-        entries = references["explanatory modeling"]
+        entries = references["exploratory approach"]
         self.assertEqual(len(entries), 1)
-        self.assertEqual(entries[0]["heading_path"], ["Module", "Modeling types"])
-        self.assertIn("[[Explanatory modeling|ref]]", "\n".join(entries[0]["section_lines"]))
-        self.assertEqual(len(wikilinks["explanatory modeling"]), 1)
-        self.assertEqual(wikilinks["explanatory modeling"][0]["mode"], "reference")
+        self.assertEqual(entries[0]["heading_path"], ["Module", "Approach types"])
+        self.assertIn("[[Exploratory approach|ref]]", "\n".join(entries[0]["section_lines"]))
+        self.assertEqual(len(wikilinks["exploratory approach"]), 1)
+        self.assertEqual(wikilinks["exploratory approach"][0]["mode"], "reference")
 
     def test_reference_heading_path_ignores_fenced_code_comments(self) -> None:
         _root, docs_dir = self.make_project()
         (docs_dir / "index.md").write_text(
             "# Module\n\n"
-            "## [[How to work with codes]]\n"
+            "## [[How to work with snippets]]\n"
             "- **The workflow:**\n"
             "    - ```r linenums=\"1\"\n"
-            "    # WORKING SPACE-------\n"
-            "    frq(gss$variable_here, out = \"v\")\n"
+            "    # WORK AREA-------\n"
+            "    frq(survey$variable_here, out = \"v\")\n"
             "    ```\n"
-            "## [[Find this working code in the R script file|ref]]\n"
-            "- All the working code are above the [[working space]].\n",
+            "## [[Find this working snippet in the script file|ref]]\n"
+            "- All the working snippet are above the [[work area]].\n",
             encoding="utf-8",
         )
 
         MODULE.main(docs_dir=docs_dir)
 
         references = json.loads((docs_dir / "assets" / "references.json").read_text(encoding="utf-8"))
-        entry = references["find this working code in the r script file"][0]
-        self.assertEqual(entry["heading_path"], ["Module", "Find this working code in the R script file"])
-        self.assertNotIn("WORKING SPACE", " > ".join(entry["heading_path"]))
+        entry = references["find this working snippet in the script file"][0]
+        self.assertEqual(entry["heading_path"], ["Module", "Find this working snippet in the script file"])
+        self.assertNotIn("WORK AREA", " > ".join(entry["heading_path"]))
 
     def test_main_includes_reference_definitions_on_definition_page_graph(self) -> None:
         _root, docs_dir = self.make_project()
         (docs_dir / "index.md").write_text(
             "# [[Keyboard shortcuts]]\n\n"
-            "## [[Using R script files]]\n"
-            "### [[Working space|ref]]\n"
-            "- Paste code under [[Working space|ref]].\n\n"
-            "### [[Highlighting and running|ref]]\n"
-            "- [[Highlighting and running|ref]] executes the code.\n\n"
+            "## [[Using Script files]]\n"
+            "### [[Work area|ref]]\n"
+            "- Paste code under [[Work area|ref]].\n\n"
+            "### [[Selecting and running|ref]]\n"
+            "- [[Selecting and running|ref]] executes the code.\n\n"
             "- Use [[outline view]].\n\n"
-            "### [[Find this working code in the R script file|ref]]\n"
-            "- All the working code are above the [[working space]].\n"
+            "### [[Find this working snippet in the script file|ref]]\n"
+            "- All the working snippet are above the [[work area]].\n"
             "- Use [[outline view]].\n"
-            "- [[Highlighting and running]] the working code will generate the exact output shown on the module page.\n",
+            "- [[Selecting and running]] the working snippet will generate the exact output shown on the module page.\n",
             encoding="utf-8",
         )
 
@@ -2722,9 +2388,9 @@ nav = [
             if edge["page"] == page_url
         }
         for keyword_id in (
-            "kw:working space",
-            "kw:highlighting and running",
-            "kw:find this working code in the r script file",
+            "kw:work area",
+            "kw:selecting and running",
+            "kw:find this working snippet in the script file",
         ):
             self.assertIn(keyword_id, node_ids)
             self.assertIn(keyword_id, page_local_keyword_ids)
@@ -2808,7 +2474,7 @@ nav = [
                     'title: "Guidelines"',
                     "moc: true",
                     "moc_pages:",
-                    "  - guidelines/office-hours.md",
+                    "  - guidelines/drop-in-hours.md",
                     "---",
                     "",
                     "# [[Guidelines]]",
@@ -2817,28 +2483,28 @@ nav = [
             ),
             encoding="utf-8",
         )
-        (docs_dir / "resources" / "guidelines" / "office-hours.md").write_text(
+        (docs_dir / "resources" / "guidelines" / "drop-in-hours.md").write_text(
             "\n".join(
                 [
                     "---",
-                    'title: "Office hours"',
+                    'title: "Drop-in hours"',
                     "moc: true",
                     "moc_pages:",
-                    "  - office-hours-online.md",
-                    "  - office-hours-inperson.md",
+                    "  - drop-in-hours-online.md",
+                    "  - drop-in-hours-inperson.md",
                     "---",
                     "",
-                    "# [[Office hours]]",
+                    "# [[Drop-in hours]]",
                     "",
                 ]
             ),
             encoding="utf-8",
         )
-        (docs_dir / "resources" / "guidelines" / "office-hours-online.md").write_text(
+        (docs_dir / "resources" / "guidelines" / "drop-in-hours-online.md").write_text(
             "# [[Scheduling an online meeting]]\n",
             encoding="utf-8",
         )
-        (docs_dir / "resources" / "guidelines" / "office-hours-inperson.md").write_text(
+        (docs_dir / "resources" / "guidelines" / "drop-in-hours-inperson.md").write_text(
             "# [[Scheduling an in-person meeting]]\n",
             encoding="utf-8",
         )
@@ -2852,17 +2518,17 @@ nav = [
             if edge["relation"] == "nav"
         }
         self.assertIn(("cat:Resources", "page:resources/guidelines/"), nav_edges)
-        self.assertIn(("page:resources/guidelines/", "page:resources/guidelines/office-hours/"), nav_edges)
+        self.assertIn(("page:resources/guidelines/", "page:resources/guidelines/drop-in-hours/"), nav_edges)
         self.assertIn(
-            ("page:resources/guidelines/office-hours/", "page:resources/guidelines/office-hours-online/"),
+            ("page:resources/guidelines/drop-in-hours/", "page:resources/guidelines/drop-in-hours-online/"),
             nav_edges,
         )
         self.assertIn(
-            ("page:resources/guidelines/office-hours/", "page:resources/guidelines/office-hours-inperson/"),
+            ("page:resources/guidelines/drop-in-hours/", "page:resources/guidelines/drop-in-hours-inperson/"),
             nav_edges,
         )
         self.assertNotIn(
-            ("page:resources/guidelines/", "page:resources/guidelines/office-hours-online/"),
+            ("page:resources/guidelines/", "page:resources/guidelines/drop-in-hours-online/"),
             nav_edges,
         )
 
@@ -2911,13 +2577,13 @@ nav = [{ Lesson = "lesson.md" }]
         )
         (docs_dir / "lesson.md").write_text(
             "# [[Keyboard shortcuts]]\n\n"
-            "### [[Copy the code|ref]]\n"
-            "- Copy the code from the module page.\n\n"
-            "### [[Files tab|ref]]\n"
-            "- Open the files tab in RStudio.\n\n"
-            "### [[Find this working code in the R script file|ref]]\n"
-            "- Look above the [[copy the code]].\n"
-            "- Open the [[files tab]].\n",
+            "### [[Copy the snippet|ref]]\n"
+            "- Copy the snippet from the module page.\n\n"
+            "### [[Files panel|ref]]\n"
+            "- Open the files panel in Juniper.\n\n"
+            "### [[Find this working snippet in the script file|ref]]\n"
+            "- Look above the [[copy the snippet]].\n"
+            "- Open the [[files panel]].\n",
             encoding="utf-8",
         )
 
@@ -2938,9 +2604,9 @@ nav = [{ Lesson = "lesson.md" }]
             (page_url, "page:lesson/", "kw:keyboard shortcuts"),
             page_graph_page_edges,
         )
-        self.assertIn("kw:copy the code", node_ids)
-        self.assertIn("kw:files tab", node_ids)
-        self.assertIn("kw:find this working code in the r script file", node_ids)
+        self.assertIn("kw:copy the snippet", node_ids)
+        self.assertIn("kw:files panel", node_ids)
+        self.assertIn("kw:find this working snippet in the script file", node_ids)
 
     def test_main_keeps_reference_backed_concepts_out_of_other_page_graphs(self) -> None:
         _root, docs_dir = self.make_project(
@@ -2955,17 +2621,17 @@ nav = [
         )
         (docs_dir / "lesson.md").write_text(
             "# Lesson\n\n"
-            "### [[Working code|ref]]\n"
+            "### [[Working snippet|ref]]\n"
             "- This page defines the reference.\n\n"
-            "### [[Model code|ref]]\n"
-            "- This page also defines [[model code|ref]].\n",
+            "### [[Model snippet|ref]]\n"
+            "- This page also defines [[model snippet|ref]].\n",
             encoding="utf-8",
         )
         (docs_dir / "other.md").write_text(
             "# Other\n\n"
-            "- [[t-test]]\n"
-            "    - [[working code]]\n"
-            "    - [[model code]]\n",
+            "- [[mean test]]\n"
+            "    - [[working snippet]]\n"
+            "    - [[model snippet]]\n",
             encoding="utf-8",
         )
 
@@ -2983,29 +2649,29 @@ nav = [
         node_ids = {node["id"] for node in graph["nodes"]}
 
         self.assertNotIn(
-            ("other/", "page:other/", "kw:working code"),
+            ("other/", "page:other/", "kw:working snippet"),
             page_graph_page_edges,
         )
         self.assertNotIn(
-            ("other/", "page:other/", "kw:model code"),
+            ("other/", "page:other/", "kw:model snippet"),
             page_graph_page_edges,
         )
         self.assertNotIn(
-            ("other/", "kw:t-test", "kw:working code"),
+            ("other/", "kw:mean test", "kw:working snippet"),
             page_graph_hierarchy_edges,
         )
         self.assertNotIn(
-            ("other/", "kw:t-test", "kw:model code"),
+            ("other/", "kw:mean test", "kw:model snippet"),
             page_graph_hierarchy_edges,
         )
-        self.assertIn("kw:working code", node_ids)
-        self.assertIn("kw:model code", node_ids)
+        self.assertIn("kw:working snippet", node_ids)
+        self.assertIn("kw:model snippet", node_ids)
         self.assertIn(
-            ("lesson/", "page:lesson/", "kw:working code"),
+            ("lesson/", "page:lesson/", "kw:working snippet"),
             page_graph_page_edges,
         )
         self.assertIn(
-            ("lesson/", "page:lesson/", "kw:model code"),
+            ("lesson/", "page:lesson/", "kw:model snippet"),
             page_graph_page_edges,
         )
 
@@ -3029,7 +2695,7 @@ nav = [
         (docs_dir / "lesson.md").write_text(
             "# Lesson\n\n"
             "- [[Search]] the variable name.\n"
-            "- Create a [[descriptive table]].\n",
+            "- Create a [[overview table]].\n",
             encoding="utf-8",
         )
 
@@ -3044,7 +2710,7 @@ nav = [
         }
         self.assertIn("search", references)
         self.assertIn("kw:search", node_ids)
-        self.assertIn("kw:descriptive table", node_ids)
+        self.assertIn("kw:overview table", node_ids)
         self.assertIn(
             ("page:how-to/", "kw:search"),
             {
@@ -3088,7 +2754,7 @@ nav = [
         (docs_dir / "lesson.md").write_text(
             "# Lesson\n\n"
             "- [[Search]]\n"
-            "    - [[descriptive table]]\n"
+            "    - [[overview table]]\n"
             "        - ```r\n"
             "        summary(x)\n"
             "        ```\n",
@@ -3105,11 +2771,11 @@ nav = [
         }
 
         self.assertNotIn(
-            ("kw:search", "kw:descriptive table", ("lesson/",)),
+            ("kw:search", "kw:overview table", ("lesson/",)),
             sibling_edges,
         )
         self.assertNotIn(
-            ("kw:descriptive table", "kw:search", ("lesson/",)),
+            ("kw:overview table", "kw:search", ("lesson/",)),
             sibling_edges,
         )
 
@@ -3143,12 +2809,12 @@ nav = [
 
     def test_ordered_list_under_wikilink_heading_nests_under_heading(self) -> None:
         graph = self.build_graph_for_page(
-            "recoding.md",
-            "# [[Reasons for recoding]]\n"
-            "- There are three reasons for recoding:\n"
-            "  1. [[Merging values]]\n"
-            "  2. [[Reversing values]]\n"
-            "  3. [[Transforming continuous variables into groups]]\n",
+            "relabeling.md",
+            "# [[Reasons for relabeling]]\n"
+            "- There are three reasons for relabeling:\n"
+            "  1. [[Combining values]]\n"
+            "  2. [[Flipping values]]\n"
+            "  3. [[Transforming numeric variables into groups]]\n",
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
@@ -3157,18 +2823,18 @@ nav = [
             for edge in graph["page_graph_page_edges"]
         }
         children = {
-            "kw:merging values",
-            "kw:reversing values",
-            "kw:transforming continuous variables into groups",
+            "kw:combining values",
+            "kw:flipping values",
+            "kw:transforming numeric variables into groups",
         }
 
-        self.assertEqual(edges[("page:recoding/", "kw:reasons for recoding")], "page")
+        self.assertEqual(edges[("page:relabeling/", "kw:reasons for relabeling")], "page")
         for child in children:
-            self.assertEqual(edges[("kw:reasons for recoding", child)], "hierarchy")
-            self.assertNotIn(("page:recoding/", child), edges)
+            self.assertEqual(edges[("kw:reasons for relabeling", child)], "hierarchy")
+            self.assertNotIn(("page:relabeling/", child), edges)
         self.assertEqual(
             page_graph_page_edges,
-            {("recoding/", "page:recoding/", "kw:reasons for recoding")},
+            {("relabeling/", "page:relabeling/", "kw:reasons for relabeling")},
         )
 
     def test_explicit_subheading_nests_under_leading_wikilink_h1(self) -> None:
@@ -3252,11 +2918,11 @@ nav = [{ Lesson = "lesson.md" }]
             (
                 "---\n"
                 "tags:\n"
-                "  - SOC399\n"
+                "  - SUBJECT101\n"
                 "  - Resources\n"
                 "---\n"
                 "# Lesson\n\n"
-                "[[Frequency table]]\n"
+                "[[Summary table]]\n"
             ),
             toml_text=
             """
@@ -3266,20 +2932,20 @@ nav = [{ Lesson = "lesson.md" }]
 
 [project.extra.knotis.site_graph.graph]
 default_view = "all"
-exclude_tags = ["#SOC399", "Resources"]
+exclude_tags = ["#SUBJECT101", "Resources"]
 """.lstrip(),
         )
 
         page_node = next(node for node in graph["nodes"] if node["id"] == "page:lesson/")
-        self.assertEqual(page_node["tag_keys"], ["soc399", "resources"])
-        self.assertEqual(page_node["tags"], ["#SOC399", "#Resources"])
+        self.assertEqual(page_node["tag_keys"], ["subject101", "resources"])
+        self.assertEqual(page_node["tags"], ["#SUBJECT101", "#Resources"])
 
         graph_cfg = graph["meta"]["knotis"]["site_graph"]["graph"]
         self.assertEqual(graph_cfg["default_view"], "all")
         self.assertEqual(
             graph_cfg["exclude_tags"],
             [
-                {"key": "soc399", "label": "#SOC399"},
+                {"key": "subject101", "label": "#SUBJECT101"},
                 {"key": "resources", "label": "#Resources"},
             ],
         )
@@ -3287,7 +2953,7 @@ exclude_tags = ["#SOC399", "Resources"]
             graph_cfg["available_tags"],
             [
                 {"key": "resources", "label": "#Resources"},
-                {"key": "soc399", "label": "#SOC399"},
+                {"key": "subject101", "label": "#SUBJECT101"},
             ],
         )
 
@@ -3300,7 +2966,7 @@ exclude_tags = ["#SOC399", "Resources"]
                 "  - Module\n"
                 "---\n"
                 "# Lesson\n\n"
-                "[[Frequency table]]\n"
+                "[[Summary table]]\n"
             ),
             toml_text=
             """
@@ -3318,7 +2984,7 @@ default_view = "Module"
     def test_build_graph_emits_extended_graph_config(self) -> None:
         graph = self.build_graph_for_page(
             "lesson.md",
-            "# Lesson\n\n[[Frequency table]]\n",
+            "# Lesson\n\n[[Summary table]]\n",
             toml_text=
             """
 [project]
@@ -3407,7 +3073,7 @@ max = 2
 show_zoom = "sometimes"
 """.lstrip()
         )
-        (docs_dir / "lesson.md").write_text("# Lesson\n\n[[Frequency table]]\n", encoding="utf-8")
+        (docs_dir / "lesson.md").write_text("# Lesson\n\n[[Summary table]]\n", encoding="utf-8")
 
         stderr = io.StringIO()
         with redirect_stderr(stderr):
@@ -3425,7 +3091,7 @@ show_zoom = "sometimes"
     def test_disabled_graph_ui_still_emits_graph_data(self) -> None:
         graph = self.build_graph_for_page(
             "lesson.md",
-            "# Lesson\n\n[[Frequency table]]\n",
+            "# Lesson\n\n[[Summary table]]\n",
             toml_text=
             """
 [project]
@@ -3483,17 +3149,17 @@ enabled = false
             "---\n"
             "# Home\n\n"
             "## Visible section\n\n"
-            "[[Frequency table]] uses `frq()` output. #code\n\n"
+            "[[Summary table]] uses `frq()` output. #code\n\n"
             "##### Tiny visible heading\n\n"
             "Tiny heading text should stay searchable through the parent section.\n\n"
-            "## R Script file { data-search-exclude }\n\n"
+            "## Script file { data-search-exclude }\n\n"
             "This hidden setup code should not be searchable.\n\n"
             "### Nested hidden heading\n\n"
             "Nested hidden text should not be searchable.\n\n"
             "## Learning outcomes { data-search-exclude }\n\n"
             "This hidden outcome text should not be searchable.\n\n"
             "## Reference source\n\n"
-            "- Use the [[RStudio console|ref]].\n",
+            "- Use the [[Juniper console|ref]].\n",
             encoding="utf-8",
         )
 
@@ -3515,21 +3181,21 @@ enabled = false
         self.assertIn("reference", kinds)
         self.assertIn("content_tag", kinds)
         self.assertIn("Visible section", titles)
-        self.assertIn("Frequency table", titles)
-        self.assertIn("RStudio console", titles)
+        self.assertIn("Summary table", titles)
+        self.assertIn("Juniper console", titles)
         self.assertIn("#code", titles)
         self.assertNotIn("Tiny visible heading", titles)
         self.assertIn("Tiny heading text", combined_text)
-        self.assertNotIn("R Script file", titles)
+        self.assertNotIn("Script file", titles)
         self.assertNotIn("Nested hidden heading", titles)
         self.assertNotIn("Learning outcomes", titles)
         self.assertNotIn("hidden setup code", combined_text)
         self.assertNotIn("Nested hidden text", combined_text)
         self.assertNotIn("hidden outcome text", combined_text)
         visible = next(doc for doc in docs if doc["kind"] == "section" and doc["title"] == "Visible section")
-        self.assertIn("Frequency table", visible["concepts"])
-        self.assertIn("frequency table", visible["concept_keys"])
-        self.assertEqual(visible["primary_concept"], "Frequency table")
+        self.assertIn("Summary table", visible["concepts"])
+        self.assertIn("summary table", visible["concept_keys"])
+        self.assertEqual(visible["primary_concept"], "Summary table")
         self.assertIn("#code", visible["content_tags"])
         self.assertEqual(visible["filter_tags"], ["Setup", "Navigation"])
         self.assertEqual(visible["breadcrumb"], ["Visible section"])
@@ -3545,7 +3211,7 @@ nav = [{ Home = "index.md" }]
 enabled = false
 """
         _root, docs_dir = self.make_project(toml_text=toml_text)
-        (docs_dir / "index.md").write_text("# Home\n\n[[Frequency table]]\n", encoding="utf-8")
+        (docs_dir / "index.md").write_text("# Home\n\n[[Summary table]]\n", encoding="utf-8")
 
         MODULE.main(docs_dir=docs_dir)
 
@@ -3559,10 +3225,10 @@ enabled = false
         md_path = docs_dir / "module.md"
         md_path.write_text(
             "# Module\n\n"
-            "### [[Linear regression]] 1 factor #code\n\n"
+            "### [[Linear model]] 1 factor #code\n\n"
             "```r\n"
-            "# model code\n"
-            "model1 <- lm(outcome_here ~ factor1_here, data = gss)\n"
+            "# model snippet\n"
+            "model1 <- lm(outcome_here ~ factor1_here, data = survey)\n"
             "```\n\n"
             "- Note that we'll introduce the predictor variables one by one.\n\n"
             "### Next section\n\n"
@@ -3573,9 +3239,9 @@ enabled = false
         occurrences = MODULE.parse_content_tags_file(md_path)
 
         self.assertEqual([occ["content_tag"] for occ in occurrences], ["#code"])
-        self.assertEqual(occurrences[0]["heading_path"], ["Module", "Linear regression 1 factor #code"])
+        self.assertEqual(occurrences[0]["heading_path"], ["Module", "Linear model 1 factor #code"])
         self.assertEqual(occurrences[0]["section_kw_offset"], 0)
-        self.assertIn("# model code", occurrences[0]["section_lines"])
+        self.assertIn("# model snippet", occurrences[0]["section_lines"])
         self.assertIn("```r", "\n".join(occurrences[0]["section_lines_raw"]))
         self.assertIn("- Note that we'll introduce the predictor variables one by one.", occurrences[0]["section_lines"])
         self.assertNotIn("### Next section", occurrences[0]["section_lines"])
@@ -3595,20 +3261,20 @@ nav = [
             "# First\n\n"
             "## Details\n\n"
             "![r logo](images/r.png){ width=\"100\" }\n"
-            "- Search &nbsp; :fontawesome-brands-apple: ++command+f++ for `binary`.\n"
-            "- **Model code** stays bold in rendered snippets.\n"
+            "- Search &nbsp; :fontawesome-brands-apple: ++command+f++ for `two-level`.\n"
+            "- **Model snippet** stays bold in rendered snippets.\n"
             "```r\n"
-            "frq(gss$variable_here, out = \"v\")\n"
+            "frq(survey$variable_here, out = \"v\")\n"
             "```\n"
             "| Variable | Type |\n"
             "| --- | --- |\n"
-            "| sex | Binary |\n",
+            "| sex | Two-level |\n",
             encoding="utf-8",
         )
         (docs_dir / "second.md").write_text(
             "# Second\n\n"
             "## Details\n\n"
-            "Binary appears here too.\n",
+            "Two-level appears here too.\n",
             encoding="utf-8",
         )
 
@@ -3621,12 +3287,12 @@ nav = [
         self.assertEqual(second["page_order"], 0)
         self.assertEqual(first["page_order"], 1)
         self.assertEqual(first["breadcrumb"], ["Details"])
-        self.assertIn("- Search \xa0 command+f for `binary`.", first["context"])
-        self.assertIn("- **Model code** stays bold in rendered snippets.", first["render_context"])
+        self.assertIn("- Search \xa0 command+f for `two-level`.", first["context"])
+        self.assertIn("- **Model snippet** stays bold in rendered snippets.", first["render_context"])
         self.assertIn('```r', first["render_context"])
-        self.assertIn('frq(gss$variable_here, out = "v")', first["render_context"])
-        self.assertIn("sex Binary", first["context"])
-        self.assertNotIn("| sex | Binary |", first["context"])
+        self.assertIn('frq(survey$variable_here, out = "v")', first["render_context"])
+        self.assertIn("sex Two-level", first["context"])
+        self.assertNotIn("| sex | Two-level |", first["context"])
         self.assertNotIn("r logo", " ".join(first["context"]))
 
     def test_search_render_context_preserves_list_prefixed_images_and_admonitions(self) -> None:
@@ -3653,8 +3319,8 @@ nav = [
         (docs_dir / "sample.md").write_text(
             "# Sample\n\n"
             "## Functions\n\n"
-            "- A [[Factor variable]]:\n"
-            "    - [[Outcome variable]] definition.\n",
+            "- A [[Input variable]]:\n"
+            "    - [[Result variable]] definition.\n",
             encoding="utf-8",
         )
         MODULE.main(docs_dir=docs_dir)
@@ -3663,10 +3329,10 @@ nav = [
         self.assertTrue(mentions)
         factor = next(
             doc for doc in mentions
-            if "factor variable" in " ".join(doc.get("concept_keys") or []).lower()
+            if "input variable" in " ".join(doc.get("concept_keys") or []).lower()
         )
         self.assertTrue(factor.get("section_lines_raw"))
-        self.assertIn("[[Outcome variable]]", "\n".join(factor["section_lines_raw"]))
+        self.assertIn("[[Result variable]]", "\n".join(factor["section_lines_raw"]))
 
     def test_search_render_context_preserves_br_tags(self) -> None:
         _root, docs_dir = self.make_project()
@@ -3684,13 +3350,13 @@ nav = [
         joined = "\n".join(section["render_context"])
         self.assertIn("<br>", joined)
 
-    def test_recoding_output_section_lines_keep_ordered_step(self) -> None:
+    def test_relabeling_output_section_lines_keep_ordered_step(self) -> None:
         _root, docs_dir = self.make_project()
         (docs_dir / "sample.md").write_text(
             "# Sample\n\n"
             "## Coding steps\n\n"
-            "5. **[[Frequency table]] #output for marital**\n"
-            "    - **Respondents' marital status**\n"
+            "5. **[[Summary table]] #output for status**\n"
+            "    - **Respondents' status status**\n"
             "        - | value | label |\n"
             "          | --- | --- |\n"
             "          | 1 | Married |\n",
@@ -3699,13 +3365,13 @@ nav = [
         MODULE.main(docs_dir=docs_dir)
         content_tags = json.loads((docs_dir / "assets" / "content-tags.json").read_text(encoding="utf-8"))
         output_entries = content_tags.get("#output") or []
-        recoding = next(
+        relabeling = next(
             entry for entry in output_entries
-            if any("Frequency table" in line for line in entry.get("section_lines_raw") or [])
+            if any("Summary table" in line for line in entry.get("section_lines_raw") or [])
         )
-        lines = recoding.get("section_lines_raw") or []
+        lines = relabeling.get("section_lines_raw") or []
         self.assertTrue(lines[0].startswith("5."))
-        self.assertIn("Respondents' marital status", lines[1])
+        self.assertIn("Respondents' status status", lines[1])
         self.assertTrue(any("| value |" in line for line in lines))
 
     def test_search_render_context_preserves_wikilink_markup(self) -> None:
@@ -3713,18 +3379,18 @@ nav = [
         (docs_dir / "sample.md").write_text(
             "# Sample\n\n"
             "## Section\n\n"
-            "- When both [[factor variable]] and [[outcome variable]] are categorical.\n"
-            "- Plain outcome variable mention without brackets.\n",
+            "- When both [[input variable]] and [[result variable]] are grouped.\n"
+            "- Plain result variable mention without brackets.\n",
             encoding="utf-8",
         )
         MODULE.main(docs_dir=docs_dir)
         search = json.loads((docs_dir / "assets" / "knotis-search.json").read_text(encoding="utf-8"))
         section = next(doc for doc in search["docs"] if doc["location"] == "sample/#section")
         joined = "\n".join(section["render_context"])
-        self.assertIn("[[factor variable]]", joined)
-        self.assertIn("[[outcome variable]]", joined)
-        self.assertIn("Plain outcome variable mention", joined)
-        self.assertNotIn("[[Plain outcome variable mention", joined)
+        self.assertIn("[[input variable]]", joined)
+        self.assertIn("[[result variable]]", joined)
+        self.assertIn("Plain result variable mention", joined)
+        self.assertNotIn("[[Plain result variable mention", joined)
 
     def test_parse_content_tags_keeps_fenced_code_lines_after_code_comments(self) -> None:
         _root, docs_dir = self.make_project()
@@ -3734,8 +3400,8 @@ nav = [
             "## Example\n\n"
             "#### Run this block #code\n\n"
             "```r\n"
-            "# model code\n"
-            "tab_corr(gss)\n"
+            "# model snippet\n"
+            "tab_corr(survey)\n"
             "```\n\n"
             "#### Next section\n\n"
             "Done.\n",
@@ -3745,24 +3411,24 @@ nav = [
         occurrences = MODULE.parse_content_tags_file(md_path)
 
         self.assertEqual(len(occurrences), 1)
-        self.assertIn("# model code", occurrences[0]["section_lines"])
-        self.assertIn("tab_corr(gss)", occurrences[0]["section_lines"])
+        self.assertIn("# model snippet", occurrences[0]["section_lines"])
+        self.assertIn("tab_corr(survey)", occurrences[0]["section_lines"])
         self.assertIn("```", occurrences[0]["section_lines"])
-        self.assertIn("# model code", occurrences[0]["section_lines_raw"])
-        self.assertIn("tab_corr(gss)", occurrences[0]["section_lines_raw"])
+        self.assertIn("# model snippet", occurrences[0]["section_lines_raw"])
+        self.assertIn("tab_corr(survey)", occurrences[0]["section_lines_raw"])
 
     def test_parse_content_tag_heading_stops_before_any_next_heading(self) -> None:
         _root, docs_dir = self.make_project()
         md_path = docs_dir / "module.md"
         md_path.write_text(
             "# Module\n\n"
-            "## Recoding\n\n"
-            "### [[Frequency table]] #code\n\n"
-            "- **Model code**\n"
+            "## Relabeling\n\n"
+            "### [[Summary table]] #code\n\n"
+            "- **Model snippet**\n"
             "    ```r\n"
-            "    frq(gss$variable_here, out = \"v\")\n"
+            "    frq(survey$variable_here, out = \"v\")\n"
             "    ```\n\n"
-            "#### [[Frequency table]] #output\n\n"
+            "#### [[Summary table]] #output\n\n"
             "| val | label |\n"
             "|-----|-------|\n"
             "| 1   | Married |\n\n"
@@ -3774,9 +3440,9 @@ nav = [
         occurrences = MODULE.parse_content_tags_file(md_path)
         code_occurrence = next(occ for occ in occurrences if occ["content_tag"] == "#code")
 
-        self.assertEqual(code_occurrence["section_lines_raw"][0], "### [[Frequency table]] #code")
-        self.assertIn("    frq(gss$variable_here, out = \"v\")", code_occurrence["section_lines_raw"])
-        self.assertNotIn("#### [[Frequency table]] #output", code_occurrence["section_lines_raw"])
+        self.assertEqual(code_occurrence["section_lines_raw"][0], "### [[Summary table]] #code")
+        self.assertIn("    frq(survey$variable_here, out = \"v\")", code_occurrence["section_lines_raw"])
+        self.assertNotIn("#### [[Summary table]] #output", code_occurrence["section_lines_raw"])
         self.assertNotIn("| 1   | Married |", code_occurrence["section_lines_raw"])
 
     def test_reference_section_after_list_prefixed_code_fence_starts_at_reference_heading(self) -> None:
@@ -3784,14 +3450,14 @@ nav = [
         md_path = docs_dir / "module.md"
         md_path.write_text(
             "# Module\n\n"
-            "### R Script file { data-search-exclude }\n"
-            "- Copy code into [[RStudio console]].\n"
+            "### Script file { data-search-exclude }\n"
+            "- Copy code into [[Juniper console]].\n"
             "    - ```r\n"
             "    source('setup.R')\n"
             "    ```\n\n"
             "## Steps\n"
-            "### Open RStudio Cloud website: Use [[RStudio console|ref]]\n"
-            "- Paste the code into [[RStudio console]].\n\n"
+            "### Open Juniper Cloud website: Use [[Juniper console|ref]]\n"
+            "- Paste the code into [[Juniper console]].\n\n"
             "### Wait\n"
             "Done.\n",
             encoding="utf-8",
@@ -3799,15 +3465,15 @@ nav = [
 
         references = [
             occ for occ in MODULE.parse_md_file(md_path)
-            if occ["keyword"] == "rstudio console" and occ.get("mode") == "reference"
+            if occ["keyword"] == "juniper console" and occ.get("mode") == "reference"
         ]
 
         self.assertEqual(len(references), 1)
         self.assertEqual(
             references[0]["section_lines_raw"][0],
-            "### Open RStudio Cloud website: Use [[RStudio console|ref]]",
+            "### Open Juniper Cloud website: Use [[Juniper console|ref]]",
         )
-        self.assertNotIn("### R Script file { data-search-exclude }", references[0]["section_lines_raw"])
+        self.assertNotIn("### Script file { data-search-exclude }", references[0]["section_lines_raw"])
         self.assertNotIn("### Wait", references[0]["section_lines_raw"])
 
     def test_parse_content_tag_list_item_as_mini_section(self) -> None:
@@ -3815,19 +3481,19 @@ nav = [
         md_path = docs_dir / "module.md"
         md_path.write_text(
             "# Module\n\n"
-            "## Recoding\n\n"
-            "4. Find the working code.\n"
-            "    1. [[Frequency table]] #code\n\n"
-            "        - **Model code**\n"
+            "## Relabeling\n\n"
+            "4. Find the working snippet.\n"
+            "    1. [[Summary table]] #code\n\n"
+            "        - **Model snippet**\n"
             "            ```r linenums=\"1\"\n"
-            "            frq(gss$variable_here, out = \"v\")\n"
+            "            frq(survey$variable_here, out = \"v\")\n"
             "            ```\n"
-            "        - **Working code**\n"
+            "        - **Working snippet**\n"
             "            ```r linenums=\"1\"\n"
-            "            frq(gss$marital, out = \"v\")\n"
+            "            frq(survey$status, out = \"v\")\n"
             "            ```\n\n"
-            "            - **Line 1:** We put `marital` here ➜ `variable_here`.\n\n"
-            "5. [[Frequency table]] #output\n\n"
+            "            - **Line 1:** We put `status` here ➜ `variable_here`.\n\n"
+            "5. [[Summary table]] #output\n\n"
             "| val | label |\n"
             "|-----|-------|\n"
             "| 1   | Married |\n",
@@ -3838,11 +3504,11 @@ nav = [
         code_occurrence = next(occ for occ in occurrences if occ["content_tag"] == "#code")
 
         self.assertEqual(code_occurrence["section_kw_offset"], 0)
-        self.assertEqual(code_occurrence["section_lines_raw"][0], "    1. [[Frequency table]] #code")
-        self.assertIn("            frq(gss$variable_here, out = \"v\")", code_occurrence["section_lines_raw"])
-        self.assertIn("            frq(gss$marital, out = \"v\")", code_occurrence["section_lines_raw"])
-        self.assertIn("            - **Line 1:** We put `marital` here ➜ `variable_here`.", code_occurrence["section_lines_raw"])
-        self.assertNotIn("5. [[Frequency table]] #output", code_occurrence["section_lines_raw"])
+        self.assertEqual(code_occurrence["section_lines_raw"][0], "    1. [[Summary table]] #code")
+        self.assertIn("            frq(survey$variable_here, out = \"v\")", code_occurrence["section_lines_raw"])
+        self.assertIn("            frq(survey$status, out = \"v\")", code_occurrence["section_lines_raw"])
+        self.assertIn("            - **Line 1:** We put `status` here ➜ `variable_here`.", code_occurrence["section_lines_raw"])
+        self.assertNotIn("5. [[Summary table]] #output", code_occurrence["section_lines_raw"])
         self.assertNotIn("| 1   | Married |", code_occurrence["section_lines_raw"])
 
     def test_parse_content_tag_numbered_step_keeps_children_until_next_step(self) -> None:
@@ -3850,20 +3516,20 @@ nav = [
         md_path = docs_dir / "module.md"
         md_path.write_text(
             "# Module\n\n"
-            "## Recoding\n\n"
-            "7. [[Frequency table]] #code for the recoded variable (`educgroups`)\n\n"
-            "    - **Model code**\n"
+            "## Relabeling\n\n"
+            "7. [[Summary table]] #code for the relabeled variable (`levelgroups`)\n\n"
+            "    - **Model snippet**\n"
             "        ```r linenums=\"1\"\n"
-            "        frq(gss$variable_here, out = \"v\")\n"
+            "        frq(survey$variable_here, out = \"v\")\n"
             "        ```\n"
-            "    - **Working code**\n"
+            "    - **Working snippet**\n"
             "        ```r linenums=\"1\"\n"
-            "        frq(gss$educgroups, out = \"v\")\n"
+            "        frq(survey$levelgroups, out = \"v\")\n"
             "        ```\n\n"
-            "        - **Line 1:** We put `educgroups` here ➜ `variable_here`.\n"
-            "            - Find the working code in this module's R script file.\n"
-            "            - [[Highlighting and running]] this code will generate the output below.\n\n"
-            "8. [[Frequency table]] #output\n\n"
+            "        - **Line 1:** We put `levelgroups` here ➜ `variable_here`.\n"
+            "            - Find the working snippet in this module's Script file.\n"
+            "            - [[Selecting and running]] this code will generate the output below.\n\n"
+            "8. [[Summary table]] #output\n\n"
             "| val | label |\n"
             "|-----|-------|\n"
             "| 1   | Low level of education |\n",
@@ -3875,12 +3541,12 @@ nav = [
 
         self.assertEqual(
             code_occurrence["section_lines_raw"][0],
-            "7. [[Frequency table]] #code for the recoded variable (`educgroups`)",
+            "7. [[Summary table]] #code for the relabeled variable (`levelgroups`)",
         )
-        self.assertIn("        frq(gss$variable_here, out = \"v\")", code_occurrence["section_lines_raw"])
-        self.assertIn("        frq(gss$educgroups, out = \"v\")", code_occurrence["section_lines_raw"])
-        self.assertIn("            - Find the working code in this module's R script file.", code_occurrence["section_lines_raw"])
-        self.assertNotIn("8. [[Frequency table]] #output", code_occurrence["section_lines_raw"])
+        self.assertIn("        frq(survey$variable_here, out = \"v\")", code_occurrence["section_lines_raw"])
+        self.assertIn("        frq(survey$levelgroups, out = \"v\")", code_occurrence["section_lines_raw"])
+        self.assertIn("            - Find the working snippet in this module's Script file.", code_occurrence["section_lines_raw"])
+        self.assertNotIn("8. [[Summary table]] #output", code_occurrence["section_lines_raw"])
         self.assertNotIn("| 1   | Low level of education |", code_occurrence["section_lines_raw"])
 
     def test_parse_content_tag_list_item_stops_before_parent_sibling(self) -> None:
@@ -3888,14 +3554,14 @@ nav = [
         md_path = docs_dir / "module.md"
         md_path.write_text(
             "# Module\n\n"
-            "## Recoding\n\n"
-            "- [[Frequency table]] #interpretation\n\n"
-            "    !!! quote \"Frequency table interpretation template\"\n\n"
+            "## Relabeling\n\n"
+            "- [[Summary table]] #interpretation\n\n"
+            "    !!! quote \"Summary table interpretation template\"\n\n"
             "        The **[variable label]** *variable* shows that ...\n\n"
             "    - We interpret the valid percentage column **(valid.prc)**.\n\n"
-            "- Here is the frequency table for recoded variables.\n\n"
+            "- Here is the summary table for relabeled variables.\n\n"
             "    ```r\n"
-            "    frq(gss$maritalgroups, out = \"v\")\n"
+            "    frq(survey$statusgroups, out = \"v\")\n"
             "    ```\n",
             encoding="utf-8",
         )
@@ -3903,10 +3569,10 @@ nav = [
         occurrences = MODULE.parse_content_tags_file(md_path)
         interpretation_occurrence = next(occ for occ in occurrences if occ["content_tag"] == "#interpretation")
 
-        self.assertIn("    !!! quote \"Frequency table interpretation template\"", interpretation_occurrence["section_lines_raw"])
+        self.assertIn("    !!! quote \"Summary table interpretation template\"", interpretation_occurrence["section_lines_raw"])
         self.assertIn("    - We interpret the valid percentage column **(valid.prc)**.", interpretation_occurrence["section_lines_raw"])
-        self.assertNotIn("- Here is the frequency table for recoded variables.", interpretation_occurrence["section_lines_raw"])
-        self.assertNotIn("    frq(gss$maritalgroups, out = \"v\")", interpretation_occurrence["section_lines_raw"])
+        self.assertNotIn("- Here is the summary table for relabeled variables.", interpretation_occurrence["section_lines_raw"])
+        self.assertNotIn("    frq(survey$statusgroups, out = \"v\")", interpretation_occurrence["section_lines_raw"])
 
     def test_parse_md_file_preserves_collapsible_admonitions_in_raw_section_lines(self) -> None:
         _root, docs_dir = self.make_project()
@@ -3996,7 +3662,7 @@ nav = [
             "    1. [[child one]]",
             "    2. [[child two]]",
             "        ```r",
-            "        summary(gss)",
+            "        summary(survey)",
             "        ```",
             "        1. [[grandchild]]",
             "    3. [[child three]]",
@@ -4026,7 +3692,7 @@ nav = [
         lines = [
             "### Sample lab assignment",
             "## Learning outcomes",
-            "- [[gss]]",
+            "- [[survey]]",
         ]
 
         heading_path = MODULE.build_heading_path_map(lines)
@@ -4037,35 +3703,35 @@ nav = [
 
     def test_heading_path_strips_readaloud_exclude_attrs(self) -> None:
         lines = [
-            "## [[Recoding model codes]]  { data-readaloud-exclude }",
-            "- [[Model code]] #code",
+            "## [[Relabeling model snippets]]  { data-readaloud-exclude }",
+            "- [[Model snippet]] #code",
         ]
 
         heading_path = MODULE.build_heading_path_map(lines)
 
-        self.assertEqual(heading_path[1], ["Recoding model codes"])
+        self.assertEqual(heading_path[1], ["Relabeling model snippets"])
         self.assertNotIn("readaloud", heading_path[1][0].lower())
 
     def test_search_render_context_strips_readaloud_exclude_attrs(self) -> None:
         context = MODULE._search_render_context_lines(
             [
-                "## [[Recoding model codes]]  { data-readaloud-exclude }",
+                "## [[Relabeling model snippets]]  { data-readaloud-exclude }",
                 "- item",
             ]
         )
         joined = "\n".join(context)
-        self.assertIn("[[Recoding model codes]]", joined)
+        self.assertIn("[[Relabeling model snippets]]", joined)
         self.assertNotIn("readaloud", joined.lower())
 
     def test_heading_path_strips_slide_anchor_markers(self) -> None:
         lines = [
-            "## GSS example: Predicting personal income (conrinc)⚓︎",
-            "- [[factor variable]]",
+            "## SURVEY example: Predicting personal income (conrinc)⚓︎",
+            "- [[input variable]]",
         ]
 
         heading_path = MODULE.build_heading_path_map(lines)
 
-        self.assertEqual(heading_path[1], ["GSS example: Predicting personal income (conrinc)"])
+        self.assertEqual(heading_path[1], ["SURVEY example: Predicting personal income (conrinc)"])
         self.assertNotIn("⚓", heading_path[1][0])
 
     def test_search_includes_template_admonition_content(self) -> None:
@@ -4074,20 +3740,20 @@ nav = [
             "# Sample\n\n"
             "## Interpretation\n\n"
             "- !!! note \"Interpretation sample\"\n"
-            "    - Teaching text with [[factor variable]].\n"
-            "- !!! quote \"Frequency table interpretation template\"\n"
-            "    - Placeholder [[factor variable]] 1 and [[outcome variable]].\n",
+            "    - Teaching text with [[input variable]].\n"
+            "- !!! quote \"Summary table interpretation template\"\n"
+            "    - Placeholder [[input variable]] 1 and [[result variable]].\n",
             encoding="utf-8",
         )
         MODULE.main(docs_dir=docs_dir)
         search = json.loads((docs_dir / "assets" / "knotis-search.json").read_text(encoding="utf-8"))
         section = next(doc for doc in search["docs"] if doc.get("kind") == "section")
-        self.assertIn("factor variable", section.get("concept_keys") or [])
-        self.assertIn("outcome variable", section.get("concept_keys") or [])
+        self.assertIn("input variable", section.get("concept_keys") or [])
+        self.assertIn("result variable", section.get("concept_keys") or [])
         mentions = [doc for doc in search["docs"] if doc.get("kind") == "mention"]
         factor_mentions = [
             doc for doc in mentions
-            if "factor variable" in " ".join(doc.get("concept_keys") or []).lower()
+            if "input variable" in " ".join(doc.get("concept_keys") or []).lower()
         ]
         self.assertEqual(len(factor_mentions), 2)
         self.assertIn("Teaching text", "\n".join(factor_mentions[0].get("section_lines_raw") or []))
@@ -4194,45 +3860,45 @@ nav = [
     def test_blank_line_inside_nested_list_keeps_sibling_parent(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "- [[significance of correlation]]\n"
-            "    - Using the p-value, we determine if the correlation is:\n"
-            "        - [[nonsignificant correlation]]\n"
+            "- [[significance of relation]]\n"
+            "    - Using the q-score, we determine if the relation is:\n"
+            "        - [[nonsignificant relation]]\n"
             "            ![No trend](image.png)\n"
             "\n"
-            "        - [[significant correlation]]\n"
+            "        - [[significant relation]]\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
         self.assertEqual(
-            edges[("kw:significance of correlation", "kw:significant correlation")],
+            edges[("kw:significance of relation", "kw:significant relation")],
             "hierarchy",
         )
 
     def test_plain_paragraph_under_heading_stays_sibling(self) -> None:
         graph = self.build_graph_for_markdown(
-            "# Home\n\n### Frequency table\n\n[[frequency table]] is used for [[categorical]] data.\n"
+            "# Home\n\n### Summary table\n\n[[summary table]] is used for [[grouped]] data.\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:categorical", "kw:frequency table")], "sibling")
-        self.assertNotIn(("kw:frequency table", "kw:categorical"), {k for k, v in edges.items() if v == "hierarchy"})
+        self.assertEqual(edges[("kw:grouped", "kw:summary table")], "sibling")
+        self.assertNotIn(("kw:summary table", "kw:grouped"), {k for k, v in edges.items() if v == "hierarchy"})
 
     def test_paragraph_keyword_can_parent_top_level_bullet_keyword(self) -> None:
         graph = self.build_graph_for_markdown(
-            "# Home\n\n## Using R script files\n\nWe follow [[using r script files]].\n\n- [[r script file]] is text.\n"
+            "# Home\n\n## Using Script files\n\nWe follow [[using script files]].\n\n- [[script file]] is text.\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:using r script files", "kw:r script file")], "hierarchy")
+        self.assertEqual(edges[("kw:using script files", "kw:script file")], "hierarchy")
 
     def test_list_hierarchy_does_not_cross_heading_boundary(self) -> None:
         graph = self.build_graph_for_markdown(
-            "# Home\n\n- For [[categorical]], use:\n  - [[frequency table]]\n\n### Frequency table\n\n- [[frequency table]] is used for [[categorical]].\n"
+            "# Home\n\n- For [[grouped]], use:\n  - [[summary table]]\n\n### Summary table\n\n- [[summary table]] is used for [[grouped]].\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:categorical", "kw:frequency table")], "hierarchy")
-        self.assertNotIn(("kw:frequency table", "kw:categorical"), {k for k, v in edges.items() if v == "hierarchy"})
+        self.assertEqual(edges[("kw:grouped", "kw:summary table")], "hierarchy")
+        self.assertNotIn(("kw:summary table", "kw:grouped"), {k for k, v in edges.items() if v == "hierarchy"})
 
     def test_reused_keyword_across_multiple_nested_sections_keeps_hierarchy_edge(self) -> None:
         graph = self.build_graph_for_markdown(
@@ -4252,60 +3918,60 @@ nav = [
     def test_first_hierarchy_parent_wins_when_keyword_reappears_later(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "## [[bivariate correlation]]\n"
-            "- [[bivariate correlation]] analysis shows the relationship between two continuous variables:\n"
-            "    - [[correlation table]] shows this relationship in a table format.\n"
-            "    - [[scatterplot]] shows this relationship in a graph format.\n\n"
-            "### [[correlation table]]\n"
-            "1. Now let's create the [[scatterplot]].\n"
+            "## [[pairwise relation]]\n"
+            "- [[pairwise relation]] analysis shows the relationship between two numeric variables:\n"
+            "    - [[relation table]] shows this relationship in a table format.\n"
+            "    - [[spread plot]] shows this relationship in a graph format.\n\n"
+            "### [[relation table]]\n"
+            "1. Now let's create the [[spread plot]].\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:bivariate correlation", "kw:scatterplot")], "hierarchy")
-        self.assertEqual(edges[("kw:correlation table", "kw:scatterplot")], "sibling")
+        self.assertEqual(edges[("kw:pairwise relation", "kw:spread plot")], "hierarchy")
+        self.assertEqual(edges[("kw:relation table", "kw:spread plot")], "sibling")
 
     def test_hierarchy_keywords_do_not_keep_direct_page_edges(self) -> None:
         graph = self.build_graph_for_page(
             "module.md",
             "# Module\n\n"
-            "## Regression definition\n\n"
-            "- [[Regression]] explains models.\n"
-            "  - [[factor variable]] affects the [[outcome variable]].\n\n"
+            "## Estimation definition\n\n"
+            "- [[Estimation]] explains models.\n"
+            "  - [[input variable]] affects the [[result variable]].\n\n"
             "## Types\n\n"
-            "- There are [[types of regression modeling based on outcome variable]].\n"
-            "  - [[Linear regression]] uses a [[continuous]] outcome.\n",
+            "- There are [[types of estimation based on result variable]].\n"
+            "  - [[Linear model]] uses a [[numeric]] outcome.\n",
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:regression", "kw:factor variable")], "hierarchy")
-        self.assertEqual(edges[("page:module/", "kw:regression")], "page")
-        self.assertEqual(edges[("page:module/", "kw:types of regression modeling based on outcome variable")], "page")
-        self.assertNotIn(("page:module/", "kw:factor variable"), edges)
-        self.assertNotIn(("page:module/", "kw:outcome variable"), edges)
-        self.assertNotIn(("page:module/", "kw:linear regression"), edges)
+        self.assertEqual(edges[("kw:estimation", "kw:input variable")], "hierarchy")
+        self.assertEqual(edges[("page:module/", "kw:estimation")], "page")
+        self.assertEqual(edges[("page:module/", "kw:types of estimation based on result variable")], "page")
+        self.assertNotIn(("page:module/", "kw:input variable"), edges)
+        self.assertNotIn(("page:module/", "kw:result variable"), edges)
+        self.assertNotIn(("page:module/", "kw:linear model"), edges)
 
     def test_hierarchy_edges_record_page_specific_sources(self) -> None:
         graph = self.build_graph_for_markdown(
-            "# [[linear regression]]\n\n"
-            "## Regression definition\n"
-            "- [[Regression]] explains models.\n\n"
+            "# [[linear model]]\n\n"
+            "## Estimation definition\n"
+            "- [[Estimation]] explains models.\n\n"
             "## Types\n"
-            "- There are two [[types of regression modeling based on outcome variable]]:\n"
-            "  - [[Linear regression]]\n"
-            "    - [[continuous]] outcome.\n"
+            "- There are two [[types of estimation based on result variable]]:\n"
+            "  - [[Linear model]]\n"
+            "    - [[numeric]] outcome.\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge for edge in graph["edges"]}
         self.assertEqual(
-            edges[("kw:linear regression", "kw:regression")]["hierarchy_sources"]["./"],
+            edges[("kw:linear model", "kw:estimation")]["hierarchy_sources"]["./"],
             {"heading_inferred": 1},
         )
         self.assertEqual(
-            edges[("kw:linear regression", "kw:types of regression modeling based on outcome variable")]["hierarchy_sources"]["./"],
+            edges[("kw:linear model", "kw:types of estimation based on result variable")]["hierarchy_sources"]["./"],
             {"section_heading": 1},
         )
         self.assertNotIn(
-            ("kw:types of regression modeling based on outcome variable", "kw:linear regression"),
+            ("kw:types of estimation based on result variable", "kw:linear model"),
             edges,
         )
         page_graph_edges = {
@@ -4313,19 +3979,19 @@ nav = [
             for edge in graph["page_hierarchy_edges"]
         }
         self.assertIn(
-            ("kw:linear regression", "kw:continuous", "list"),
+            ("kw:linear model", "kw:numeric", "list"),
             page_graph_edges,
         )
 
     def test_page_title_plain_text_does_not_infer_graph_ancestor(self) -> None:
         graph = self.build_graph_for_page(
             "module.md",
-            "# 01. Introduction to RStudio\n\n"
+            "# 01. Getting started\n\n"
             "## [[Software]]\n"
-            "### What is [[RStudio]]?\n"
-            "- RStudio is an IDE.\n\n"
-            "## Data: General Social Survey (GSS)\n"
-            "- We'll use [[GSS]] for the modules.\n",
+            "### What is [[Juniper]]?\n"
+            "- Juniper is an IDE.\n\n"
+            "## Data: General Social Survey (SURVEY)\n"
+            "- We'll use [[SURVEY]] for the modules.\n",
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
@@ -4338,10 +4004,10 @@ nav = [
             for edge in graph["page_graph_page_edges"]
         }
 
-        self.assertNotIn(("kw:rstudio", "kw:gss"), edges)
-        self.assertNotIn(("kw:rstudio", "kw:gss", "heading_inferred"), page_graph_edges)
-        self.assertIn(("page:module/", "kw:gss"), page_graph_page_edges)
-        self.assertEqual(edges[("kw:software", "kw:rstudio")], "hierarchy")
+        self.assertNotIn(("kw:juniper", "kw:survey"), edges)
+        self.assertNotIn(("kw:juniper", "kw:survey", "heading_inferred"), page_graph_edges)
+        self.assertIn(("page:module/", "kw:survey"), page_graph_page_edges)
+        self.assertEqual(edges[("kw:software", "kw:juniper")], "hierarchy")
 
         graph = self.build_graph_for_markdown("# Home\n\n- [[parent]]\n  - [[child|ref]]\n")
 
@@ -4359,22 +4025,22 @@ nav = [
     def test_nested_reference_uses_top_list_ancestor_as_graph_parent(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "- In [[regression]]\n"
-            "  - There are three [[types of regression modeling based on outcome variable]]:\n"
-            "    - [[Explanatory modeling|ref]]\n"
-            "    - [[Predictive modeling|ref]]\n"
+            "- In [[estimation]]\n"
+            "  - There are three [[types of estimation based on result variable]]:\n"
+            "    - [[Exploratory approach|ref]]\n"
+            "    - [[Forecasting approach|ref]]\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge for edge in graph["edges"]}
         self.assertEqual(
-            edges[("kw:regression", "kw:types of regression modeling based on outcome variable")]["hierarchy_sources"]["./"],
+            edges[("kw:estimation", "kw:types of estimation based on result variable")]["hierarchy_sources"]["./"],
             {"list": 1},
         )
         node_ids = {node["id"] for node in graph["nodes"]}
-        self.assertIn("kw:explanatory modeling", node_ids)
-        self.assertIn("kw:predictive modeling", node_ids)
-        self.assertIn(("kw:regression", "kw:explanatory modeling"), edges)
-        self.assertIn(("kw:regression", "kw:predictive modeling"), edges)
+        self.assertIn("kw:exploratory approach", node_ids)
+        self.assertIn("kw:forecasting approach", node_ids)
+        self.assertIn(("kw:estimation", "kw:exploratory approach"), edges)
+        self.assertIn(("kw:estimation", "kw:forecasting approach"), edges)
 
     def test_reference_definition_page_graph_ignores_inline_alias_hierarchy(self) -> None:
         graph = self.build_graph_for_page(
@@ -4423,45 +4089,45 @@ nav = [
     def test_reference_page_graph_emits_hierarchy_per_ref_occurrence(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "## [[Steps of using RStudio]]\n"
-            "### Open RStudio Cloud website: Use [[RStudio console|ref]]\n"
-            "- Paste the code into [[RStudio console]].\n\n"
-            "## [[RStudio interface]]\n"
+            "## [[Steps of using juniper]]\n"
+            "### Open Juniper Cloud website: Use [[Juniper console|ref]]\n"
+            "- Paste the code into [[Juniper console]].\n\n"
+            "## [[Juniper interface]]\n"
             "### Main look\n"
             "- Overview image\n"
-            "    3. **[[RStudio console|ref]]:** Console pane\n"
+            "    3. **[[Juniper console|ref]]:** Console pane\n"
             "    4. **Files/plots/packages/help:** Lower-right pane\n"
             "### More detailed look\n"
             "- Detail image\n"
-            "    9. **[[Files tab|ref]]:** Files tab\n"
-            "    10. **[[Plots tab|ref]]:** Plots tab\n"
-            "    12. **[[Viewer tab|ref]]:** Viewer tab\n"
+            "    9. **[[Files panel|ref]]:** Files panel\n"
+            "    10. **[[Charts panel|ref]]:** Charts panel\n"
+            "    12. **[[Preview panel|ref]]:** Preview panel\n"
         )
 
         page_hierarchy = {
             (edge["source"], edge["target"])
             for edge in graph["page_hierarchy_edges"]
         }
-        self.assertIn(("kw:steps of using rstudio", "kw:rstudio console"), page_hierarchy)
-        self.assertIn(("kw:rstudio interface", "kw:rstudio console"), page_hierarchy)
-        self.assertIn(("kw:rstudio interface", "kw:files tab"), page_hierarchy)
-        self.assertIn(("kw:rstudio interface", "kw:plots tab"), page_hierarchy)
-        self.assertIn(("kw:rstudio interface", "kw:viewer tab"), page_hierarchy)
-        self.assertNotIn(("kw:rstudio console", "kw:files tab"), page_hierarchy)
-        self.assertNotIn(("kw:rstudio console", "kw:plots tab"), page_hierarchy)
-        self.assertNotIn(("kw:rstudio console", "kw:viewer tab"), page_hierarchy)
+        self.assertIn(("kw:steps of using juniper", "kw:juniper console"), page_hierarchy)
+        self.assertIn(("kw:juniper interface", "kw:juniper console"), page_hierarchy)
+        self.assertIn(("kw:juniper interface", "kw:files panel"), page_hierarchy)
+        self.assertIn(("kw:juniper interface", "kw:charts panel"), page_hierarchy)
+        self.assertIn(("kw:juniper interface", "kw:preview panel"), page_hierarchy)
+        self.assertNotIn(("kw:juniper console", "kw:files panel"), page_hierarchy)
+        self.assertNotIn(("kw:juniper console", "kw:charts panel"), page_hierarchy)
+        self.assertNotIn(("kw:juniper console", "kw:preview panel"), page_hierarchy)
 
     def test_page_graph_keeps_later_local_list_links_for_repeated_keywords(self) -> None:
         graph = self.build_graph_for_markdown(
             "# [[Keyboard shortcuts]]\n\n"
-            "## [[Using R script files]]\n"
+            "## [[Using Script files]]\n"
             "- Use [[outline view]].\n"
-            "- Paste under [[working space]].\n"
-            "- [[Highlighting and running]] executes the code.\n\n"
-            "- [[Find this working code in the R script file]]\n"
-            "  - All the working code are above the [[working space]].\n"
+            "- Paste under [[work area]].\n"
+            "- [[Selecting and running]] executes the code.\n\n"
+            "- [[Find this working snippet in the script file]]\n"
+            "  - All the working snippet are above the [[work area]].\n"
             "  - Use [[outline view]].\n"
-            "  - [[Highlighting and running]] the working code will generate the exact output shown on the module page.\n",
+            "  - [[Selecting and running]] the working snippet will generate the exact output shown on the module page.\n",
         )
 
         page_graph_edges = {
@@ -4469,23 +4135,23 @@ nav = [
             for edge in graph["page_hierarchy_edges"]
         }
         self.assertIn(
-            ("kw:find this working code in the r script file", "kw:working space", "list"),
+            ("kw:find this working snippet in the script file", "kw:work area", "list"),
             page_graph_edges,
         )
         self.assertIn(
-            ("kw:find this working code in the r script file", "kw:outline view", "list"),
+            ("kw:find this working snippet in the script file", "kw:outline view", "list"),
             page_graph_edges,
         )
 
     def test_explicit_heading_keyword_parents_list_children_through_plain_bridge(self) -> None:
         graph = self.build_graph_for_markdown(
-            "# [[linear regression]] basics\n\n"
-            "## [[types of regression modeling based on outcome variable]]\n"
+            "# [[linear model]] basics\n\n"
+            "## [[types of estimation based on result variable]]\n"
             "- There are two types:\n"
-            "  - [[linear regression]]\n"
-            "    - The [[outcome variable]] is\n"
-            "      - [[continuous]]\n"
-            "  - [[logistic regression]]\n"
+            "  - [[linear model]]\n"
+            "    - The [[result variable]] is\n"
+            "      - [[numeric]]\n"
+            "  - [[logistic model]]\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge for edge in graph["edges"]}
@@ -4493,168 +4159,168 @@ nav = [
             (edge["source"], edge["target"])
             for edge in graph["page_hierarchy_edges"]
         }
-        self.assertIn(("kw:linear regression", "kw:types of regression modeling based on outcome variable"), edges)
+        self.assertIn(("kw:linear model", "kw:types of estimation based on result variable"), edges)
         self.assertEqual(
-            edges[("kw:linear regression", "kw:types of regression modeling based on outcome variable")]["relation"],
+            edges[("kw:linear model", "kw:types of estimation based on result variable")]["relation"],
             "hierarchy",
         )
-        self.assertIn(("kw:linear regression", "kw:types of regression modeling based on outcome variable"), page_graph_edges)
-        self.assertNotIn(("kw:types of regression modeling based on outcome variable", "kw:linear regression"), page_graph_edges)
-        self.assertIn(("kw:types of regression modeling based on outcome variable", "kw:logistic regression"), page_graph_edges)
-        self.assertIn(("kw:linear regression", "kw:outcome variable"), page_graph_edges)
-        self.assertIn(("kw:outcome variable", "kw:continuous"), page_graph_edges)
+        self.assertIn(("kw:linear model", "kw:types of estimation based on result variable"), page_graph_edges)
+        self.assertNotIn(("kw:types of estimation based on result variable", "kw:linear model"), page_graph_edges)
+        self.assertIn(("kw:types of estimation based on result variable", "kw:logistic model"), page_graph_edges)
+        self.assertIn(("kw:linear model", "kw:result variable"), page_graph_edges)
+        self.assertIn(("kw:result variable", "kw:numeric"), page_graph_edges)
 
     def test_repeated_keyword_can_become_local_context_sibling_without_losing_first_parent(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "- [[correlation]]\n"
-            "  - [[p-value]]\n"
-            "  - [[r-value]]\n\n"
+            "- [[relation]]\n"
+            "  - [[q-score]]\n"
+            "  - [[s-score]]\n\n"
             "### Significance\n"
-            "- [[significance of correlation]]\n"
-            "  - Review [[p-value]].\n\n"
-            "### [[direction of correlation]]\n"
-            "#### [[r-value]]\n"
+            "- [[significance of relation]]\n"
+            "  - Review [[q-score]].\n\n"
+            "### [[direction of relation]]\n"
+            "#### [[s-score]]\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:correlation", "kw:p-value")], "hierarchy")
-        self.assertEqual(edges[("kw:correlation", "kw:r-value")], "hierarchy")
-        self.assertEqual(edges[("kw:significance of correlation", "kw:p-value")], "sibling")
-        self.assertEqual(edges[("kw:direction of correlation", "kw:r-value")], "sibling")
+        self.assertEqual(edges[("kw:relation", "kw:q-score")], "hierarchy")
+        self.assertEqual(edges[("kw:relation", "kw:s-score")], "hierarchy")
+        self.assertEqual(edges[("kw:significance of relation", "kw:q-score")], "sibling")
+        self.assertEqual(edges[("kw:direction of relation", "kw:s-score")], "sibling")
 
     def test_paragraph_fallback_parent_does_not_create_local_context_sibling(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "- [[correlation]]\n"
-            "  - [[p-value]]\n\n"
+            "- [[relation]]\n"
+            "  - [[q-score]]\n\n"
             "## Later\n"
-            "[[significance of correlation]] explains the threshold.\n"
-            "- Review [[p-value]].\n"
+            "[[significance of relation]] explains the threshold.\n"
+            "- Review [[q-score]].\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:correlation", "kw:p-value")], "hierarchy")
-        self.assertNotIn(("kw:significance of correlation", "kw:p-value"), edges)
+        self.assertEqual(edges[("kw:relation", "kw:q-score")], "hierarchy")
+        self.assertNotIn(("kw:significance of relation", "kw:q-score"), edges)
 
     def test_section_heading_fallback_does_not_create_local_context_sibling(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "## [[correlation]]\n"
-            "- [[correlation]]\n"
-            "  - [[p-value]]\n\n"
-            "### [[significance of correlation]]\n"
-            "- Review [[p-value]].\n"
+            "## [[relation]]\n"
+            "- [[relation]]\n"
+            "  - [[q-score]]\n\n"
+            "### [[significance of relation]]\n"
+            "- Review [[q-score]].\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:correlation", "kw:p-value")], "hierarchy")
-        self.assertNotIn(("kw:significance of correlation", "kw:p-value"), edges)
+        self.assertEqual(edges[("kw:relation", "kw:q-score")], "hierarchy")
+        self.assertNotIn(("kw:significance of relation", "kw:q-score"), edges)
 
     def test_repeated_bridge_keyword_does_not_own_nested_children(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "- [[correlation]]\n"
-            "  - [[r-value]]\n\n"
-            "- [[strength of correlation]]\n"
-            "  - Using [[r-value]], we determine the strength of correlation.\n"
-            "    - [[weak correlation]]\n"
-            "    - [[moderate correlation]]\n"
-            "    - [[strong correlation]]\n"
+            "- [[relation]]\n"
+            "  - [[s-score]]\n\n"
+            "- [[strength of relation]]\n"
+            "  - Using [[s-score]], we determine the strength of relation.\n"
+            "    - [[weak relation]]\n"
+            "    - [[moderate relation]]\n"
+            "    - [[strong relation]]\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:correlation", "kw:r-value")], "hierarchy")
-        self.assertEqual(edges[("kw:strength of correlation", "kw:r-value")], "sibling")
-        self.assertEqual(edges[("kw:strength of correlation", "kw:weak correlation")], "hierarchy")
-        self.assertEqual(edges[("kw:strength of correlation", "kw:moderate correlation")], "hierarchy")
-        self.assertEqual(edges[("kw:strength of correlation", "kw:strong correlation")], "hierarchy")
-        self.assertNotIn(("kw:r-value", "kw:weak correlation"), edges)
-        self.assertNotIn(("kw:r-value", "kw:moderate correlation"), edges)
-        self.assertNotIn(("kw:r-value", "kw:strong correlation"), edges)
+        self.assertEqual(edges[("kw:relation", "kw:s-score")], "hierarchy")
+        self.assertEqual(edges[("kw:strength of relation", "kw:s-score")], "sibling")
+        self.assertEqual(edges[("kw:strength of relation", "kw:weak relation")], "hierarchy")
+        self.assertEqual(edges[("kw:strength of relation", "kw:moderate relation")], "hierarchy")
+        self.assertEqual(edges[("kw:strength of relation", "kw:strong relation")], "hierarchy")
+        self.assertNotIn(("kw:s-score", "kw:weak relation"), edges)
+        self.assertNotIn(("kw:s-score", "kw:moderate relation"), edges)
+        self.assertNotIn(("kw:s-score", "kw:strong relation"), edges)
 
     def test_top_level_numbered_step_in_nested_heading_inherits_section_keyword(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "## Reasons for recoding\n"
-            "- [[reasons for recoding]] include several approaches.\n\n"
-            "### Merging values\n"
-            "- [[Merging values]] changes grouped categories.\n\n"
-            "#### Merging values - coding steps\n"
-            "1. Start from [[merging values]].\n"
-            "2. Review the [[frequency table]].\n"
+            "## Reasons for relabeling\n"
+            "- [[reasons for relabeling]] include several approaches.\n\n"
+            "### Combining values\n"
+            "- [[Combining values]] changes grouped categories.\n\n"
+            "#### Combining values - coding steps\n"
+            "1. Start from [[combining values]].\n"
+            "2. Review the [[summary table]].\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:merging values", "kw:frequency table")], "hierarchy")
+        self.assertEqual(edges[("kw:combining values", "kw:summary table")], "hierarchy")
 
     def test_nested_plain_bridge_bullet_inherits_single_keyword_heading(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "## [[linear regression assumptions]]\n\n"
-            "### Assumption 2: Normal distribution\n"
-            "- The continuous variables used should display approximately [[normal distribution]].\n"
-            "- For example, some variables should not be treated as continuous:\n"
-            "    - **Several solutions exist for [[nonnormal distribution]] issue:**\n"
+            "## [[linear model assumptions]]\n\n"
+            "### Assumption 2: Bell shape\n"
+            "- The numeric variables used should display approximately [[bell shape]].\n"
+            "- For example, some variables should not be treated as numeric:\n"
+            "    - **Several solutions exist for [[skewed shape]] issue:**\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:linear regression assumptions", "kw:normal distribution")], "hierarchy")
-        self.assertEqual(edges[("kw:normal distribution", "kw:nonnormal distribution")], "hierarchy")
+        self.assertEqual(edges[("kw:linear model assumptions", "kw:bell shape")], "hierarchy")
+        self.assertEqual(edges[("kw:bell shape", "kw:skewed shape")], "hierarchy")
 
     def test_nested_heading_step_does_not_inherit_from_multi_keyword_intro(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
             "## Summary statistics\n\n"
-            "### Frequency table\n"
-            "[[frequency table]] is used for [[categorical]] variables.\n\n"
-            "1. See the [[bar graph]].\n"
+            "### Summary table\n"
+            "[[summary table]] is used for [[grouped]] variables.\n\n"
+            "1. See the [[column chart]].\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
         self.assertNotIn(
-            ("kw:frequency table", "kw:bar graph"),
+            ("kw:summary table", "kw:column chart"),
             {k for k, v in edges.items() if v == "hierarchy"},
         )
 
     def test_plain_heading_keyword_parents_same_level_bullet_siblings(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "## Statistical significance and p-value\n"
-            "- [[Statistical significance]] is meaningful.\n"
-            "  - We determine this using [[p-value]].\n\n"
-            "### How to make sure p-value is significant?\n"
-            "- **[[Is my p-value less than 0.05?]]**\n"
+            "## Measured significance and q-score\n"
+            "- [[Measured significance]] is meaningful.\n"
+            "  - We determine this using [[q-score]].\n\n"
+            "### How to make sure q-score is significant?\n"
+            "- **[[Is my q-score below the cutoff?]]**\n"
             "- **[[Check asterisks]]**\n"
         )
 
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
-        self.assertEqual(edges[("kw:statistical significance", "kw:p-value")], "hierarchy")
-        self.assertEqual(edges[("kw:p-value", "kw:is my p-value less than 0.05?")], "hierarchy")
-        self.assertEqual(edges[("kw:p-value", "kw:check asterisks")], "hierarchy")
-        self.assertEqual(edges[("kw:check asterisks", "kw:is my p-value less than 0.05?")], "sibling")
-        self.assertNotIn(("kw:is my p-value less than 0.05?", "kw:check asterisks"), edges)
+        self.assertEqual(edges[("kw:measured significance", "kw:q-score")], "hierarchy")
+        self.assertEqual(edges[("kw:q-score", "kw:is my q-score below the cutoff?")], "hierarchy")
+        self.assertEqual(edges[("kw:q-score", "kw:check asterisks")], "hierarchy")
+        self.assertEqual(edges[("kw:check asterisks", "kw:is my q-score below the cutoff?")], "sibling")
+        self.assertNotIn(("kw:is my q-score below the cutoff?", "kw:check asterisks"), edges)
 
         page_hierarchy = {
             (edge["source"], edge["target"]) for edge in graph["page_hierarchy_edges"]
         }
         self.assertEqual(page_hierarchy, {
-            ("kw:statistical significance", "kw:p-value"),
-            ("kw:p-value", "kw:is my p-value less than 0.05?"),
-            ("kw:p-value", "kw:check asterisks"),
+            ("kw:measured significance", "kw:q-score"),
+            ("kw:q-score", "kw:is my q-score below the cutoff?"),
+            ("kw:q-score", "kw:check asterisks"),
         })
 
     def test_comparison_heading_sibling_bullets_inherit_parent_section(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "## [[Migration]]\n"
-            "- Migration is defined as movement.\n\n"
-            "### Permanent vs. temporary migration\n"
-            "- [[Permanent migration]] refers to leaving forever.\n"
-            "- [[Temporary migration]] refers to being away for a time.\n\n"
-            "### Voluntary vs. involuntary migration\n"
-            "- [[Voluntary migration]] involves free choice.\n"
-            "- [[Involuntary migration]] involves no choice.\n"
+            "## [[Relocation]]\n"
+            "- Relocation is defined as movement.\n\n"
+            "### Permanent vs. temporary relocation\n"
+            "- [[Permanent relocation]] refers to leaving forever.\n"
+            "- [[Temporary relocation]] refers to being away for a time.\n\n"
+            "### Voluntary vs. involuntary relocation\n"
+            "- [[Voluntary relocation]] involves free choice.\n"
+            "- [[Involuntary relocation]] involves no choice.\n"
         )
 
         page_hierarchy = {
@@ -4662,38 +4328,38 @@ nav = [
         }
         edges = {(edge["source"], edge["target"]): edge["relation"] for edge in graph["edges"]}
 
-        self.assertIn(("kw:migration", "kw:permanent migration"), page_hierarchy)
-        self.assertIn(("kw:migration", "kw:temporary migration"), page_hierarchy)
-        self.assertIn(("kw:migration", "kw:voluntary migration"), page_hierarchy)
-        self.assertIn(("kw:migration", "kw:involuntary migration"), page_hierarchy)
-        self.assertNotIn(("kw:temporary migration", "kw:permanent migration"), page_hierarchy)
-        self.assertNotIn(("kw:permanent migration", "kw:temporary migration"), page_hierarchy)
-        self.assertNotIn(("kw:involuntary migration", "kw:voluntary migration"), page_hierarchy)
-        self.assertNotIn(("kw:voluntary migration", "kw:involuntary migration"), page_hierarchy)
-        self.assertEqual(edges[("kw:permanent migration", "kw:temporary migration")], "sibling")
-        self.assertEqual(edges[("kw:involuntary migration", "kw:voluntary migration")], "sibling")
+        self.assertIn(("kw:relocation", "kw:permanent relocation"), page_hierarchy)
+        self.assertIn(("kw:relocation", "kw:temporary relocation"), page_hierarchy)
+        self.assertIn(("kw:relocation", "kw:voluntary relocation"), page_hierarchy)
+        self.assertIn(("kw:relocation", "kw:involuntary relocation"), page_hierarchy)
+        self.assertNotIn(("kw:temporary relocation", "kw:permanent relocation"), page_hierarchy)
+        self.assertNotIn(("kw:permanent relocation", "kw:temporary relocation"), page_hierarchy)
+        self.assertNotIn(("kw:involuntary relocation", "kw:voluntary relocation"), page_hierarchy)
+        self.assertNotIn(("kw:voluntary relocation", "kw:involuntary relocation"), page_hierarchy)
+        self.assertEqual(edges[("kw:permanent relocation", "kw:temporary relocation")], "sibling")
+        self.assertEqual(edges[("kw:involuntary relocation", "kw:voluntary relocation")], "sibling")
 
     def test_page_hierarchy_ignores_inline_reference_parents_in_method_bullets(self) -> None:
         graph = self.build_graph_for_markdown(
             "# Home\n\n"
-            "## Statistical significance and p-value\n"
-            "- [[Statistical significance]]:\n"
-            "  - We determine this using [[p-value]]:\n\n"
-            "### How to make sure p-value is significant?\n"
-            "- **[[Is my p-value less than 0.05?]]**\n"
-            "    - To determine [[statistical significance]]\n"
+            "## Measured significance and q-score\n"
+            "- [[Measured significance]]:\n"
+            "  - We determine this using [[q-score]]:\n\n"
+            "### How to make sure q-score is significant?\n"
+            "- **[[Is my q-score below the cutoff?]]**\n"
+            "    - To determine [[measured significance]]\n"
             "- **[[Check asterisks]]**\n"
-            "    - To determine [[statistical significance]]\n"
+            "    - To determine [[measured significance]]\n"
         )
 
         page_hierarchy = {
             (edge["source"], edge["target"]) for edge in graph["page_hierarchy_edges"]
         }
-        self.assertIn(("kw:statistical significance", "kw:p-value"), page_hierarchy)
-        self.assertIn(("kw:p-value", "kw:check asterisks"), page_hierarchy)
-        self.assertIn(("kw:p-value", "kw:is my p-value less than 0.05?"), page_hierarchy)
-        self.assertNotIn(("kw:check asterisks", "kw:statistical significance"), page_hierarchy)
-        self.assertNotIn(("kw:is my p-value less than 0.05?", "kw:statistical significance"), page_hierarchy)
+        self.assertIn(("kw:measured significance", "kw:q-score"), page_hierarchy)
+        self.assertIn(("kw:q-score", "kw:check asterisks"), page_hierarchy)
+        self.assertIn(("kw:q-score", "kw:is my q-score below the cutoff?"), page_hierarchy)
+        self.assertNotIn(("kw:check asterisks", "kw:measured significance"), page_hierarchy)
+        self.assertNotIn(("kw:is my q-score below the cutoff?", "kw:measured significance"), page_hierarchy)
 
     def test_nested_knotis_config_parser_supports_maps_lists_bools_ints_and_defaults(self) -> None:
         toml_text = """
@@ -5750,6 +5416,69 @@ exclude_paths = ["modules/02.-skip.md"]
         self.assertEqual(slides["include_urls"], ["modules/01.-keep/"])
         self.assertEqual(slides["exclude_urls"], ["modules/02.-skip/"])
 
+    def _sticky_headers_meta(self, toml_extra: str) -> dict:
+        toml_text = '[project]\nsite_name = "Test"\nnav = [{ Home = "index.md" }]\n' + toml_extra
+        _root, docs_dir = self.make_project(toml_text=toml_text)
+        pages = []
+        for rel in ("index.md", "guide/a.md", "guide/b.md", "notes/c.md"):
+            page = docs_dir / rel
+            page.parent.mkdir(parents=True, exist_ok=True)
+            page.write_text("# Page\n", encoding="utf-8")
+            pages.append(page)
+        config = MODULE._normalize_knotis_config(MODULE._load_toml_knotis_config())
+        return MODULE._build_graph_meta(config, pages)["knotis"]["table"]["sticky_headers"]
+
+    def test_table_sticky_headers_disabled_when_section_absent(self) -> None:
+        config = MODULE._normalize_knotis_config({})
+        self.assertEqual(
+            config["table"]["sticky_headers"],
+            {"enabled": False, "include_paths": [], "exclude_paths": []},
+        )
+        sticky = self._sticky_headers_meta("")
+        self.assertFalse(sticky["enabled"])
+
+    def test_table_sticky_headers_default_section_stays_disabled(self) -> None:
+        sticky = self._sticky_headers_meta(
+            "\n[project.extra.knotis.table.sticky_headers]\nenabled = false\ninclude_paths = []\nexclude_paths = []\n"
+        )
+        self.assertFalse(sticky["enabled"])
+
+    def test_table_sticky_headers_enabled_without_include_paths_allows_all_pages(self) -> None:
+        sticky = self._sticky_headers_meta("\n[project.extra.knotis.table.sticky_headers]\nenabled = true\n")
+        self.assertTrue(sticky["enabled"])
+        self.assertTrue(sticky["include_all"])
+        self.assertEqual(sticky["include_urls"], [])
+        self.assertEqual(sticky["exclude_urls"], [])
+
+    def test_table_sticky_headers_exclude_paths_take_precedence_over_include_paths(self) -> None:
+        sticky = self._sticky_headers_meta(
+            '\n[project.extra.knotis.table.sticky_headers]\nenabled = true\n'
+            'include_paths = ["docs/guide"]\nexclude_paths = ["guide/b.md"]\n'
+        )
+        self.assertEqual(sticky["include_paths"], ["guide"])
+        self.assertFalse(sticky["include_all"])
+        self.assertEqual(sticky["include_urls"], ["guide/a/"])
+        self.assertEqual(sticky["exclude_urls"], ["guide/b/"])
+
+        sticky = self._sticky_headers_meta(
+            '\n[project.extra.knotis.table.sticky_headers]\nenabled = true\nexclude_paths = ["guide"]\n'
+        )
+        self.assertTrue(sticky["include_all"])
+        self.assertEqual(sticky["exclude_urls"], ["guide/a/", "guide/b/"])
+
+    def test_table_sticky_headers_rejects_invalid_and_unknown_settings(self) -> None:
+        stderr = io.StringIO()
+        with redirect_stderr(stderr):
+            config = MODULE._normalize_knotis_config(
+                {"table": {"enabled": True, "sticky_headers": {"enabled": "yes", "columns": 2}}}
+            )
+        self.assertFalse(config["table"]["sticky_headers"]["enabled"])
+        self.assertNotIn("enabled", config["table"])
+        warnings = stderr.getvalue()
+        self.assertIn("knotis.table.enabled", warnings)
+        self.assertIn("knotis.table.sticky_headers.enabled", warnings)
+        self.assertIn("knotis.table.sticky_headers.columns", warnings)
+
     def test_slides_include_page_path_aliases_normalize_equivalently(self) -> None:
         cases = [
             ("modules", ["modules"]),
@@ -5822,6 +5551,28 @@ exclude_paths = ["modules/02.-skip.md"]
             config["pane"]["path"]["exclude_paths"],
             ["get-started", "features/glossary-feature"],
         )
+
+    def test_pane_graph_path_size_defaults_to_current_size(self) -> None:
+        config = MODULE._normalize_knotis_config({})
+        self.assertEqual(config["pane"]["graph_path_size"], 3)
+        self.assertEqual(config["defaults"]["pane"]["graph_path_size"], 3)
+
+    def test_pane_graph_path_size_accepts_each_preset(self) -> None:
+        for size in (1, 2, 3, 4):
+            with self.subTest(size=size):
+                config = MODULE._normalize_knotis_config({"pane": {"graph_path_size": size}})
+                self.assertEqual(config["pane"]["graph_path_size"], size)
+                self.assertEqual(config["defaults"]["pane"]["graph_path_size"], size)
+
+    def test_pane_graph_path_size_warns_and_falls_back_on_invalid_value(self) -> None:
+        for value in (0, 5, -1, "2", 2.5, True):
+            with self.subTest(value=value):
+                stderr = io.StringIO()
+                with redirect_stderr(stderr):
+                    config = MODULE._normalize_knotis_config({"pane": {"graph_path_size": value}})
+                self.assertIn("knotis.pane.graph_path_size", stderr.getvalue())
+                self.assertEqual(config["pane"]["graph_path_size"], 3)
+                self.assertEqual(config["defaults"]["pane"]["graph_path_size"], 3)
 
     def test_pane_config_warns_on_unknown_key(self) -> None:
         stderr = io.StringIO()

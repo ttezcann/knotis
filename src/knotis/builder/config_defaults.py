@@ -157,6 +157,7 @@ KNOTIS_BASE_VIEW_DEFAULTS = {
         "initial_lines": 12,
         "initial_list_items": 20,
         "chunk_lines": 4,
+        "graph_path_size": 3,
         "intro_expand_to_heading": False,
         "content_tag_full_section": True,
         "reference_full_section": True,
@@ -514,6 +515,7 @@ KNOTIS_DEFAULT_CONFIG = {
         "initial_lines": 12,
         "initial_list_items": 20,
         "chunk_lines": 4,
+        "graph_path_size": 3,
     },
     "glossary": {
         "enabled": True,
@@ -548,6 +550,13 @@ KNOTIS_DEFAULT_CONFIG = {
         "content_inset": [3, 5, 3, 5],
         "include_paths": [],
         "exclude_paths": [],
+    },
+    "table": {
+        "sticky_headers": {
+            "enabled": False,
+            "include_paths": [],
+            "exclude_paths": [],
+        },
     },
     "content": {
         "heading_numbering": True,

@@ -486,7 +486,7 @@ def build_heading_keyword_map(lines: list[str]) -> dict[int, str | None]:
             and is_comparison_heading_section(lines, i)
         )
         # Page titles (#) only define a graph keyword from an explicit [[wikilink]].
-        # Plain-text matches like "Introduction to RStudio" must not become ancestors.
+        # Plain-text matches like "Introduction to the editor" must not become ancestors.
         if own_kw is None and level > 1:
             own_kw = infer_keyword_from_plain_heading(heading_text, known_keywords)
         if own_kw is None and not comparison_heading and level > 1:

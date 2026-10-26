@@ -262,65 +262,65 @@ class JsAssetTests(unittest.TestCase):
           docs: [
             {{
               kind: "section",
-              id: "section:rstudio-interface",
-              title: "RStudio interface",
+              id: "section:juniper-interface",
+              title: "Juniper interface",
               text: "",
-              concepts: ["RStudio interface"],
-              concept_keys: ["rstudio interface"],
-              location: "modules/01.-introduction-to-rstudio/#rstudio-interface",
-              page_url: "modules/01.-introduction-to-rstudio/",
-              page_title: "01. Introduction to RStudio",
+              concepts: ["Juniper interface"],
+              concept_keys: ["juniper interface"],
+              location: "modules/01.-getting-started/#juniper-interface",
+              page_url: "modules/01.-getting-started/",
+              page_title: "01. Getting started",
               page_order: 1,
               section_order: 1,
             }},
             {{
               kind: "section",
-              id: "section:factor-variable",
-              title: "Factor variable",
-              text: "The factor variable explains the outcome variable.",
-              concepts: ["Factor variable"],
-              concept_keys: ["factor variable"],
-              location: "modules/06.-chi-square-analysis/#factor-variable",
-              page_url: "modules/06.-chi-square-analysis/",
-              page_title: "06. Chi-square analysis",
+              id: "section:input-variable",
+              title: "Input variable",
+              text: "The input variable explains the result variable.",
+              concepts: ["Input variable"],
+              concept_keys: ["input variable"],
+              location: "modules/06.-group-comparison/#input-variable",
+              page_url: "modules/06.-group-comparison/",
+              page_title: "06. Group comparison",
               page_order: 6,
               section_order: 1,
             }},
             {{
               kind: "page",
               id: "page:03",
-              title: "03. Descriptive statistics",
+              title: "03. Summary methods",
               text: "",
-              location: "modules/03.-descriptive-statistics/",
-              page_url: "modules/03.-descriptive-statistics/",
-              page_title: "03. Descriptive statistics",
+              location: "modules/03.-summary-methods/",
+              page_url: "modules/03.-summary-methods/",
+              page_title: "03. Summary methods",
               page_order: 3,
               section_order: 0,
             }},
             {{
               kind: "section",
-              id: "section:frequency-code",
-              title: "Frequency table #code",
-              text: "Working code",
-              concepts: ["Frequency table"],
-              concept_keys: ["frequency table"],
+              id: "section:summary-code",
+              title: "Summary table #code",
+              text: "Working snippet",
+              concepts: ["Summary table"],
+              concept_keys: ["summary table"],
               content_tags: ["#code"],
-              render_context: ["1. **[[Frequency table]] #code**", "- Working code"],
-              location: "modules/03.-descriptive-statistics/#frequency-table-code",
-              page_url: "modules/03.-descriptive-statistics/",
-              page_title: "03. Descriptive statistics",
+              render_context: ["1. **[[Summary table]] #code**", "- Working snippet"],
+              location: "modules/03.-summary-methods/#summary-table-code",
+              page_url: "modules/03.-summary-methods/",
+              page_title: "03. Summary methods",
               page_order: 3,
               section_order: 10,
             }},
             {{
               kind: "section",
-              id: "section:frequency-output-tagged",
-              title: "Frequency result #output",
-              text: "A frequency output table.",
+              id: "section:summary-output-tagged",
+              title: "Summary result #output",
+              text: "A summary output table.",
               content_tags: ["#output"],
-              render_context: ["1. **Frequency result #output**", "- A frequency output table."],
-              section_lines_raw: ["1. **Frequency result #output**", "- A frequency output table."],
-              location: "modules/tagged-output/#frequency-result-output",
+              render_context: ["1. **Summary result #output**", "- A summary output table."],
+              section_lines_raw: ["1. **Summary result #output**", "- A summary output table."],
+              location: "modules/tagged-output/#summary-result-output",
               page_url: "modules/tagged-output/",
               page_title: "Tagged output",
               page_order: 21,
@@ -328,10 +328,10 @@ class JsAssetTests(unittest.TestCase):
             }},
             {{
               kind: "section",
-              id: "section:frequency-output-plain",
-              title: "Plain frequency discussion",
-              text: "The frequency output word appears here as ordinary prose.",
-              location: "modules/plain-output/#frequency-discussion",
+              id: "section:summary-output-plain",
+              title: "Plain summary discussion",
+              text: "The summary output word appears here as ordinary prose.",
+              location: "modules/plain-output/#summary-discussion",
               page_url: "modules/plain-output/",
               page_title: "Plain output prose",
               page_order: 22,
@@ -339,10 +339,10 @@ class JsAssetTests(unittest.TestCase):
             }},
             {{
               kind: "section",
-              id: "section:frequency-code-plain",
-              title: "Plain frequency code discussion",
+              id: "section:summary-code-plain",
+              title: "Plain summary code discussion",
               text: "The code word appears here without a content tag.",
-              location: "modules/plain-code/#frequency-code-discussion",
+              location: "modules/plain-code/#summary-code-discussion",
               page_url: "modules/plain-code/",
               page_title: "Plain code prose",
               page_order: 23,
@@ -353,9 +353,9 @@ class JsAssetTests(unittest.TestCase):
               id: "section:random-sampling",
               title: "Random sampling",
               text: "",
-              location: "modules/08.-probabilistic-sampling/#random-sampling",
-              page_url: "modules/08.-probabilistic-sampling/",
-              page_title: "08. Probabilistic sampling",
+              location: "modules/08.-sampling-methods/#random-sampling",
+              page_url: "modules/08.-sampling-methods/",
+              page_title: "08. Sampling methods",
               page_order: 8,
               section_order: 1,
             }},
@@ -432,59 +432,59 @@ class JsAssetTests(unittest.TestCase):
             }},
             {{
               kind: "section",
-              id: "section:concept-rstudio",
-              title: "RStudio",
+              id: "section:concept-juniper",
+              title: "Juniper",
               search_title: "",
-              text: "RStudio is the IDE students use.",
-              search_text: "RStudio is the IDE students use.",
-              concepts: ["RStudio"],
-              concept_keys: ["rstudio"],
-              location: "module-01/#rstudio",
+              text: "Juniper is the IDE students use.",
+              search_text: "Juniper is the IDE students use.",
+              concepts: ["Juniper"],
+              concept_keys: ["juniper"],
+              location: "module-01/#juniper",
               page_url: "module-01/",
-              page_title: "01. Introduction to RStudio",
+              page_title: "01. Getting started",
               page_order: 1,
               section_order: 1,
             }},
             {{
               kind: "reference_occurrence",
-              id: "reference-occurrence:rstudio-console-0",
-              title: "RStudio console",
+              id: "reference-occurrence:juniper-console-0",
+              title: "Juniper console",
               search_title: "",
               text: "Reference definition one for the console.",
               search_text: "Reference definition one for the console.",
-              references: ["RStudio console"],
-              reference_keys: ["rstudio console"],
-              location: "module-01/#wikilink-rstudio-console-0",
+              references: ["Juniper console"],
+              reference_keys: ["juniper console"],
+              location: "module-01/#wikilink-juniper-console-0",
               page_url: "module-01/",
-              page_title: "01. Introduction to RStudio",
+              page_title: "01. Getting started",
               page_order: 1,
               section_order: 2,
             }},
             {{
               kind: "reference_occurrence",
-              id: "reference-occurrence:rstudio-console-1",
-              title: "RStudio console",
+              id: "reference-occurrence:juniper-console-1",
+              title: "Juniper console",
               search_title: "",
               text: "Reference definition two for immediate output.",
               search_text: "Reference definition two for immediate output.",
-              references: ["RStudio console"],
-              reference_keys: ["rstudio console"],
-              location: "module-01/#wikilink-rstudio-console-1",
+              references: ["Juniper console"],
+              reference_keys: ["juniper console"],
+              location: "module-01/#wikilink-juniper-console-1",
               page_url: "module-01/",
-              page_title: "01. Introduction to RStudio",
+              page_title: "01. Getting started",
               page_order: 1,
               section_order: 3,
             }},
             {{
               kind: "page",
               id: "page:module-02",
-              title: "02. Introduction to data and scripting",
+              title: "02. Working with data",
               search_title: "",
               text: "",
               search_text: "",
               location: "module-02/",
               page_url: "module-02/",
-              page_title: "02. Introduction to data and scripting",
+              page_title: "02. Working with data",
               page_order: 2,
               section_order: 0,
             }},
@@ -504,7 +504,7 @@ class JsAssetTests(unittest.TestCase):
               breadcrumb: ["Module items", "Learning outcomes"],
               location: "module-02/#learning-outcomes",
               page_url: "module-02/",
-              page_title: "02. Introduction to data and scripting",
+              page_title: "02. Working with data",
               page_order: 2,
               section_order: 1,
             }},
@@ -521,10 +521,10 @@ class JsAssetTests(unittest.TestCase):
               ],
               section_kw_offset: 1,
               content_line: 80,
-              breadcrumb: ["Using R script files", "Pasting variable names"],
+              breadcrumb: ["Using Script files", "Pasting variable names"],
               location: "module-02/#pasting-variable-names",
               page_url: "module-02/",
-              page_title: "02. Introduction to data and scripting",
+              page_title: "02. Working with data",
               page_order: 2,
               section_order: 8,
             }},
@@ -555,20 +555,20 @@ class JsAssetTests(unittest.TestCase):
               breadcrumb: ["Terminologies", "Data terminology"],
               location: `module-02/#wikilink-${{slug}}-0`,
               page_url: "module-02/",
-              page_title: "02. Introduction to data and scripting",
+              page_title: "02. Working with data",
               page_order: 2,
               section_order: occurrence + 1,
             }})),
             {{
               kind: "section",
-              id: "section:ordinary-rstudio-console",
-              title: "Ordinary RStudio console wikilink",
+              id: "section:ordinary-juniper-console",
+              title: "Ordinary Juniper console wikilink",
               search_title: "Ordinary wikilink",
-              text: "Paste code into RStudio console.",
+              text: "Paste code into Juniper console.",
               search_text: "Paste code into .",
               concepts: [],
               concept_keys: [],
-              location: "ordinary-console/#ordinary-rstudio-console-wikilink",
+              location: "ordinary-console/#ordinary-juniper-console-wikilink",
               page_url: "ordinary-console/",
               page_title: "Ordinary Console",
               page_order: 29,
@@ -576,21 +576,21 @@ class JsAssetTests(unittest.TestCase):
             }},
             {{
               kind: "section",
-              id: "section:plain-rstudio",
-              title: "Plain RStudio text",
-              text: "This sentence mentions RStudio without a wikilink.",
-              location: "plain-rstudio/#plain-rstudio-text",
-              page_url: "plain-rstudio/",
-              page_title: "Plain RStudio",
+              id: "section:plain-juniper",
+              title: "Plain Juniper text",
+              text: "This sentence mentions Juniper without a wikilink.",
+              location: "plain-juniper/#plain-juniper-text",
+              page_url: "plain-juniper/",
+              page_title: "Plain Juniper",
               page_order: 32,
               section_order: 1,
             }},
             {{
               kind: "section",
-              id: "section:plain-rstudio-console",
-              title: "Plain RStudio console text",
-              text: "This sentence mentions RStudio console without a wikilink.",
-              location: "plain-console/#plain-rstudio-console-text",
+              id: "section:plain-juniper-console",
+              title: "Plain Juniper console text",
+              text: "This sentence mentions Juniper console without a wikilink.",
+              location: "plain-console/#plain-juniper-console-text",
               page_url: "plain-console/",
               page_title: "Plain Console",
               page_order: 33,
@@ -598,29 +598,29 @@ class JsAssetTests(unittest.TestCase):
             }},
             {{
               kind: "section",
-              id: "section:categorical-primary",
-              title: "Categorical variables",
-              text: "Categorical variables take on values that are labels.",
-              search_text: "Categorical variables take on values that are labels.",
-              concepts: ["Categorical variables"],
-              concept_keys: ["categorical variables"],
-              location: "categorical/#categorical-variables",
-              page_url: "categorical/",
-              page_title: "03. Descriptive statistics",
+              id: "section:grouped-primary",
+              title: "Grouped variables",
+              text: "Grouped variables take on values that are labels.",
+              search_text: "Grouped variables take on values that are labels.",
+              concepts: ["Grouped variables"],
+              concept_keys: ["grouped variables"],
+              location: "grouped/#grouped-variables",
+              page_url: "grouped/",
+              page_title: "03. Summary methods",
               page_order: 3,
               section_order: 1,
             }},
             {{
               kind: "section",
-              id: "section:categorical-secondary",
-              title: "Categorical examples",
-              text: "Another categorical example appears later on the page.",
-              search_text: "Another categorical example appears later on the page.",
-              concepts: ["Categorical examples"],
-              concept_keys: ["categorical examples"],
-              location: "categorical/#categorical-examples",
-              page_url: "categorical/",
-              page_title: "03. Descriptive statistics",
+              id: "section:grouped-secondary",
+              title: "Grouped examples",
+              text: "Another grouped example appears later on the page.",
+              search_text: "Another grouped example appears later on the page.",
+              concepts: ["Grouped examples"],
+              concept_keys: ["grouped examples"],
+              location: "grouped/#grouped-examples",
+              page_url: "grouped/",
+              page_title: "03. Summary methods",
               page_order: 3,
               section_order: 2,
             }},
@@ -646,22 +646,22 @@ class JsAssetTests(unittest.TestCase):
           }}
         }}
 
-        for (const query of ["descriptive st", "descriptive sta", "descriptive stat", "descriptive stati", "descriptive statistics"]) {{
-          assertHas(query, "03. Descriptive statistics");
+        for (const query of ["summary me", "summary met", "summary meth", "summary metho", "summary methods"]) {{
+          assertHas(query, "03. Summary methods");
         }}
-        assertMissing("descriptive x", "03. Descriptive statistics");
-        assertHas("frequency table code", "Frequency table #code");
-        assertHas("output", "Frequency result #output");
-        assertHas("output", "Plain frequency discussion");
-        assertHas("#output", "Frequency result #output");
-        assertMissing("#output", "Plain frequency discussion");
-        assertHas("frequency #output", "Frequency result #output");
-        assertMissing("frequency #output", "Plain frequency discussion");
-        assertHas("#code", "Frequency table #code");
-        assertMissing("#code", "Plain frequency code discussion");
+        assertMissing("summary x", "03. Summary methods");
+        assertHas("summary table code", "Summary table #code");
+        assertHas("output", "Summary result #output");
+        assertHas("output", "Plain summary discussion");
+        assertHas("#output", "Summary result #output");
+        assertMissing("#output", "Plain summary discussion");
+        assertHas("summary #output", "Summary result #output");
+        assertMissing("summary #output", "Plain summary discussion");
+        assertHas("#code", "Summary table #code");
+        assertMissing("#code", "Plain summary code discussion");
         assertHas("random samp", "Random sampling");
-        assertHas("fac", "Factor variable");
-        assertMissing("fac", "RStudio interface");
+        assertHas("inp", "Input variable");
+        assertMissing("fac", "Juniper interface");
 
         const videoGroups = search.searchIndex("video controls", index, new Set());
         const videoGroup = videoGroups.find((group) => group.id === "features/video-controls-feature/");
@@ -672,7 +672,7 @@ class JsAssetTests(unittest.TestCase):
         const videoDocIds = videoGroup.docs.map((item) => item.doc.id);
         if (!videoDocIds.includes("section:features-video-controls-feature-feature-video-controls") ||
             !videoDocIds.includes("mention:features-video-controls-feature-wikilink-video-controls-0")) {{
-          console.error("regression setup did not include both section and mention hits: " + videoDocIds.join(" | "));
+          console.error("estimation setup did not include both section and mention hits: " + videoDocIds.join(" | "));
           process.exit(1);
         }}
         const renderedVideoGroup = search.renderGroup(videoGroup, "video controls", index, null, null);
@@ -681,11 +681,11 @@ class JsAssetTests(unittest.TestCase):
           process.exit(1);
         }}
 
-        const categoricalGroup = search.searchIndex("categorical", index, new Set())
-          .find((group) => group.id === "categorical/");
-        const renderedCategorical = search.renderGroup(categoricalGroup, "categorical", index, null, null);
-        if (!renderedCategorical.includes("1 more on this page")) {{
-          console.error("normal same-page matches must retain more on this page: " + renderedCategorical);
+        const groupedGroup = search.searchIndex("grouped", index, new Set())
+          .find((group) => group.id === "grouped/");
+        const renderedGrouped = search.renderGroup(groupedGroup, "grouped", index, null, null);
+        if (!renderedGrouped.includes("1 more on this page")) {{
+          console.error("normal same-page matches must retain more on this page: " + renderedGrouped);
           process.exit(1);
         }}
 
@@ -743,7 +743,7 @@ class JsAssetTests(unittest.TestCase):
           process.exit(1);
         }}
 
-        for (const prefix of ["rs", "rst", "rstu"]) {{
+        for (const prefix of ["ju", "jun", "juni"]) {{
           const groupIds = search.searchIndex(prefix, index, new Set()).map((group) => group.id);
           if (groupIds[0] !== "module-01/") {{
             console.error(`${{prefix}} should rank Module 01 first: ${{groupIds.join(" | ")}}`);
@@ -751,12 +751,12 @@ class JsAssetTests(unittest.TestCase):
           }}
           const group = search.searchIndex(prefix, index, new Set())[0];
           const rendered = search.renderGroup(group, prefix, index, null, null);
-          const rstudioAt = rendered.indexOf("knotis-target-text=RStudio&amp;");
+          const juniperAt = rendered.indexOf("knotis-target-text=Juniper&amp;");
           const firstRefAt = rendered.indexOf("Reference definition one for the console");
           const secondRefAt = rendered.indexOf("Reference definition two for immediate output");
           const detailsAt = rendered.indexOf('<details class="md-search-result__more">');
-          if (!(rstudioAt >= 0 && rstudioAt < firstRefAt && firstRefAt < secondRefAt)) {{
-            console.error(`${{prefix}} should show RStudio first and both refs next: ${{rendered}}`);
+          if (!(juniperAt >= 0 && juniperAt < firstRefAt && firstRefAt < secondRefAt)) {{
+            console.error(`${{prefix}} should show Juniper first and both refs next: ${{rendered}}`);
             process.exit(1);
           }}
           if (detailsAt >= 0 && (firstRefAt > detailsAt || secondRefAt > detailsAt)) {{
@@ -765,25 +765,25 @@ class JsAssetTests(unittest.TestCase):
           }}
         }}
 
-        const rstuGroupIds = search.searchIndex("rstu", index, new Set()).map((group) => group.id);
-        const rstudioIndex = rstuGroupIds.indexOf("module-01/");
-        const ordinaryConsoleIndex = rstuGroupIds.indexOf("ordinary-console/");
-        const plainRstudioIndex = rstuGroupIds.indexOf("plain-rstudio/");
-        const plainConsoleIndex = rstuGroupIds.indexOf("plain-console/");
-        if ([rstudioIndex, plainRstudioIndex, plainConsoleIndex].some((index) => index < 0)) {{
-          console.error("rstu prefix search missed an expected group: " + rstuGroupIds.join(" | "));
+        const juniGroupIds = search.searchIndex("juni", index, new Set()).map((group) => group.id);
+        const juniperIndex = juniGroupIds.indexOf("module-01/");
+        const ordinaryConsoleIndex = juniGroupIds.indexOf("ordinary-console/");
+        const plainJuniperIndex = juniGroupIds.indexOf("plain-juniper/");
+        const plainConsoleIndex = juniGroupIds.indexOf("plain-console/");
+        if ([juniperIndex, plainJuniperIndex, plainConsoleIndex].some((index) => index < 0)) {{
+          console.error("juni prefix search missed an expected group: " + juniGroupIds.join(" | "));
           process.exit(1);
         }}
         if (ordinaryConsoleIndex >= 0) {{
-          console.error("rstu prefix search should suppress longer ordinary wikilinks that shadow the shorter RStudio concept: " + rstuGroupIds.join(" | "));
+          console.error("juni prefix search should suppress longer ordinary wikilinks that shadow the shorter Juniper concept: " + juniGroupIds.join(" | "));
           process.exit(1);
         }}
-        if (!(rstudioIndex < plainRstudioIndex && plainRstudioIndex < plainConsoleIndex)) {{
-          console.error("rstu prefix search order should be Module 01 refs, then plain text: " + rstuGroupIds.join(" | "));
+        if (!(juniperIndex < plainJuniperIndex && plainJuniperIndex < plainConsoleIndex)) {{
+          console.error("juni prefix search order should be Module 01 refs, then plain text: " + juniGroupIds.join(" | "));
           process.exit(1);
         }}
 
-        const consoleGroups = search.searchIndex("rstudio console", index, new Set());
+        const consoleGroups = search.searchIndex("juniper console", index, new Set());
         const consoleGroupIds = consoleGroups.map((group) => group.id);
         const consoleReferenceIndex = consoleGroupIds.indexOf("module-01/");
         const consoleOrdinaryIndex = consoleGroupIds.indexOf("ordinary-console/");
@@ -791,7 +791,7 @@ class JsAssetTests(unittest.TestCase):
           console.error("exact reference search should show explicit refs and exclude ordinary wikilinks: " + consoleGroupIds.join(" | "));
           process.exit(1);
         }}
-        const renderedReferenceGroup = search.renderGroup(consoleGroups[0], "rstudio console", index, null, null);
+        const renderedReferenceGroup = search.renderGroup(consoleGroups[0], "juniper console", index, null, null);
         for (const text of ["Reference definition one for the console", "Reference definition two for immediate output"]) {{
           if (renderedReferenceGroup.split(text).length !== 2) {{
             console.error("each explicit ref must render exactly once: " + renderedReferenceGroup);
@@ -805,19 +805,19 @@ class JsAssetTests(unittest.TestCase):
           process.exit(1);
         }}
 
-        if (!search.lineMatchesQuery("Descriptive statistics", ["descriptive", "st"], "all")) {{
+        if (!search.lineMatchesQuery("Summary methods", ["summary", "me"], "all")) {{
           console.error("lineMatchesQuery missed adjacent prefix phrase");
           process.exit(1);
         }}
-        if (search.lineMatchesQuery("Descriptive values and statistics", ["descriptive", "st"], "all")) {{
+        if (search.lineMatchesQuery("Summary values and methods", ["summary", "me"], "all")) {{
           console.error("lineMatchesQuery matched scattered phrase");
           process.exit(1);
         }}
-        if (!search.lineMatchesQuery("Factor variable", ["fac"], "any")) {{
+        if (!search.lineMatchesQuery("Input variable", ["inp"], "any")) {{
           console.error("lineMatchesQuery missed single-word prefix");
           process.exit(1);
         }}
-        if (search.lineMatchesQuery("RStudio interface", ["fac"], "any")) {{
+        if (search.lineMatchesQuery("Juniper interface", ["fac"], "any")) {{
           console.error("lineMatchesQuery matched inside a word");
           process.exit(1);
         }}
@@ -1115,19 +1115,19 @@ class JsAssetTests(unittest.TestCase):
         }}
         paneOpenDom.window.close();
         const contentTagSlice = [
-          "2. **[[Reversing values]] #code structure:**",
-          "    - **[[Model code]]**",
+          "2. **[[Flipping values]] #code structure:**",
+          "    - **[[Model snippet]]**",
           "        - ```r linenums=\\"1\\"",
-          "        gss$new_variable_here <-",
+          "        survey$new_variable_here <-",
           "        ```",
-          "    - **[[Working code]]**",
+          "    - **[[Working snippet]]**",
           "        - ```r linenums=\\"1\\"",
-          "        gss$satjobreversed <-",
+          "        survey$ratingreversed <-",
           "        ```",
           "            - **Line 1:** We put the new variable name here.",
           "            - **Line 2:** We put the original variable here.",
         ];
-        const renderedContentTag = renderer.wrapMarkdownSurface(renderer.renderLines(contentTagSlice, "modules/04.-recoding-variables/", {{
+        const renderedContentTag = renderer.wrapMarkdownSurface(renderer.renderLines(contentTagSlice, "modules/04.-reshaping-variables/", {{
           keyword: "#code",
           renderMode: "content_tag",
           sourceLines: contentTagSlice,
@@ -1146,7 +1146,7 @@ class JsAssetTests(unittest.TestCase):
           process.exit(1);
         }}
         const topItem = outerOl.children[0];
-        if (!topItem || !topItem.textContent.includes("Reversing values") || topItem.classList.contains("knotis-nested-list-shell")) {{
+        if (!topItem || !topItem.textContent.includes("Flipping values") || topItem.classList.contains("knotis-nested-list-shell")) {{
           console.error("content tag list slice rendered a shell instead of the tagged item: " + renderedContentTag);
           process.exit(1);
         }}
@@ -1159,14 +1159,14 @@ class JsAssetTests(unittest.TestCase):
           console.error("content tag list slice omitted nested line explanation bullets: " + renderedContentTag);
           process.exit(1);
         }}
-        const workingItem = [...topItem.querySelectorAll(":scope > ul > li")].find((li) => li.textContent.includes("Working code"));
+        const workingItem = [...topItem.querySelectorAll(":scope > ul > li")].find((li) => li.textContent.includes("Working snippet"));
         const workingCodeItem = workingItem?.querySelector(":scope > ul > li");
         if (!workingCodeItem?.querySelector(":scope > .wl-sec-code-block")) {{
-          console.error("content tag list slice did not render the working code block as a child bullet: " + renderedContentTag);
+          console.error("content tag list slice did not render the working snippet block as a child bullet: " + renderedContentTag);
           process.exit(1);
         }}
         if (!workingCodeItem.querySelector(":scope > ul > li")) {{
-          console.error("content tag list slice did not keep line bullets under the working code block: " + renderedContentTag);
+          console.error("content tag list slice did not keep line bullets under the working snippet block: " + renderedContentTag);
           process.exit(1);
         }}
         console.log("ok");
@@ -1381,11 +1381,11 @@ class JsAssetTests(unittest.TestCase):
         dom.window.eval(readFileSync({str(ASSETS_DIR / "knotis-wikilinks.js")!r}, "utf8"));
 
         const lines = [
-          "- Categorical variables take on values that are labels.",
-          "    - Variables are categorical when respondents choose from responses.",
+          "- Grouped variables take on values that are labels.",
+          "    - Variables are grouped when respondents choose from responses.",
           "- Values are NOT real numbers.",
           "    - In the response categories below, no is not triple of yes.",
-          "        - !!! info \"Categorical variable\"",
+          "        - !!! info \"Grouped variable\"",
           "            - **Do you like coffee?**  ",
           "                1. Yes  ",
           "                2. Not much  ",
@@ -1445,9 +1445,9 @@ class JsAssetTests(unittest.TestCase):
           "    2. [[Page graph]]: The page graph is for active page only.",
           "    3. [[Concept graph]]: The concept graph centers on one concept.",
           "- ![Pane showing details](pane.png)",
-          "    1. This is the pane of \\"linear regression\\" wikilink.",
+          "    1. This is the pane of \\"linear model\\" wikilink.",
           "        1. This part shows the number of mentions and pages including this concept.",
-          "    2. Shows the [[concept graph]] of \\"linear regression\\" wikilink.",
+          "    2. Shows the [[concept graph]] of \\"linear model\\" wikilink.",
           "        1. Clicking on the graph preview expands the graph.",
           "    3. Return button: returns to that graph.",
           "        1. Site graph appears because the wikilink was clicked on the site graph.",
@@ -1501,15 +1501,15 @@ class JsAssetTests(unittest.TestCase):
         }}
 
         const workflowLines = [
-          "## [[How to work with codes]]?",
+          "## [[How to work with snippets]]?",
           " - We never type the codes or variables inside the codes.",
           "    - **The workflow:**",
-          "        1. Imagine we need a frequency table.",
-          "        2. Find the frequency table model code.",
-          "        3. Paste it under the working space.",
+          "        1. Imagine we need a summary table.",
+          "        2. Find the summary table model snippet.",
+          "        3. Paste it under the work area.",
           "            1. Hit ++enter++ and add a blank line.",
         ];
-        holder.innerHTML = renderer.renderLines(workflowLines, "modules/02.-introduction-to-data-and-scripting/", {{
+        holder.innerHTML = renderer.renderLines(workflowLines, "modules/02.-working-with-data/", {{
           keyword: "search",
           sourceLines: workflowLines,
           baseLineIndex: 0,
@@ -2967,6 +2967,289 @@ class JsAssetTests(unittest.TestCase):
         }
         console.log("ok");
         """)
+
+
+    def test_sticky_table_headers_follow_resolved_config_across_navigation(self) -> None:
+        node = _node()
+        jsdom = _jsdom_entry()
+        if node is None or jsdom is None:
+            self.skipTest("node/jsdom runtime is unavailable")
+        script = """
+        import { JSDOM } from "__JSDOM__";
+        import { readFileSync } from "node:fs";
+
+        const SOURCE = readFileSync("__ASSET__", "utf8");
+        const PAGE = (rows) => `<header class="md-header"></header><article class="md-content__inner md-typeset">
+          <table id="data"><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody>${rows}</tbody></table>
+          <table id="code" class="highlighttable"><tbody><tr><td class="linenos">1</td><td class="code">x</td></tr></tbody></table>
+        </article>`;
+        const fail = (message) => { console.error(message); process.exit(1); };
+        const tick = () => new Promise((resolve) => setTimeout(resolve, 60));
+
+        async function boot(sticky, path) {
+          const dom = new JSDOM(`<!DOCTYPE html><html><body>${PAGE("<tr><td>a</td><td>1</td></tr>")}</body></html>`, {
+            runScripts: "outside-only",
+            pretendToBeVisual: true,
+            url: `https://example.test/course/${path}`,
+          });
+          const subscribers = [];
+          dom.window.document$ = { subscribe(fn) { subscribers.push(fn); fn(); } };
+          const meta = sticky === undefined ? {} : { table: { sticky_headers: sticky } };
+          dom.window.fetch = async () => ({ ok: true, status: 200, json: async () => ({ meta: { knotis: meta } }) });
+          dom.window.eval(SOURCE);
+          await tick();
+          const navigate = async (nextPath) => {
+            dom.window.history.pushState({}, "", `https://example.test/course/${nextPath}`);
+            dom.window.document.body.innerHTML = PAGE("<tr><td>b</td><td>2</td></tr>");
+            subscribers.forEach((fn) => fn());
+            await tick();
+          };
+          return { dom, navigate };
+        }
+
+        const state = (dom) => {
+          const doc = dom.window.document;
+          return {
+            root: doc.documentElement.getAttribute("data-knotis-sticky-table-headers"),
+            data: doc.getElementById("data").hasAttribute("data-sticky-head"),
+            code: doc.getElementById("code").hasAttribute("data-sticky-head"),
+          };
+        };
+        const expectState = (dom, expected, label) => {
+          const actual = state(dom);
+          if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+            fail(`${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+          }
+        };
+        const ON = { root: "true", data: true, code: false };
+        const OFF = { root: null, data: false, code: false };
+        const scoped = { enabled: true, include_all: false, include_urls: ["guide/a/"], exclude_urls: ["guide/b/"] };
+
+        for (const [label, sticky] of [["absent config", undefined], ["disabled config", { enabled: false, include_all: true, include_urls: [], exclude_urls: [] }]]) {
+          const { dom } = await boot(sticky, "guide/a/");
+          expectState(dom, OFF, label);
+        }
+
+        const { dom, navigate } = await boot(scoped, "guide/a/");
+        expectState(dom, ON, "included page");
+        const oldTable = dom.window.document.getElementById("data");
+        await navigate("guide/b/");
+        expectState(dom, OFF, "instant navigation to excluded page");
+        if (oldTable.hasAttribute("data-sticky-head") || oldTable.getAttribute("style")) {
+          fail("previous page table kept sticky state: " + oldTable.outerHTML);
+        }
+        await navigate("notes/c/");
+        expectState(dom, OFF, "page outside include_paths");
+        await navigate("guide/a/");
+        expectState(dom, ON, "instant navigation back to included page");
+
+        const all = await boot({ enabled: true, include_all: true, include_urls: [], exclude_urls: ["guide/b/"] }, "notes/c/");
+        expectState(all.dom, ON, "include_all page");
+        await all.navigate("guide/b/");
+        expectState(all.dom, OFF, "exclude_paths wins over include_all");
+        console.log("ok");
+        process.exit(0);
+        """.replace("__JSDOM__", str(jsdom)).replace("__ASSET__", str(ASSETS_DIR / "knotis-sticky-table-headers.js"))
+        result = subprocess.run(
+            [node, "--input-type=module", "-e", script],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+
+    def test_pane_learning_panel_carries_configured_graph_path_size(self) -> None:
+        node = _node()
+        jsdom = _jsdom_entry()
+        if node is None or jsdom is None:
+            self.skipTest("node/jsdom runtime is unavailable")
+        script = """
+        import { JSDOM } from "__JSDOM__";
+        import { readFileSync } from "node:fs";
+
+        const CORE = readFileSync("__CORE__", "utf8");
+        const WIKILINKS = readFileSync("__WIKILINKS__", "utf8");
+        const fail = (message) => { console.error(message); process.exit(1); };
+        const entry = (pageUrl, title) => ({
+          title: "example", page_title: title, page_url: pageUrl,
+          context: "- An [[example]] concept.", child_items: [], occurrence_index: 0,
+          heading_path: [title], parent_chain: [`# ${title}`],
+          section_lines: [`# ${title}`, "- An [[example]] concept."],
+          section_lines_raw: [`# ${title}`, "- An [[example]] concept."],
+          section_kw_offset: 1, line_idx: 1,
+        });
+
+        async function openWithPane(pane) {
+          const dom = new JSDOM(`<!DOCTYPE html><html><body><main class="md-content__inner">
+            <span id="link" class="wikilink" data-keyword="example" data-occurrence-index="0" role="button" tabindex="0">example</span>
+          </main></body></html>`, { pretendToBeVisual: true, runScripts: "outside-only", url: "https://example.test/guide/a/" });
+          dom.window.requestAnimationFrame = (callback) => dom.window.setTimeout(callback, 0);
+          dom.window.HTMLElement.prototype.scrollTo = function () {};
+          dom.window.Knotis = { renderConceptGraphPreview: async () => {} };
+          const wikilinks = { example: [entry("guide/a/", "Guide A"), entry("guide/b/", "Guide B")] };
+          const meta = pane === undefined ? {} : { defaults: { pane } };
+          dom.window.fetch = async (url) => {
+            const href = String(url);
+            if (href.includes("wikilinks.json")) return { ok: true, json: async () => wikilinks };
+            if (href.includes("nav_order.json")) return { ok: true, json: async () => ({ "guide/a/": 1, "guide/b/": 2 }) };
+            if (href.includes("graph.json")) return { ok: true, json: async () => ({ meta: { knotis: meta } }) };
+            return { ok: true, json: async () => ({}) };
+          };
+          dom.window.eval(CORE);
+          dom.window.eval(WIKILINKS);
+          dom.window.document.dispatchEvent(new dom.window.Event("DOMContentLoaded", { bubbles: true }));
+          await new Promise((resolve) => setTimeout(resolve, 20));
+          dom.window.document.getElementById("link").click();
+          await new Promise((resolve) => setTimeout(resolve, 80));
+          const panel = dom.window.document.querySelector("#wikilink-pane .wikilink-pane__learning-panel");
+          if (!panel) fail("learning panel did not render for " + JSON.stringify(pane));
+          return panel;
+        }
+
+        const cases = [
+          ["absent config", undefined, "3"],
+          ["size 1", { graph_path_size: 1 }, "1"],
+          ["size 2", { graph_path_size: 2 }, "2"],
+          ["size 3", { graph_path_size: 3 }, "3"],
+          ["size 4", { graph_path_size: 4 }, "4"],
+          ["out of range", { graph_path_size: 7 }, "3"],
+          ["string", { graph_path_size: "2" }, "3"],
+          ["fraction", { graph_path_size: 1.5 }, "3"],
+        ];
+        for (const [label, pane, expected] of cases) {
+          const panel = await openWithPane(pane);
+          if (panel.dataset.graphPathSize !== expected) {
+            fail(`${label}: expected data-graph-path-size=${expected}, got ${panel.dataset.graphPathSize}`);
+          }
+          if (panel.querySelectorAll(".learning-path__item").length !== 2) {
+            fail(`${label}: Path rows changed: ${panel.innerHTML}`);
+          }
+        }
+        console.log("ok");
+        process.exit(0);
+        """
+        script = (
+            script.replace("__JSDOM__", str(jsdom))
+            .replace("__CORE__", str(ASSETS_DIR / "knotis-core.js"))
+            .replace("__WIKILINKS__", str(ASSETS_DIR / "knotis-wikilinks.js"))
+        )
+        result = subprocess.run(
+            [node, "--input-type=module", "-e", script],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+
+    def test_graph_path_size_presets_only_change_pane_heights(self) -> None:
+        css = (ASSETS_DIR / "knotis-pane.css").read_text(encoding="utf-8")
+        graph_js = (ASSETS_DIR / "knotis-graph.js").read_text(encoding="utf-8")
+        for size in ("1", "2", "4"):
+            self.assertIn(f'.wikilink-pane__learning-panel[data-graph-path-size="{size}"]', css)
+        start = css.index(".wikilink-pane__learning-panel{")
+        base = css[start:css.index("}", start)]
+        # Size 3 keeps the pre-preset geometry: 4:3 graph clamped to 200-300px, 280px Path list.
+        for declaration in (
+            "--knotis-graph-path-min: 200px",
+            "--knotis-graph-path-ratio: 4 / 3",
+            "--knotis-graph-path-max: 300px",
+            "--knotis-path-list-max: 280px",
+        ):
+            self.assertIn(declaration, base)
+        self.assertIn("max-height: var(--knotis-path-list-max, 280px)", css)
+        self.assertIn("aspect-ratio: var(--knotis-graph-path-ratio, 4 / 3)", css)
+        self.assertNotIn("--knotis-graph-path-max", css[:start])
+        preset_css = css[css.index('[data-graph-path-size="1"]') - 40:]
+        preset_css = preset_css[:preset_css.index(".wikilink-pane__graph-section")]
+        self.assertNotIn("scale(", preset_css)
+        self.assertNotIn("zoom", preset_css)
+        self.assertIn("--knotis-graph-path-fit-floor", graph_js)
+
+    def test_generated_custom_and_octicon_shortcodes_render_outside_code(self) -> None:
+        node = _node()
+        jsdom = _jsdom_entry()
+        if node is None or jsdom is None:
+            self.skipTest("node/jsdom runtime is unavailable")
+        script = """
+        import { JSDOM } from "__JSDOM__";
+        import { readFileSync } from "node:fs";
+
+        const fail = (message) => { console.error(message); process.exit(1); };
+        const ICON_MAP = {
+          "octicons-vscode-24": { label: "vscode 24", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="octicons-vscode-24" aria-hidden="true" focusable="false"><path d="M1 1h22"/></svg>' },
+          "knotis-mark": { label: "Knotis", svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" class="knotis-mark" aria-hidden="true" focusable="false"><g stroke="currentColor"><circle cx="28" cy="49" r="11" stroke-width="6"/></g></svg>' },
+        };
+        const boot = (asset, url) => {
+          const dom = new JSDOM("<!DOCTYPE html><html><body data-knotis-offline-preview='true'></body></html>", { runScripts: "outside-only", url });
+          dom.window.fetch = async () => ({ ok: false, status: 404, json: async () => ({}) });
+          dom.window.KNOTIS_ICON_MAP = ICON_MAP;
+          if (asset === "search") dom.window.__KNOTIS_SEARCH_TEST__ = true;
+          dom.window.eval(readFileSync("__CORE__", "utf8"));
+          dom.window.eval(readFileSync(asset === "search" ? "__SEARCH__" : "__WIKILINKS__", "utf8"));
+          return dom;
+        };
+        const iconCount = (root, cls) => root.querySelectorAll(`svg.${cls}`).length;
+
+        const pane = boot("pane", "https://example.test/assets/knotis-wikilinks.js");
+        const api = pane.window.KnotisWikilinks;
+        const mark = api.renderIconToken("knotis-mark");
+        if (!mark || !mark.includes('aria-label="Knotis"') || !mark.includes('viewBox="0 0 100 100"')) fail("custom icon did not render: " + mark);
+        if (api.renderIconToken("octicons-not-real-24") !== null) fail("unknown octicon must not get a fallback icon");
+        if (api.renderIconToken("smile") !== null) fail("ordinary emoji names must stay literal");
+        if (!api.renderIconToken("lucide-not-in-map")) fail("existing family fallback changed");
+
+        const expanded = api.expandIconShortcodesInHtml('Use :octicons-vscode-24: and :knotis-mark:, write <code>:knotis-mark:</code>, keep :smile: and 10:30:45 <a href="x:knotis-mark:y">link</a>');
+        const holder = pane.window.document.createElement("div");
+        holder.innerHTML = expanded;
+        if (iconCount(holder, "knotis-mark") !== 1 || iconCount(holder, "octicons-vscode-24") !== 1) fail("inline expansion missed icons: " + expanded);
+        if (holder.querySelector("code").textContent !== ":knotis-mark:") fail("inline code example was expanded: " + expanded);
+        if (!holder.textContent.includes(":smile:") || !holder.textContent.includes("10:30:45")) fail("ordinary colon text changed: " + expanded);
+        if (holder.querySelector("a").getAttribute("href") !== "x:knotis-mark:y") fail("attribute text was expanded: " + expanded);
+
+        const slideLike = pane.window.document.createElement("div");
+        slideLike.innerHTML = '<p id="prose">Open :octicons-vscode-24: then :knotis-mark:</p><p id="code"><code>:knotis-mark:</code></p><pre><code>:octicons-vscode-24:</code></pre>';
+        const untouched = slideLike.querySelector("#code");
+        api.expandIconShortcodesInRoot(slideLike);
+        if (iconCount(slideLike.querySelector("#prose"), "knotis-mark") !== 1 || iconCount(slideLike.querySelector("#prose"), "octicons-vscode-24") !== 1) fail("root expansion missed icons: " + slideLike.innerHTML);
+        if (slideLike.querySelector("#code") !== untouched || slideLike.querySelector("pre").textContent !== ":octicons-vscode-24:") fail("root expansion touched code: " + slideLike.innerHTML);
+
+        const lines = [
+          "- **Recommended:** :octicons-vscode-24: [VS Code](https://code.visualstudio.com/) with",
+          "    - :knotis-mark: [Knotis VS Code extension](https://example.test/ext)",
+          "- Literal: `:knotis-mark:`",
+        ];
+        const paneHtml = pane.window.document.createElement("div");
+        paneHtml.innerHTML = pane.window.KnotisSectionRender.renderLines(lines, "getting-started/install/");
+        if (iconCount(paneHtml, "knotis-mark") !== 1 || iconCount(paneHtml, "octicons-vscode-24") !== 1) fail("pane renderer missed icons: " + paneHtml.innerHTML);
+        if (![...paneHtml.querySelectorAll("code")].some((code) => code.textContent === ":knotis-mark:")) fail("pane renderer expanded inline code: " + paneHtml.innerHTML);
+
+        const search = boot("search", "https://example.test/assets/knotis-search.js");
+        const searchHtml = search.window.document.createElement("div");
+        searchHtml.innerHTML = search.window.__KnotisSearchTest.renderSnippetLines(lines, "", "getting-started/install/", []);
+        if (iconCount(searchHtml, "knotis-mark") !== 1 || iconCount(searchHtml, "octicons-vscode-24") !== 1) fail("search snippet missed icons: " + searchHtml.innerHTML);
+        if (![...searchHtml.querySelectorAll("code")].some((code) => code.textContent === ":knotis-mark:")) fail("search snippet expanded inline code: " + searchHtml.innerHTML);
+        console.log("ok");
+        process.exit(0);
+        """
+        script = (
+            script.replace("__JSDOM__", str(jsdom))
+            .replace("__CORE__", str(ASSETS_DIR / "knotis-core.js"))
+            .replace("__WIKILINKS__", str(ASSETS_DIR / "knotis-wikilinks.js"))
+            .replace("__SEARCH__", str(ASSETS_DIR / "knotis-search.js"))
+        )
+        result = subprocess.run(
+            [node, "--input-type=module", "-e", script],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+
+    def test_sticky_table_header_styles_are_gated_by_root_attribute(self) -> None:
+        css = (ASSETS_DIR / "knotis-content.css").read_text(encoding="utf-8")
+        start = css.index("knotis-sticky-table-headers.js")
+        sticky_css = css[start:css.index("@keyframes knotis-sticky-head-shift", start)]
+        selectors = [line for line in sticky_css.splitlines() if "table[data-sticky-head]" in line]
+        self.assertTrue(selectors)
+        for selector in selectors:
+            self.assertIn(':root[data-knotis-sticky-table-headers="true"] .md-content__inner', selector)
 
 
 if __name__ == "__main__":

@@ -182,6 +182,27 @@
   padding: 0.75rem 1rem 0.6rem;
   border-bottom: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
   flex-shrink: 0;
+  --knotis-graph-path-min: 200px;
+  --knotis-graph-path-ratio: 4 / 3;
+  --knotis-graph-path-max: 300px;
+  --knotis-path-list-max: 280px;
+}.wikilink-pane__learning-panel[data-graph-path-size="1"]{
+  --knotis-graph-path-min: 150px;
+  --knotis-graph-path-ratio: 2 / 1;
+  --knotis-graph-path-max: 190px;
+  --knotis-path-list-max: 180px;
+  --knotis-graph-path-fit-floor: 0.62;
+}.wikilink-pane__learning-panel[data-graph-path-size="2"]{
+  --knotis-graph-path-min: 170px;
+  --knotis-graph-path-ratio: 8 / 5;
+  --knotis-graph-path-max: 240px;
+  --knotis-path-list-max: 230px;
+  --knotis-graph-path-fit-floor: 0.78;
+}.wikilink-pane__learning-panel[data-graph-path-size="4"]{
+  --knotis-graph-path-min: 260px;
+  --knotis-graph-path-ratio: 1 / 1;
+  --knotis-graph-path-max: 400px;
+  --knotis-path-list-max: 390px;
 }@media (max-width: 720px){
   .wikilink-pane__learning-panel {
     grid-template-columns: 1fr;
@@ -222,7 +243,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  max-height: 280px;
+  max-height: var(--knotis-path-list-max, 280px);
   overflow: auto;
 }.learning-path__item{
   display: grid;
@@ -344,9 +365,9 @@
   position: relative;
   z-index: 0;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  min-height: 200px;
-  max-height: 300px;
+  aspect-ratio: var(--knotis-graph-path-ratio, 4 / 3);
+  min-height: var(--knotis-graph-path-min, 200px);
+  max-height: var(--knotis-graph-path-max, 300px);
   overflow: hidden;
   contain: paint;
   border: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));

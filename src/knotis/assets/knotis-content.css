@@ -616,3 +616,47 @@
 .hll :is(.nf, .s) {
   color: #5b1f68;
 }
+
+/* Sticky table headings (knotis-sticky-table-headers.js). Real header cells shift inside
+   the table's scroll box; gated by the root attribute the script sets on enabled pages and
+   scoped to page content so slide clones are unaffected. The shift and separator are
+   separate animations because one with a non-compositable property (box-shadow) runs on
+   the main thread and shakes behind scrolling. */
+:root[data-knotis-sticky-table-headers="true"] .md-content__inner table[data-sticky-head] th {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-knotis-sticky-table-headers="true"] .md-content__inner table[data-sticky-head][data-sticky-head-active] th {
+  transform: translateY(var(--knotis-sticky-head-shift, 0px));
+  background-color: var(--md-default-bg-color);
+  box-shadow: inset 0 -1px 0 var(--md-typeset-table-color);
+}
+
+@supports (animation-timeline: scroll()) {
+  :root[data-knotis-sticky-table-headers="true"] .md-content__inner table[data-sticky-head] th {
+    background-color: var(--md-default-bg-color);
+    animation: knotis-sticky-head-shift linear both, knotis-sticky-head-rule linear both;
+    animation-timeline: scroll(root block);
+    animation-range: var(--knotis-sticky-head-start, 0px) var(--knotis-sticky-head-end, 0px);
+  }
+}
+
+@keyframes knotis-sticky-head-shift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(var(--knotis-sticky-head-travel, 0px));
+  }
+}
+
+@keyframes knotis-sticky-head-rule {
+  from {
+    box-shadow: inset 0 -1px 0 transparent;
+  }
+  0.5%,
+  to {
+    box-shadow: inset 0 -1px 0 var(--md-typeset-table-color);
+  }
+}

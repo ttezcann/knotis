@@ -117,6 +117,12 @@ Instructors maintain Markdown files. Knotis indexes wikilinks such as `[[concept
   supports authoring and previewing.
 </p>
 
+## Accessibility
+
+Knotis includes keyboard navigation, focus management, reduced-motion support, and accessible alternatives for graph interactions. Its generated interfaces have been evaluated against WCAG 2.2 Level A and AA criteria through automated axe scans, source inspection, and human testing. No known violations were identified within the evaluated Knotis-owned runtime components.
+
+See the [accessibility documentation](https://knotis-docs.ttezcan.com/explore/accessibility/) for the evaluation methods, scope, and detailed results.
+
 ## Requirements
 
 - Python **3.11 or later**, with `pip` and virtual-environment support.

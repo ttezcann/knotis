@@ -42,6 +42,7 @@ KNOTIS_ASSET_FILES = (
     "knotis-readaloud.css",
     "knotis-media.js",
     "knotis-media.css",
+    "knotis-sticky-table-headers.js",
     "lunr.min.js",
     "lunr.LICENSE",
 )

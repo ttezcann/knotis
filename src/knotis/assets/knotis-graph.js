@@ -3341,6 +3341,11 @@
   ) {
     const highlight = new Set([hoveredNode.id]);
     const pageUrls = collectHoveredKeywordPageUrls(hoveredNode.id, maps, visibleNodeIds);
+    // A sub-concept taught only inside a page's hierarchy has no page edge of its own, so
+    // its teaching families are found through their keyword lists.
+    Object.entries(teachingPathByPage || {}).forEach(([pageUrl, family]) => {
+      if ((family?.keywordIds || []).includes(hoveredNode.id)) pageUrls.add(pageUrl);
+    });
 
     pageUrls.forEach((pageUrl) => {
       const family = teachingPathByPage?.[pageUrl];
@@ -4450,8 +4455,12 @@
         fitHeight / (boundsHeight + paddingY)
       );
       const fit = SIDEBAR_GRAPH_PREVIEW_FIT;
+      const floorFactor = isCompactConceptPreview
+        ? Number.parseFloat(getComputedStyle(container).getPropertyValue("--knotis-graph-path-fit-floor"))
+        : NaN;
+      const minScale = fit.minScale * (floorFactor > 0 && floorFactor < 1 ? floorFactor : 1);
       const scale = Math.max(
-        fit.minScale,
+        minScale,
         Math.min(fit.maxScale, fitScale * fit.fitShrink)
       );
       const centerX = (bounds.minX + bounds.maxX) / 2;
@@ -6121,10 +6130,16 @@
           .attr("fill", (n) => restFill(n))
           .attr("stroke", FOCAL_HALO.color)
           .attr("stroke-width", 3);
+        // The halo keeps the focal node findable, but during a highlight that excludes it the
+        // node stays dimmed so it does not look connected to the highlighted concept.
         node.filter((n) => n.id === focalHaloId)
           .style("visibility", "visible")
           .style("pointer-events", "auto")
-          .attr("opacity", 1);
+          .attr("opacity", function () {
+            const current = Number(this.getAttribute("opacity") ?? 1);
+            if (current > 0 && current < 1) return current;
+            return current === 0 && hoverHaloIds.size ? dimmedNodeOpacity : 1;
+          });
         node.select("text.graph-label")
           .filter((n) => n.id === focalHaloId)
           .attr("display", null);

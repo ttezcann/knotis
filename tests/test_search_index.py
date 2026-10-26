@@ -153,21 +153,21 @@ enabled = true
         MODULE.knotis_site_io.configure(docs_dir=docs_dir, repo_root=root)
         (docs_dir / "index.md").write_text(
             "# Home\n\n"
-            "## What is [[RStudio]]?\n"
-            "- RStudio is an IDE.\n\n"
+            "## What is [[Juniper]]?\n"
+            "- Juniper is an IDE.\n\n"
             "## Reference source one\n"
-            "- Paste the code into [[RStudio console|ref]].\n\n"
+            "- Paste the code into [[Juniper console|ref]].\n\n"
             "## Reference source two\n"
-            "- The [[RStudio console|ref]] shows immediate output.\n",
+            "- The [[Juniper console|ref]] shows immediate output.\n",
             encoding="utf-8",
         )
         (docs_dir / "other.md").write_text(
             "# Other\n\n"
             "## Ordinary links\n"
-            ":lucide-clipboard-copy: Use [[RStudio console]] here.\n"
-            "Use [[RStudio console|console pane]] again.\n\n"
+            ":lucide-clipboard-copy: Use [[Juniper console]] here.\n"
+            "Use [[Juniper console|console pane]] again.\n\n"
             "## Plain text\n"
-            "The RStudio console is also mentioned without a wikilink.\n",
+            "The Juniper console is also mentioned without a wikilink.\n",
             encoding="utf-8",
         )
 
@@ -177,12 +177,12 @@ enabled = true
         docs = index["docs"]
 
         references = json.loads((asset_dir / "references.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(references["rstudio console"]), 2)
+        self.assertEqual(len(references["juniper console"]), 2)
 
         reference_docs = [d for d in docs if d["kind"] == "reference_occurrence"]
         self.assertEqual(len(reference_docs), 2)
         self.assertTrue(all(d["group"] == "./" for d in reference_docs))
-        self.assertTrue(all(d["reference_keys"] == ["rstudio console"] for d in reference_docs))
+        self.assertTrue(all(d["reference_keys"] == ["juniper console"] for d in reference_docs))
         self.assertTrue(all(d["search_title"] == "" for d in reference_docs))
         self.assertTrue(all(d["search_text"] == "" for d in reference_docs))
         self.assertEqual(
@@ -219,16 +219,16 @@ enabled = true
             d for d in docs
             if d["kind"] == "section" and d.get("page_url") == "other/" and d["title"] == "Ordinary links"
         )
-        self.assertNotIn("rstudio console", ordinary["search_text"].lower())
+        self.assertNotIn("juniper console", ordinary["search_text"].lower())
         self.assertNotIn("console pane", ordinary["search_text"].lower())
         self.assertNotIn("copy", ordinary["search_text"].lower())
-        self.assertIn("[[RStudio console|console pane]]", "\n".join(ordinary["section_lines_raw"]))
+        self.assertIn("[[Juniper console|console pane]]", "\n".join(ordinary["section_lines_raw"]))
 
         plain = next(
             d for d in docs
             if d["kind"] == "section" and d.get("page_url") == "other/" and d["title"] == "Plain text"
         )
-        self.assertIn("rstudio console", plain["search_text"].lower())
+        self.assertIn("juniper console", plain["search_text"].lower())
 
     def test_html_comments_are_inert_for_every_index(self) -> None:
         root, docs_dir = self.make_site()

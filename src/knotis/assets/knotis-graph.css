@@ -906,6 +906,11 @@
   padding: 0.12em 0;
 }
 
+/* Wikilinks are buttons, which center text by default; long names wrap. */
+.glossary-tag .wikilink {
+  text-align: start;
+}
+
 .glossary-module-count--recurring,
 .glossary-tag--recurring,
 .glossary-tag--recurring .wikilink {

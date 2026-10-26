@@ -42,6 +42,12 @@ heading_guides = true
 generator = true
 styled_section_groups = true
 
+## Table
+[project.extra.knotis.table.sticky_headers]
+enabled = false
+include_paths = []
+exclude_paths = []
+
 ## Wikilinks
 [project.extra.knotis.wikilinks]
 default = "#006b75"
@@ -54,6 +60,7 @@ initial_lines = 12
 initial_list_items = 20
 chunk_lines = 4
 order = []
+graph_path_size = 3
 
 ### Pane path
 [project.extra.knotis.pane.path]

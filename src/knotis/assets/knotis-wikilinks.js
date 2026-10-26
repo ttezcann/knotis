@@ -73,6 +73,7 @@
     initial_lines: 6,
     initial_list_items: 6,
     chunk_lines: 3,
+    graph_path_size: 3,
     intro_expand_to_heading: false,
     content_tag_full_section: true,
     reference_full_section: true,
@@ -288,15 +289,21 @@
 
   function expandIconShortcodesInHtml(html) {
     if (!html || html.indexOf(":") < 0) return html;
-    return html.replace(/:([a-z0-9-]+):(?![a-z0-9-])(?:\{[^}\n]*\})?/gi, (match, token) => renderIconToken(token) || match);
+    // Tags (and their attributes) and code/pre bodies pass through untouched, so
+    // shortcode examples written as code stay literal.
+    return html.replace(
+      /(<(?:code|pre)\b[\s\S]*?<\/(?:code|pre)>|<[^>]*>)|:([a-z0-9][a-z0-9_-]*):(?![a-z0-9_-])(?:\{[^}\n]*\})?/gi,
+      (match, protectedHtml, token) => (protectedHtml ? match : renderIconToken(token) || match),
+    );
   }
 
   function expandIconShortcodesInRoot(root) {
     if (!root?.querySelectorAll) return;
     const selector = "p, li, span.wl-sec-td, h1, h2, h3, h4, h5, h6, td, th, .md-typeset__inner, .heading-flow__content";
     root.querySelectorAll(selector).forEach((el) => {
-      if (!/(?:^|[^a-z0-9-]):(?:lucide|fontawesome|material|simple)-[a-z0-9-]+:/i.test(el.innerHTML)) return;
-      el.innerHTML = expandIconShortcodesInHtml(el.innerHTML);
+      if (el.innerHTML.indexOf(":") < 0) return;
+      const expanded = expandIconShortcodesInHtml(el.innerHTML);
+      if (expanded !== el.innerHTML) el.innerHTML = expanded;
     });
   }
 
@@ -321,7 +328,11 @@
     const protectedBlocks = [];
     const replaced = html.replace(/`([^`\n]+)`/g, (_, content) => {
       const idx = protectedBlocks.length;
-      protectedBlocks.push(`<code>${opts.escapeContent ? escapeHtml(content) : content}</code>`);
+      // Search still marks query text inside code (variable names are often backticked).
+      const body = opts.highlightQuery
+        ? highlightPlainQueryText(content, opts.highlightQuery, { plainTextOnly: true })
+        : (opts.escapeContent ? escapeHtml(content) : content);
+      protectedBlocks.push(`<code>${body}</code>`);
       return `@@WL_CODE_${idx}@@`;
     });
     return { html: replaced, protectedBlocks };
@@ -699,10 +710,17 @@
     const enableMarkSyntax = renderOpts.enableMarkSyntax !== false;
     const inlineCode = protectInlineCodeSpans(html);
     html = inlineCode.html;
+    // Keyword highlighting can turn backtick spans into <code> HTML before this runs; code
+    // content must stay literal, e.g. `a == 1 | a == 2` is not ==mark== syntax.
+    const htmlCodeSpans = [];
+    html = html.replace(/<code\b[^>]*>[\s\S]*?<\/code>/gi, (match) => {
+      htmlCodeSpans.push(match);
+      return `@@WL_HTMLCODE_${htmlCodeSpans.length - 1}@@`;
+    });
     html = html.replace(/&amp;nbsp;/g, "&nbsp;");
     html = html.replace(/(?:&lt;|<)\s*br\s*\/?\s*(?:&gt;|>)/gi, "<br>");
     if (enableMarkSyntax) html = html.replace(MARK_SYNTAX_RE, "<mark>$1</mark>");
-    html = html.replace(/:([a-z0-9-]+):(?![a-z0-9-])(?:\{[^}\n]*\})?/gi, (match, token) => renderIconToken(token) || match);
+    html = html.replace(/:([a-z0-9][a-z0-9_-]*):(?![a-z0-9_-])(?:\{[^}\n]*\})?/gi, (match, token) => renderIconToken(token) || match);
     html = html.replace(/\+\+([^<>\n]+?)\+\+/g, (_, content) => renderKeyChord(content));
     
     
@@ -733,6 +751,7 @@
     html = html.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
     
     html = html.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, "<em>$1</em>");
+    html = html.replace(/@@WL_HTMLCODE_(\d+)@@/g, (_, rawIndex) => htmlCodeSpans[Number(rawIndex)] || "");
     return restoreProtectedInlineCodeSpans(html, inlineCode.protectedBlocks);
   }
 
@@ -1275,7 +1294,7 @@
     const learningPathSection = buildLearningPathSection(keyword);
     if (!graphSection && !learningPathSection) return "";
     return `
-      <section class="wikilink-pane__learning-panel">
+      <section class="wikilink-pane__learning-panel" data-graph-path-size="${paneConfig.graph_path_size || FALLBACK_PANE_CONFIG.graph_path_size}">
         ${graphSection}
         ${learningPathSection}
       </section>`;
@@ -1348,6 +1367,9 @@
     normalized.chunk_lines = Number.isInteger(normalized.chunk_lines) && normalized.chunk_lines >= 1
       ? normalized.chunk_lines
       : FALLBACK_PANE_CONFIG.chunk_lines;
+    normalized.graph_path_size = [1, 2, 3, 4].includes(normalized.graph_path_size)
+      ? normalized.graph_path_size
+      : FALLBACK_PANE_CONFIG.graph_path_size;
     normalized.intro_expand_to_heading = typeof normalized.intro_expand_to_heading === "boolean"
       ? normalized.intro_expand_to_heading
       : FALLBACK_PANE_CONFIG.intro_expand_to_heading;
@@ -1932,7 +1954,9 @@
   }
 
   function findBestContextBlock(targetText, scopeRoot = null) {
-    const normalizedTarget = normalizeComparableText(targetText);
+    // Compared without whitespace: rendered <br> and table-cell boundaries leave no space in
+    // textContent where the source text has one.
+    const normalizedTarget = normalizeComparableText(targetText).replace(/\s+/g, "");
     if (!normalizedTarget) return null;
     const content =
       document.querySelector(".md-content__inner") ||
@@ -1945,7 +1969,7 @@
     let best = null;
     let bestScore = Number.POSITIVE_INFINITY;
     candidates.forEach((el) => {
-      const normalizedCandidate = normalizeComparableText(el.textContent || "");
+      const normalizedCandidate = normalizeComparableText(el.textContent || "").replace(/\s+/g, "");
       if (!normalizedCandidate || !normalizedCandidate.includes(normalizedTarget)) return;
       const score = normalizedCandidate.length - normalizedTarget.length;
       if (score < bestScore) {
@@ -2437,7 +2461,10 @@
     
     
     
-    const inlineCode = protectInlineCodeSpans(String(text || ""), { escapeContent: true });
+    const inlineCode = protectInlineCodeSpans(String(text || ""), {
+      escapeContent: true,
+      highlightQuery: renderOpts.searchQuery || "",
+    });
     text = inlineCode.html;
     const kwSet = new Set(
       (Array.isArray(keyword) ? keyword : [keyword])

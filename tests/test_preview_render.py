@@ -47,8 +47,8 @@ from pathlib import Path
 
 assert docs_rel_to_page_url("index.md") == ""
 assert docs_rel_to_page_url("glossary.md") == "glossary/"
-assert docs_rel_to_page_url("modules/01.-introduction-to-rstudio.md") == "modules/01.-introduction-to-rstudio/"
-site = docs_rel_to_site_html(Path("site"), "modules/01.-introduction-to-rstudio.md")
+assert docs_rel_to_page_url("modules/01.-getting-started.md") == "modules/01.-getting-started/"
+site = docs_rel_to_site_html(Path("site"), "modules/01.-getting-started.md")
 assert site is not None
 print("ok")
 """
@@ -61,8 +61,8 @@ print("ok")
 from preview_render import preview_asset_base_url
 from pathlib import Path
 
-assert preview_asset_base_url(Path("."), "modules/03.-descriptive-statistics.md") == (
-    "http://127.0.0.1:8000/modules/03.-descriptive-statistics/"
+assert preview_asset_base_url(Path("."), "modules/03.-summary-methods.md") == (
+    "http://127.0.0.1:8000/modules/03.-summary-methods/"
 )
 assert preview_asset_base_url(Path("."), "glossary.md") == (
     "http://127.0.0.1:8000/glossary/"
@@ -82,10 +82,10 @@ from pathlib import Path
 
 html = build_preview_page_html(
     Path("."),
-    "modules/03.-descriptive-statistics.md",
+    "modules/03.-summary-methods.md",
     "# Live Preview Test\\n\\nUnsaved body.",
 )
-assert '<base href="http://127.0.0.1:8000/modules/03.-descriptive-statistics/">' in html
+assert '<base href="http://127.0.0.1:8000/modules/03.-summary-methods/">' in html
 print("ok")
 """
         )
@@ -112,8 +112,8 @@ print("ok")
         )
         self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
 
-    def test_module_01_render_contains_gss_heading(self) -> None:
-        module_path = SITE_ROOT / "docs" / "modules" / "01.-introduction-to-rstudio.md"
+    def test_module_01_render_contains_survey_heading(self) -> None:
+        module_path = SITE_ROOT / "docs" / "modules" / "01.-getting-started.md"
         if not module_path.is_file():
             self.skipTest("Module 01 source is unavailable")
         result = self._run_preview_helper(
@@ -121,9 +121,9 @@ print("ok")
 from preview_render import render_markdown_content
 from pathlib import Path
 
-markdown = Path("docs/modules/01.-introduction-to-rstudio.md").read_text(encoding="utf-8")
-html = render_markdown_content(Path("."), "modules/01.-introduction-to-rstudio.md", markdown)
-assert 'id="data-general-social-survey-gss"' in html
+markdown = Path("docs/modules/01.-getting-started.md").read_text(encoding="utf-8")
+html = render_markdown_content(Path("."), "modules/01.-getting-started.md", markdown)
+assert 'id="data-example-survey-survey"' in html
 print("ok")
 """
         )

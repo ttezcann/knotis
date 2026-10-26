@@ -310,6 +310,7 @@
 
   function textForNavigation(raw) {
     return String(raw || "")
+      .replace(/<br\s*\/?>/gi, " ")
       .replace(/^#{1,6}\s+/, "")
       .replace(/^(\s*)(?:[-*+]|\d+[.)])\s+/, "")
       .replace(/!\[([^\]]*)\]\(([^)]+)\)(?:\s*\{[^}]*\})?/g, "$1")
@@ -644,6 +645,7 @@
         _pageOrder: Number.isFinite(Number(doc.page_order)) ? Number(doc.page_order) : 999999,
         _sectionOrder: Number.isFinite(Number(doc.section_order)) ? Number(doc.section_order) : 999999,
         _title: normalize(searchTitle),
+        _headingTitle: normalize(title.replace(/#[a-z0-9_-]+/gi, " ")),
         _text: normalize(searchText),
         _tags: normalize(tags.join(" ")),
         _concepts: normalize(concepts.join(" ")),
@@ -851,7 +853,16 @@
     
     
     
-    const exactPhraseInTitle = haystackContainsPhrase(doc._title, textPhrase);
+    // search_title omits wikilink labels, so a heading phrase that spans a wikilink and plain
+    // words ("Reversing values #code with 2 values") is only visible in the display heading.
+    // Concept-only queries keep their existing ranking. The last word may still be partly
+    // typed ("... with 2 value").
+    const literalPhrase = stripTerminalPunctuation(normalize(String(query || "").replace(/#[a-z0-9_-]+\b/gi, " ")));
+    const headingSpanMatch = literalPhrase.includes(" ")
+      && !knownEntityKeys.has(literalPhrase)
+      && !queryIsEntityPrefix(literalPhrase)
+      && haystackContainsPhrasePrefix(doc._headingTitle || "", literalPhrase);
+    const exactPhraseInTitle = haystackContainsPhrase(doc._title, textPhrase) || headingSpanMatch;
     const exactPhraseInText = haystackContainsPhrase(doc._text, textPhrase);
     const phraseInTitle = exactPhraseInTitle || haystackContainsPhrasePrefix(doc._title, textPhrase);
     const phraseInText = exactPhraseInText || haystackContainsPhrasePrefix(doc._text, textPhrase);
@@ -920,7 +931,7 @@
     const taskAwareMatch = intent.hasTaskIntent && conceptLevel >= 2 && contentTagTerms.every((tag) => doc._content_tags.includes(tag));
     const multiWordQuery = intent.conceptTerms.length > 1;
     const fullPhraseNorm = normalize(stripTerminalPunctuation(intent.conceptPhrase));
-    const hasFullPhrase = !multiWordQuery || (fullPhraseNorm && (
+    const hasFullPhrase = !multiWordQuery || headingSpanMatch || (fullPhraseNorm && (
       haystackContainsPhrase(haystack, intent.conceptPhrase)
       || haystackContainsPhrasePrefix(haystack, intent.conceptPhrase)
     ));
@@ -1329,8 +1340,17 @@
       })
       .filter((item) => item && item.score > 0);
 
-    const mentionByPage = bestMentionByPage(scoredAll, query);
-    const scored = scoredAll
+    // A query naming an explicit |ref target lists only the pages that define that reference;
+    // prose elsewhere that happens to use the same words would add unrelated page cards.
+    // Those pages keep their other distinct matches under "more on this page".
+    const referencePages = !intent.explicitTags.length && knownReferenceKeys.has(stripTerminalPunctuation(intent.phrase))
+      ? new Set(scoredAll.filter((item) => item.doc.kind === "reference_occurrence").map((item) => item.doc.page_url))
+      : new Set();
+    const pageScoped = referencePages.size
+      ? scoredAll.filter((item) => referencePages.has(item.doc.page_url))
+      : scoredAll;
+    const mentionByPage = bestMentionByPage(pageScoped, query);
+    const scored = pageScoped
       .filter((item) => item.doc.kind === "page" || item.doc.kind === "section" || item.doc.kind === "reference_occurrence")
       .sort((a, b) => compareReadingOrder(a, b, query));
 
@@ -1342,7 +1362,11 @@
     
     const taskOnly = intent.hasTaskIntent && scored.some((item) => item.priority >= PRIORITY.GATE_TASK);
     const contentTagOnly = isContentTagOnlyQuery(query, intent) && scored.some((item) => item.priority >= PRIORITY.GATE_CONTENT_TAG);
-    const strongEntityMatch = scored.some((item) => item.priority >= PRIORITY.GATE_ENTITY);
+    // Trimming weaker matches is for concept/reference searches. A plain-text query keeps
+    // every match, ranked, so a page filter never reveals results the default view hid.
+    const entityPhrase = stripTerminalPunctuation(intent.conceptPhrase || intent.phrase);
+    const entityQuery = knownEntityKeys.has(entityPhrase) || queryIsEntityPrefix(entityPhrase);
+    const strongEntityMatch = entityQuery && scored.some((item) => item.priority >= PRIORITY.GATE_ENTITY);
     const gateThreshold = taskOnly
       ? PRIORITY.GATE_TASK
       : contentTagOnly
@@ -1533,8 +1557,8 @@
       return result;
     };
 
-    return raw.split(/(:[a-z0-9-]+:)/gi).map((segment) => (
-      /^:[a-z0-9-]+:$/i.test(segment) ? escapeHtml(segment) : highlightSegment(segment)
+    return raw.split(/(:[a-z0-9][a-z0-9_-]*:)/gi).map((segment) => (
+      /^:[a-z0-9][a-z0-9_-]*:$/i.test(segment) ? escapeHtml(segment) : highlightSegment(segment)
     )).join("");
   }
 
@@ -1553,7 +1577,8 @@
       "fontawesome-brands-windows": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 4.5 11 3v8H2Zm10 0 10-1.5V11H12ZM2 12h9v8L2 18.5Zm10 0h10v8.5L12 20Z"/></svg>',
       "fontawesome-brands-apple": '<span aria-hidden="true"></span>',
     };
-    const svg = icons[token];
+    // The generated icon map covers every shortcode a site's pages use.
+    const svg = icons[token] || window.KNOTIS_ICON_MAP?.[token]?.svg;
     if (!svg) return null;
     return `<span class="knotis-search-icon md-icon" aria-hidden="true">${svg}</span>`;
   }
@@ -1581,7 +1606,8 @@
   function tokenizeInlineDecorations(text) {
     const replacements = [];
     let working = String(text || "").replace(/&amp;nbsp;/g, "\u00a0");
-    working = working.replace(/:([a-z0-9-]+):(?!:)(?:\{[^}\n]*\})?/gi, (match, token) => {
+    working = working.replace(/(`[^`]+`)|:([a-z0-9][a-z0-9_-]*):(?!:)(?:\{[^}\n]*\})?/gi, (match, code, token) => {
+      if (code) return match;
       const html = renderSearchIconToken(token);
       if (!html) return match;
       const index = replacements.length;
@@ -2221,6 +2247,9 @@
       }
       flushCode();
 
+      // A standalone attribute list such as `{ .card }` styles the block above it on the page.
+      if (/^\{[^{}]*\}$/.test(trimmed)) continue;
+
       const teachingHeader = parseTeachingSectionHeader(line);
       if (teachingHeader) {
         closeDownTo(0);
@@ -2643,14 +2672,22 @@
     `;
   }
 
+  // The snippet is itself a native link; a nested <a> makes the HTML parser split it into
+  // broken fragments, so inner links become inline text inside it.
+  function unlinkNestedAnchors(html) {
+    return String(html || "")
+      .replace(/<a\b[^>]*>/gi, '<span class="knotis-search-inline-link">')
+      .replace(/<\/a>/gi, "</span>");
+  }
+
   function renderSnippet(doc, query, score, paneConfig) {
     const snippet = makeSnippetHtml(doc, query, paneConfig);
     if (!snippet) return "";
     const href = resultUrlWithHighlight(doc, query);
     return `
       <a class="md-search-result__more-link" href="${escapeAttr(href)}" data-href="${escapeAttr(href)}" data-md-score="${Number(score || 0).toFixed(2)}">
-        ${renderBreadcrumb(doc, query, { includeCurrent: true })}
-        <div class="md-search-result__teaser">${snippet}</div>
+        ${unlinkNestedAnchors(renderBreadcrumb(doc, query, { includeCurrent: true }))}
+        <div class="md-search-result__teaser">${unlinkNestedAnchors(snippet)}</div>
       </a>
     `;
   }

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 import tempfile
@@ -52,6 +53,7 @@ class PackagingTests(unittest.TestCase):
             "knotis/assets/knotis-content.css",
             "knotis/assets/knotis-content-tags.css",
             "knotis/assets/knotis-wikilinks.js",
+            "knotis/assets/knotis-sticky-table-headers.js",
             "knotis/assets/lunr.min.js",
             "knotis/assets/lunr.LICENSE",
             "knotis/assets/vendor/gifuct-js.min.js",
@@ -147,6 +149,40 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("assets/knotis/knotis-core.js", html)
         self.assertIn("assets/knotis/knotis-search.css", html)
         self.assertIn("stylesheets/knotis-theme.css", html)
+        self.assertIn("assets/knotis/knotis-sticky-table-headers.js", html)
+        self.assertTrue((site_root / "site" / "assets" / "knotis" / "knotis-sticky-table-headers.js").is_file())
+        self.assertFalse(config_data["project"]["extra"]["knotis"]["table"]["sticky_headers"]["enabled"])
+        self.assertEqual(config_data["project"]["extra"]["knotis"]["pane"]["graph_path_size"], 3)
+        graph = json.loads((site_root / "site" / "assets" / "knotis" / "graph.json").read_text(encoding="utf-8"))
+        self.assertEqual(graph["meta"]["knotis"]["defaults"]["pane"]["graph_path_size"], 3)
+        pane_css = (site_root / "site" / "assets" / "knotis" / "knotis-pane.css").read_text(encoding="utf-8")
+        self.assertIn('[data-graph-path-size="1"]', pane_css)
+
+        # Enabling sticky headers and changing the graph/Path size need only the
+        # scaffolded settings, no asset paths.
+        config_path = site_root / "zensical.toml"
+        scaffolded = config_path.read_text(encoding="utf-8")
+        section = "[project.extra.knotis.table.sticky_headers]\nenabled = false\n"
+        self.assertIn(section, scaffolded)
+        self.assertIn("graph_path_size = 3\n", scaffolded)
+        config_path.write_text(
+            scaffolded.replace(section, "[project.extra.knotis.table.sticky_headers]\nenabled = true\n")
+            .replace("graph_path_size = 3\n", "graph_path_size = 1\n"),
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [str(knotis), "build"],
+            cwd=site_root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        graph = json.loads((site_root / "site" / "assets" / "knotis" / "graph.json").read_text(encoding="utf-8"))
+        sticky = graph["meta"]["knotis"]["table"]["sticky_headers"]
+        self.assertTrue(sticky["enabled"])
+        self.assertTrue(sticky["include_all"])
+        self.assertEqual(graph["meta"]["knotis"]["defaults"]["pane"]["graph_path_size"], 1)
 
 
 if __name__ == "__main__":

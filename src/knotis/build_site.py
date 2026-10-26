@@ -10,6 +10,9 @@ from pathlib import Path
 
 from .builder.assets_mirror import (
     GENERATED_ASSET_FILES,
+    RUNTIME_SCRIPTS,
+    RUNTIME_SCRIPTS_AFTER_SITE,
+    RUNTIME_STYLESHEETS,
     runtime_asset_output_dir,
     site_runtime_assets_dir,
     sync_site_runtime_assets,
@@ -18,25 +21,11 @@ from .builder.zensical_config import resolve_zensical_config_path
 from .zensical_runtime import resolve_zensical_command
 
 KNOTIS_STAMPED_ASSETS = (
-    "knotis-core.js",
-    "knotis-icon-map.js",
-    "knotis-content.css",
-    "knotis-wikilinks.js",
-    "knotis-wikilinks.css",
-    "knotis-pane.css",
-    "knotis-graph.css",
-    "knotis-graph.js",
-    "knotis-search.js",
-    "knotis-search.css",
-    "knotis-slides.js",
-    "knotis-slides.css",
-    "knotis-palette.css",
-    "knotis-content-tags.css",
-    "knotis-readaloud.js",
-    "knotis-readaloud.css",
-    "knotis-media.js",
-    "knotis-media.css",
-    "knotis-sticky-table-headers.js",
+    *(
+        name
+        for name in (*RUNTIME_STYLESHEETS, *RUNTIME_SCRIPTS, *RUNTIME_SCRIPTS_AFTER_SITE)
+        if name.startswith("knotis-")
+    ),
     "knotis-theme.css",
 )
 GENERATED_PAGE_FILENAMES = ("site-graph.md", "graph.md", "glossary.md", "content-tags.md")

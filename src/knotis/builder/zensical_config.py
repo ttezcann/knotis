@@ -3,9 +3,18 @@ from __future__ import annotations
 
 import io
 import re
+import sys
 import tomllib
 from pathlib import Path
 
+from .assets_mirror import (
+    COPY_ONLY_ASSET_FILES,
+    RUNTIME_ASSET_URL_PREFIX,
+    RUNTIME_SCRIPTS,
+    RUNTIME_SCRIPTS_AFTER_SITE,
+    RUNTIME_STYLESHEETS,
+    runtime_asset_paths,
+)
 from .config_defaults import KNOTIS_DEFAULT_CONFIG, KNOTIS_FOOTER_ATTRIBUTION_HTML
 from . import moc_nav
 
@@ -19,7 +28,20 @@ SLIDE_MARKERS_EXTENSION_MARKERS = (
 )
 
 _SECTION_HEADING_RE = re.compile(r"^\[[^\]]+\]\s*$")
-CONTENT_TAGS_CSS_LINE = '  "assets/knotis-content-tags.css",'
+RUNTIME_ASSETS_CONFIG_KEY = "knotis_runtime_assets"
+LEGACY_RUNTIME_ASSET_PREFIX = "assets/"
+_RETIRED_KNOTIS_ASSET_RE = re.compile(r"knotis-[A-Za-z0-9._-]+\.(?:css|js)")
+# A literal `{%- for path in [...] %}` asset loop, as older Knotis scaffolds wrote it.
+_TEMPLATE_ASSET_LIST_RE = re.compile(
+    r"\{%-?\s*for\s+path\s+in\s+\[(?P<body>[^\]]*)\]\s*-?%\}\n"
+    r"(?P<tag>[^\n]*\{\{\s*path\s*\|\s*url\s*\}\}[^\n]*)\n"
+    r"[ \t]*\{%-?\s*endfor\s*-?%\}"
+)
+_TEMPLATE_LIST_BODY_RE = re.compile(r'(?:\s*"[^"\n]*"\s*,?)*\s*')
+_TEMPLATE_ASSETS_SET_LINE = (
+    "{%- set knotis_assets = config.extra.knotis_runtime_assets "
+    "if config.extra.knotis_runtime_assets else {} %}"
+)
 
 
 def zensical_text_includes_slide_markers_extension(text: str) -> bool:
@@ -203,31 +225,210 @@ def inject_project_copyright(text: str, copyright_value: str) -> str:
     return "\n".join(replacement) + ("\n" if text.endswith("\n") else "")
 
 
-def inject_content_tags_css(text: str) -> str:
-    if "assets/knotis-content-tags.css" in text:
-        return text
+def _legacy_package_asset_name(entry: str) -> str | None:
+    if not entry.startswith(LEGACY_RUNTIME_ASSET_PREFIX):
+        return None
+    name = entry[len(LEGACY_RUNTIME_ASSET_PREFIX):]
+    if name.startswith("vendor/") or name in COPY_ONLY_ASSET_FILES or name == "knotis-theme.css":
+        return None
+    if name in (*RUNTIME_STYLESHEETS, *RUNTIME_SCRIPTS) or _RETIRED_KNOTIS_ASSET_RE.fullmatch(name):
+        return name
+    return None
 
+
+def _reconciled_legacy_asset_list(values: list[str], names: tuple[str, ...]) -> list[str]:
+    """Put the registry's package assets where the old package entries started.
+
+    Site entries (knotis-theme.css, course scripts, vendored libraries a legacy
+    site lists itself) keep their order around that block; package entries that
+    the registry no longer ships are dropped.
+    """
+    package_indexes = [index for index, value in enumerate(values) if _legacy_package_asset_name(value)]
+    if not package_indexes:
+        return values
+    first = package_indexes[0]
+    before = values[:first]
+    rest = [value for value in values[first:] if not _legacy_package_asset_name(value)]
+    package = [f"{LEGACY_RUNTIME_ASSET_PREFIX}{name}" for name in names if not name.startswith("vendor/")]
+    return [*before, *package, *rest]
+
+
+def _format_toml_string_array(key: str, values: list[str]) -> str:
+    return f"{key} = [\n" + "".join(f'  "{value}",\n' for value in values) + "]"
+
+
+def reconcile_legacy_extra_assets(text: str) -> str:
+    """Bring legacy extra_css/extra_javascript Knotis entries up to the registry (build config only)."""
+    data = _read_zensical_dict_from_text(text)
+    project = data.get("project", {}) if isinstance(data.get("project"), dict) else {}
     lines = text.splitlines()
-    in_extra_css = False
-    fallback_insert_at = None
-    for index, line in enumerate(lines):
-        stripped = line.strip()
-        if stripped.startswith("extra_css") and "[" in stripped:
-            in_extra_css = True
+    section = _section_range(lines, "[project]")
+    if section is None:
+        return text
+    updated = text
+    for key, names in (("extra_css", RUNTIME_STYLESHEETS), ("extra_javascript", RUNTIME_SCRIPTS)):
+        values = project.get(key)
+        if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
             continue
-        if not in_extra_css:
+        reconciled = _reconciled_legacy_asset_list(values, names)
+        if reconciled == values:
             continue
-        if '"assets/knotis-palette.css"' in line:
-            lines.insert(index + 1, CONTENT_TAGS_CSS_LINE)
-            return "\n".join(lines) + ("\n" if text.endswith("\n") else "")
-        if stripped == "]":
-            fallback_insert_at = index
-            break
+        start, end = _section_range(updated.splitlines(), "[project]")
+        section_lines = updated.splitlines(keepends=True)
+        offset = sum(len(line) for line in section_lines[:start])
+        limit = sum(len(line) for line in section_lines[:end])
+        match = re.compile(rf"^{key}\s*=\s*\[[^\]]*\]", re.MULTILINE).search(updated, offset, limit)
+        if match is None:
+            continue
+        candidate = updated[: match.start()] + _format_toml_string_array(key, reconciled) + updated[match.end():]
+        parsed = _read_zensical_dict_from_text(candidate).get("project", {})
+        if isinstance(parsed, dict) and parsed.get(key) == reconciled:
+            updated = candidate
+    return updated
 
-    if fallback_insert_at is not None:
-        lines.insert(fallback_insert_at, CONTENT_TAGS_CSS_LINE)
-        return "\n".join(lines) + ("\n" if text.endswith("\n") else "")
-    return text
+
+def runtime_assets_config() -> dict[str, list[str]]:
+    return {
+        "stylesheets": runtime_asset_paths(RUNTIME_STYLESHEETS),
+        "scripts": runtime_asset_paths(RUNTIME_SCRIPTS),
+        "scripts_after_site": runtime_asset_paths(RUNTIME_SCRIPTS_AFTER_SITE),
+    }
+
+
+def inject_runtime_assets_config(text: str) -> str:
+    """Append the registry to the build config so templates can loop over it."""
+    data = _read_zensical_dict_from_text(text)
+    extra = data.get("project", {}).get("extra", {}) if isinstance(data.get("project"), dict) else {}
+    if isinstance(extra, dict) and RUNTIME_ASSETS_CONFIG_KEY in extra:
+        print(
+            f"[knotis] WARNING: zensical.toml defines project.extra.{RUNTIME_ASSETS_CONFIG_KEY}, which Knotis "
+            "generates; remove it so templates receive the package runtime asset list.",
+            file=sys.stderr,
+        )
+        return text
+    assets = runtime_assets_config()
+    block = (
+        "\n# Generated by Knotis: package runtime assets for overrides templates.\n"
+        f"[project.extra.{RUNTIME_ASSETS_CONFIG_KEY}]\n"
+        + "\n".join(_format_toml_string_array(group, paths) for group, paths in assets.items())
+        + "\n"
+    )
+    candidate = text.rstrip("\n") + "\n" + block
+    parsed = _read_zensical_dict_from_text(candidate).get("project", {})
+    parsed_assets = parsed.get("extra", {}).get(RUNTIME_ASSETS_CONFIG_KEY) if isinstance(parsed, dict) else None
+    if parsed_assets != assets:
+        print(
+            "[knotis] WARNING: could not add the Knotis runtime asset list to the build config "
+            "(is project.extra an inline table?); templates will not load package assets.",
+            file=sys.stderr,
+        )
+        return text
+    return candidate
+
+
+def _migrated_template_asset_list(entries: list[str], tag: str) -> str:
+    def literal(values: list[str]) -> list[str]:
+        if not values:
+            return []
+        body = "".join(f'  "{value}",\n' for value in values)
+        return [f"{{%- for path in [\n{body}] %}}\n{tag}\n{{%- endfor %}}"]
+
+    def loop(group: str) -> str:
+        return f"{{%- for path in knotis_assets.{group} | default([]) %}}\n{tag}\n{{%- endfor %}}"
+
+    is_package = [entry.startswith(RUNTIME_ASSET_URL_PREFIX) for entry in entries]
+    first = is_package.index(True)
+    before = [entry for entry, package in zip(entries[:first], is_package) if not package]
+    if "<script" not in tag:
+        rest = [entry for entry, package in zip(entries[first:], is_package[first:]) if not package]
+        parts = [*literal(before), _TEMPLATE_ASSETS_SET_LINE, loop("stylesheets"), *literal(rest)]
+        return "\n".join(parts)
+    after_site_paths = set(runtime_asset_paths(RUNTIME_SCRIPTS_AFTER_SITE))
+    split = next((index for index, entry in enumerate(entries) if entry in after_site_paths), len(entries))
+    middle = [entry for index, entry in enumerate(entries) if first < index < split and not is_package[index]]
+    after = [entry for index, entry in enumerate(entries) if index > split and not is_package[index]]
+    parts = [
+        *literal(before),
+        _TEMPLATE_ASSETS_SET_LINE,
+        loop("scripts"),
+        *literal(middle),
+        loop("scripts_after_site"),
+        *literal(after),
+    ]
+    return "\n".join(parts)
+
+
+def migrate_template_asset_lists(text: str) -> tuple[str, int]:
+    """Replace literal Knotis asset loops in a template with registry loops.
+
+    Only `{%- for path in [...] %}` lists made of plain strings that include
+    package paths (assets/knotis/...) are touched; the site's own entries stay
+    as literal lists in the same position relative to the Knotis assets.
+    """
+    replaced = 0
+
+    def replace(match: re.Match) -> str:
+        nonlocal replaced
+        body = match.group("body")
+        if not _TEMPLATE_LIST_BODY_RE.fullmatch(body):
+            return match.group(0)
+        entries = re.findall(r'"([^"\n]*)"', body)
+        if not any(entry.startswith(RUNTIME_ASSET_URL_PREFIX) for entry in entries):
+            return match.group(0)
+        replaced += 1
+        return _migrated_template_asset_list(entries, match.group("tag"))
+
+    return _TEMPLATE_ASSET_LIST_RE.sub(replace, text), replaced
+
+
+def _site_lists_legacy_package_assets(data: dict) -> bool:
+    project = data.get("project", {}) if isinstance(data.get("project"), dict) else {}
+    for key in ("extra_css", "extra_javascript"):
+        values = project.get(key)
+        if isinstance(values, list) and any(isinstance(v, str) and _legacy_package_asset_name(v) for v in values):
+            return True
+    return False
+
+
+def sync_site_template_runtime_assets(repo_root: Path, data: dict) -> None:
+    """Migrate an older Knotis main.html once, then report templates that miss package assets."""
+    if _site_lists_legacy_package_assets(data):
+        return
+    theme = data.get("project", {}).get("theme", {}) if isinstance(data.get("project"), dict) else {}
+    custom_dir = theme.get("custom_dir") if isinstance(theme, dict) else None
+    templates_dir = repo_root / str(custom_dir) if isinstance(custom_dir, str) and custom_dir.strip() else None
+    main_html = templates_dir / "main.html" if templates_dir is not None else None
+    label = f"{custom_dir.strip('/')}/main.html" if main_html is not None else "overrides/main.html"
+
+    if main_html is not None and main_html.is_file():
+        original = main_html.read_text(encoding="utf-8")
+        migrated, replaced = migrate_template_asset_lists(original)
+        if replaced and migrated != original:
+            main_html.write_text(migrated, encoding="utf-8")
+            print(
+                f"[knotis] Updated {label}: {replaced} Knotis asset list(s) now load from the package "
+                "runtime asset list (one-time migration; your other template content is unchanged).",
+                file=sys.stderr,
+            )
+
+    template_text = ""
+    if templates_dir is not None and templates_dir.is_dir():
+        template_text = "\n".join(
+            path.read_text(encoding="utf-8", errors="replace") for path in sorted(templates_dir.rglob("*.html"))
+        )
+    if RUNTIME_ASSETS_CONFIG_KEY in template_text:
+        return
+    expected = [path for paths in runtime_assets_config().values() for path in paths]
+    missing = [path for path in expected if path not in template_text]
+    if missing:
+        print(
+            f"[knotis] WARNING: {label} does not load Knotis runtime assets from "
+            f"config.extra.{RUNTIME_ASSETS_CONFIG_KEY}, so these package assets are not loaded: "
+            f"{', '.join(missing)}. Replace the template's Knotis asset list with the knotis_assets "
+            "loops in the packaged scaffold (knotis/scaffold/overrides/main.html), or add the missing "
+            "paths yourself.",
+            file=sys.stderr,
+        )
 
 
 def apply_knotis_zensical_overrides(text: str, repo_root: Path) -> str:
@@ -243,7 +444,7 @@ def apply_knotis_zensical_overrides(text: str, repo_root: Path) -> str:
         expanded_nav = moc_nav.apply_moc_nav_to_items(nav_items, nav_moc_configs)
         if expanded_nav != nav_items:
             text = moc_nav.replace_nav_block(text, expanded_nav)
-    text = inject_content_tags_css(text)
+    text = reconcile_legacy_extra_assets(text)
     text = inject_project_extra_generator_false(text)
     text = inject_knotis_content_generator_false(text)
     if show_attribution:
@@ -289,8 +490,10 @@ def resolve_zensical_config_path(repo_root: Path) -> Path:
         return source
 
     original = source.read_text(encoding="utf-8")
+    sync_site_template_runtime_assets(repo_root, _read_zensical_dict_from_text(original))
     text = inject_slide_markers_extension(original)
     text = apply_knotis_zensical_overrides(text, repo_root)
+    text = inject_runtime_assets_config(text)
     if text == original:
         return source
 

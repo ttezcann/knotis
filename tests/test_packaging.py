@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -11,6 +12,14 @@ import zipfile
 from pathlib import Path
 
 KNOTIS_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(KNOTIS_ROOT / "src"))
+
+from knotis.builder.assets_mirror import (  # noqa: E402
+    RUNTIME_SCRIPTS,
+    RUNTIME_SCRIPTS_AFTER_SITE,
+    RUNTIME_STYLESHEETS,
+    runtime_asset_paths,
+)
 
 
 class PackagingTests(unittest.TestCase):
@@ -150,6 +159,17 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("assets/knotis/knotis-search.css", html)
         self.assertIn("stylesheets/knotis-theme.css", html)
         self.assertIn("assets/knotis/knotis-sticky-table-headers.js", html)
+        # The scaffold template loads exactly the package registry, in order, once each.
+        loaded = re.findall(r'(?:href|src)="(?:\./)?(assets/knotis/[^"?]+)(?:\?v=[0-9a-f]+)?"', html)
+        expected = [
+            *runtime_asset_paths(RUNTIME_STYLESHEETS),
+            *runtime_asset_paths(RUNTIME_SCRIPTS),
+            *runtime_asset_paths(RUNTIME_SCRIPTS_AFTER_SITE),
+        ]
+        self.assertEqual([path for path in loaded if path in expected], expected)
+        self.assertLess(html.index("knotis-media.css"), html.index("stylesheets/knotis-theme.css"))
+        self.assertLess(html.index("javascripts/mathjax.js"), html.index("vendor/mathjax-3.2.2-tex-mml-chtml.js"))
+        self.assertRegex(html, r'knotis-sticky-table-headers\.js\?v=[0-9a-f]{12}"')
         self.assertTrue((site_root / "site" / "assets" / "knotis" / "knotis-sticky-table-headers.js").is_file())
         self.assertFalse(config_data["project"]["extra"]["knotis"]["table"]["sticky_headers"]["enabled"])
         self.assertEqual(config_data["project"]["extra"]["knotis"]["pane"]["graph_path_size"], 3)

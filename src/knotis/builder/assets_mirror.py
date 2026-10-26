@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-"""
-assets_mirror.py — Mirror Knotis runtime assets into a site's asset dirs.
-
-Fresh scaffolded sites keep package-owned JS/CSS/data out of docs/assets/ and
-sync them into site/assets/ for the built product. Existing sites that still
-load assets/knotis-* paths through zensical.toml keep the legacy docs/assets/
-mirror for compatibility. Legacy root assets/ folders are also mirrored for
-local workspace compatibility. The module seeds the per-site knotis-theme.css
-where the site config expects it, and — for sites that do not load the packaged
-markdown extensions — drops knotis_slide_markers.py at the site root.
-"""
 
 import shutil
 import sys
@@ -19,33 +8,6 @@ from pathlib import Path
 
 KNOTIS_DIR = Path(__file__).resolve().parents[1]
 FRESH_SITE_ASSET_SUBDIR = "knotis"
-
-# Runtime browser assets mirrored into every site.
-KNOTIS_ASSET_FILES = (
-    "knotis-core.js",
-    "knotis-wikilinks.js",
-    "knotis-wikilinks.css",
-    "knotis-pane.css",
-    "knotis-graph.css",
-    "knotis-graph.js",
-    "d3.min.js",
-    "dev-reload.js",
-    "knotis-preview-bridge.js",
-    "knotis-palette.css",
-    "knotis-content-tags.css",
-    "knotis-content.css",
-    "knotis-search.js",
-    "knotis-search.css",
-    "knotis-slides.js",
-    "knotis-slides.css",
-    "knotis-readaloud.js",
-    "knotis-readaloud.css",
-    "knotis-media.js",
-    "knotis-media.css",
-    "knotis-sticky-table-headers.js",
-    "lunr.min.js",
-    "lunr.LICENSE",
-)
 
 GENERATED_ASSET_FILES = (
     "content-tags.json",
@@ -57,9 +19,53 @@ GENERATED_ASSET_FILES = (
     "wikilinks.json",
 )
 
-# Auto-generated pages skipped when scanning: indexing them would create
-# circular wikilink references. Generated glossary pages are identified by
-# their front matter marker so authored glossary.md pages can still be scanned.
+RUNTIME_STYLESHEETS = (
+    "knotis-palette.css",
+    "knotis-content-tags.css",
+    "knotis-content.css",
+    "knotis-wikilinks.css",
+    "knotis-pane.css",
+    "knotis-graph.css",
+    "knotis-search.css",
+    "knotis-slides.css",
+    "knotis-readaloud.css",
+    "knotis-media.css",
+)
+RUNTIME_SCRIPTS = (
+    "vendor/mermaid-10.9.6.min.js",
+    "knotis-core.js",
+    "knotis-media.js",
+    "knotis-icon-map.js",
+    "knotis-wikilinks.js",
+    "lunr.min.js",
+    "knotis-search.js",
+    "knotis-slides.js",
+    "knotis-graph.js",
+    "knotis-readaloud.js",
+    "knotis-sticky-table-headers.js",
+)
+RUNTIME_SCRIPTS_AFTER_SITE = (
+    "vendor/mathjax-3.2.2-tex-mml-chtml.js",
+)
+COPY_ONLY_ASSET_FILES = (
+    "d3.min.js",
+    "dev-reload.js",
+    "knotis-preview-bridge.js",
+    "lunr.LICENSE",
+)
+RUNTIME_ASSET_URL_PREFIX = f"assets/{FRESH_SITE_ASSET_SUBDIR}/"
+
+KNOTIS_ASSET_FILES = tuple(
+    name
+    for name in (*RUNTIME_SCRIPTS, *RUNTIME_SCRIPTS_AFTER_SITE, *RUNTIME_STYLESHEETS, *COPY_ONLY_ASSET_FILES)
+    if not name.startswith("vendor/") and name not in GENERATED_ASSET_FILES
+)
+
+
+def runtime_asset_paths(names: tuple[str, ...], prefix: str = RUNTIME_ASSET_URL_PREFIX) -> list[str]:
+    return [f"{prefix}{name}" for name in names]
+
+
 SKIP_FILES = {"glossary.md", "roadmap.md", "zensical-features-demo.md"}
 
 VENDOR_ASSET_FILES = (
@@ -277,7 +283,6 @@ def mirror_runtime_assets(
             dst = dst_dir / fname
             if src.resolve() == dst.resolve():
                 continue
-            # Only copy if content differs — avoids triggering file-watch rebuild loops
             if dst.exists() and src_bytes == dst.read_bytes():
                 continue
             dst.parent.mkdir(parents=True, exist_ok=True)

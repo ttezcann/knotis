@@ -125,7 +125,7 @@ See the [accessibility documentation](https://knotis-docs.ttezcan.com/explore/ac
 
 ## Requirements
 
-- Python **3.11 or later**, with `pip` and virtual-environment support.
+- For pip installation: Python **3.11 or later**, with `pip` and virtual-environment support. Homebrew manages these dependencies automatically.
 - A terminal and a plain-text editor.
 - Git is needed only for source-based installation or Git-based publishing.
 
@@ -133,9 +133,17 @@ Knotis depends on Zensical. Installing Knotis installs its declared dependencies
 
 ## Installation
 
-Create a working directory and an isolated Python environment. Keep the site in its own subdirectory.
+### macOS with Homebrew
 
-### macOS and Linux
+Install [Homebrew](https://brew.sh/), then run:
+
+```bash
+brew install ttezcann/tap/knotis
+```
+
+### macOS and Linux with pip
+
+Create a working directory and an isolated Python environment. Keep the site in its own subdirectory.
 
 ```bash
 python3 -m venv .venv
@@ -143,7 +151,9 @@ source .venv/bin/activate
 pip install knotis
 ```
 
-### Windows
+### Windows with pip
+
+Create an isolated Python environment:
 
 ```console
 python -m venv .venv
@@ -153,7 +163,7 @@ pip install knotis
 
 ## Quick Start
 
-With the environment active, create and preview a new site:
+After installation, create and preview a new site. If you installed with pip, activate your virtual environment first:
 
 ```bash
 mkdir my-course
@@ -289,8 +299,19 @@ For newly scaffolded sites, the main files and directories are:
 
 ## Upgrade
 
+### Homebrew
+
 ```bash
-pip install --upgrade knotis
+brew update
+brew upgrade ttezcann/tap/knotis
+```
+
+### pip
+
+With your virtual environment active:
+
+```bash
+python -m pip install --upgrade knotis
 ```
 
 Review the [GitHub Releases page](https://github.com/ttezcann/knotis/releases) before upgrading.
